@@ -1,0 +1,15 @@
+.logo {
+  height: 40px;
+  width: auto;
+}
+/* Pega esto en tu archivo login.page.scss */
+
+ion-content {
+  // Esta es la forma correcta y más segura de poner una imagen de fondo
+  --background: url('/assets/bg.png') no-repeat center center / cover;
+}
+
+ion-toolbar {
+  // Esto fuerza a la barra de navegación a ser transparente, siempre
+  --background: transparent;
+}
