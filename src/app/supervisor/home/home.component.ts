@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonLabel, IonItem } from "@ionic/angular/standalone";
 
 @Component({
@@ -6,7 +7,7 @@ import { IonLabel, IonItem } from "@ionic/angular/standalone";
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent  implements OnInit {
+export class HomeComponent {
    today: Date = new Date();
 
   // Datos de ejemplo; sustitúyelos por los reales desde tu servicio
@@ -15,8 +16,12 @@ export class HomeComponent  implements OnInit {
   pendingRoutes = 5;
 
 
-  constructor() { }
+  constructor(
+ private router: Router ) { }
+       goToHome() {
+    // Redirige al Home
+    this.router.navigate(['/repartidores']);
 
-  ngOnInit() {}
+  }
 
 }

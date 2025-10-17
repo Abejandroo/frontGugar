@@ -1,0 +1,140 @@
+:root {
+  --blue-1: #2ea1ff;
+  --blue-2: #0e8be8;
+  --bg: #f7f8fa;
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.app-shell {
+  background: var(--bg);
+  min-height: 100vh;
+  color: #083b66;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(90deg, var(--blue-2), var(--blue-1));
+  color: #fff;
+  padding: 20px;
+  border-bottom-left-radius: 28px;
+  position: relative;
+}
+
+.menu-btn {
+  position: absolute;
+  left: 14px;
+  top: 18px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 22px;
+}
+
+.avatar {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #7b45c6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.date {
+  margin: 0;
+  font-weight: 500;
+  font-style: italic;
+  opacity: 0.95;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* CONTENT */
+.content {
+  padding: 18px;
+}
+
+/* SUMMARY */
+.summary h2,
+.drivers-list h2 {
+  margin: 10px 0 14px;
+  color: #0e6aa8;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.card {
+  background: linear-gradient(180deg, #66bfff, #3aa0ff);
+  border-radius: var(--radius);
+  padding: 16px;
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 6px 0 rgba(14, 139, 232, 0.25);
+}
+
+/* DRIVERS LIST */
+.driver-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  transition: 0.2s;
+}
+
+.driver-card:hover {
+  transform: scale(1.01);
+}
+
+.driver-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #0e6aa8;
+  margin-bottom: 6px;
+}
+
+.driver-status {
+  background: #a6e5a6;
+  color: #0b6024;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.driver-status.busy {
+  background: #f7a7a7;
+  color: #8b1010;
+}
+
+.driver-details p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}

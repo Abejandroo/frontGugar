@@ -10,8 +10,12 @@ export const routes: Routes = [
     loadComponent: () => import('./supervisor/login/login.component').then((m) => m.LoginComponent),
   },
    {
-    path: 'home', 
+    path: 'home',
     loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
+  },
+   {
+    path: 'repartidores',
+    loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
   },
   {
     path: '',
