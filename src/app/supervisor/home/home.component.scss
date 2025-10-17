@@ -1,0 +1,140 @@
+/* Estilos pensados para pantalla móvil, inspirados en tu diseño */
+:root {
+  --blue-1: #2ea1ff;
+  --blue-2: #0e8be8;
+  --bg: #f7f8fa;
+  --card-shadow: rgba(14, 139, 232, 0.25);
+  --radius: 18px;
+  --padding: 16px;
+}
+
+* { box-sizing: border-box; font-family: "Helvetica Neue", Arial, sans-serif; }
+
+.app-shell {
+  background: var(--bg);
+  min-height: 100vh;
+  color: #083b66;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(90deg, var(--blue-2), var(--blue-1));
+  color: #fff;
+  padding: 20px var(--padding) 30px;
+  border-bottom-left-radius: 28px;
+  position: relative;
+}
+
+.menu-btn {
+  position: absolute;
+  left: 14px;
+  top: 18px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.9);
+  font-size: 22px;
+}
+
+.avatar {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #7b45c6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Hero */
+.hero {
+  margin-top: 6px;
+  padding-top: 12px;
+}
+
+.title {
+  margin: 0 0 6px 0;
+  font-size: 30px;
+  letter-spacing: 0.6px;
+  line-height: 1.0;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.title span { display: block; font-size: 30px; }
+
+.date {
+  margin: 0;
+  font-weight: 500;
+  font-style: italic;
+  opacity: 0.95;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* CONTENT */
+.content {
+  padding: 18px;
+}
+
+/* Status */
+.status-section h2 {
+  margin: 6px 0 12px;
+  color: #0e6aa8;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.card {
+  background: linear-gradient(180deg, #66bfff, #3aa0ff);
+  border-radius: var(--radius);
+  padding: 18px;
+  min-height: 80px;
+  box-shadow: 0 6px 0 0 var(--card-shadow), inset 0 -2px 0 rgba(255,255,255,0.12);
+  display:flex;
+  align-items:center;
+}
+
+.card-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  white-space: normal;
+}
+
+/* Main access */
+.main-access h2 {
+  margin: 10px 0 14px;
+  color: #0e6aa8;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.big-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 30px;
+}
+
+.big-btn {
+  background: linear-gradient(180deg, #66bfff, #3aa0ff);
+  border: none;
+  border-radius: 28px;
+  padding: 18px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 15px;
+  box-shadow: 0 6px 0 0 var(--card-shadow);
+}

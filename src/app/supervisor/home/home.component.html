@@ -1,3 +1,44 @@
-<p>
-  home works!
-</p>
+<!-- Página sin usar componentes ion- -->
+<div class="app-shell">
+  <header class="header">
+    <button class="menu-btn" aria-label="menu">&#9776;</button>
+    <div class="avatar">A</div>
+    <div class="hero">
+      <h1 class="title">BIENVENIDO, <span>SUPERVISOR</span></h1>
+      <p class="date">{{ today  }}</p>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="status-section">
+      <h2>Estado general hoy:</h2>
+
+      <div class="status-grid">
+        <div class="card">
+          <div class="card-text">{{ activeRoutes }} rutas activas de {{ totalRoutes }}</div>
+        </div>
+
+        <div class="card">
+          <div class="card-text">Notificaciones</div>
+        </div>
+
+        <div class="card">
+          <div class="card-text">{{ pendingRoutes }} Rutas pendientes</div>
+        </div>
+
+        <div class="card">
+          <div class="card-text">Incidencias</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-access">
+      <h2>Accesos Principales</h2>
+
+      <div class="big-buttons">
+        <button class="big-btn" >GESTIÓN DE RUTAS</button>
+        <button class="big-btn">CONDUCTORES / REPARTIDORES</button>
+      </div>
+    </section>
+  </main>
+</div>
