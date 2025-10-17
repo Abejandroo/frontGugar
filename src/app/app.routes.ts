@@ -5,9 +5,13 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
+    {
+    path: 'login',
+    loadComponent: () => import('./supervisor/login/login.component').then((m) => m.LoginComponent),
+  },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
 ];

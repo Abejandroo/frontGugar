@@ -1,9 +1,9 @@
-<ion-page>
-  <ion-content class="login-content">
+<div class="page-container">
+  <div class="content-container login-content">
 
     <div class="header-wave-container">
       <div class="logo-text-area">
-        <img src="ruta/a/tu/logo.png" alt="Logo Agua Gugar Vívela" class="app-logo">
+        <img src="logo.png" alt="Logo Agua Gugar Vívela" class="app-logo">
         <h1 class="welcome-text">BIENVENIDO SUPERVISOR</h1>
       </div>
       <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -13,30 +13,29 @@
 
     <div class="login-form-container">
 
-        <ion-icon name="arrow-back-outline" class="back-arrow"></ion-icon>
+      <span class="back-arrow">←</span>
 
-        <ion-list lines="full" class="ion-no-padding">
-            <ion-item class="input-item">
-                <ion-icon name="mail-outline" slot="start"></ion-icon>
-                <ion-input type="email" placeholder="Email"></ion-input>
-            </ion-item>
-
-            <ion-item class="input-item">
-                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-                <ion-input type="password" placeholder="Password"></ion-input>
-                <ion-icon name="eye-off-outline" slot="end"></ion-icon>
-            </ion-item>
-        </ion-list>
-
-        <div class="forgot-password-link">
-            <a href="#">¿Olvidaste tu contraseña?</a>
+      <div class="input-list">
+        <div class="input-item">
+          <span class="icon">✉️</span>
+          <input type="email" placeholder="Email" class="text-input">
         </div>
 
-        <ion-button expand="block" shape="round" class="login-button">
-            Ingresar
-        </ion-button>
+        <div class="input-item">
+          <span class="icon">🔒</span>
+          <input type="password" placeholder="Password" class="text-input">
+          <span class="icon-end">👁️</span>
+        </div>
+      </div>
+
+      <div class="forgot-password-link">
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button class="login-button">
+        Ingresar
+      </button>
 
     </div>
-
-  </ion-content>
-</ion-page>
+  </div>
+</div>
