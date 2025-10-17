@@ -65,14 +65,14 @@ onSubmit() {
           rol: this.rol
         };
         this.router.navigate(['/admin']);
-      } else if (this.rol === 'maestro') {
+      } else if (this.rol === 'supervisor') {
         usuario = {
           correo: res.maestro.correo,
           nombre: res.maestro.nombre,
           rol: this.rol
         };
-        this.router.navigate(['/dashboard']);
-      } else if (this.rol === 'tutor') {
+        this.router.navigate(['/supervisor']);
+      } else if (this.rol === 'repartidor') {
         
         usuario = {
           correo: res.tutor.correo,
@@ -80,7 +80,7 @@ onSubmit() {
           rol: this.rol,
           id: res.tutor.id
         };
-        this.router.navigate(['/padres-home']);
+        this.router.navigate(['/repartidor']);
         console.log('redirigido a tutores');
         
       }

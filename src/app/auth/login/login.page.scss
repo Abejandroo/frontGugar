@@ -13,3 +13,16 @@ ion-toolbar {
   // Esto fuerza a la barra de navegación a ser transparente, siempre
   --background: transparent;
 }
+/* Pega esto en tu archivo login.page.scss */
+
+ion-item {
+  --background: transparent;
+  --color: #ffffff; // Color del texto del input y los íconos
+  --border-color: rgba(255, 255, 255, 0.5); // Color de la línea de abajo
+  --highlight-color-focused: #ffffff; // Color de la línea al hacer clic
+}
+
+// Esto es para asegurar que el label también sea blanco
+ion-item .item-native ion-label {
+  color: #ffffff !important;
+}
