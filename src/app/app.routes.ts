@@ -10,4 +10,22 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'auth/login',
+    loadComponent: () => import('./auth/login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'usuario/admin',
+    loadComponent: () => import('./usuario/admin/admin.page').then( m => m.AdminPage)
+  },
+  {
+    path: 'usuario/supervisor',
+    loadComponent: () => import('./usuario/supervisor/supervisor.page').then( m => m.SupervisorPage)
+  },
+  {
+    path: 'usuario/repartidor',
+    loadComponent: () => import('./usuario/repartidor/repartidor.page').then( m => m.RepartidorPage)
+  },
+
+
 ];

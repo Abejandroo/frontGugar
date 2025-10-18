@@ -1,0 +1,73 @@
+<ion-header [translucent]="true" class="ion-no-border">
+<ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">  
+   <ion-buttons slot="start">
+      <ion-button (click)="toggleMenu()">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-grid fixed>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+        <ion-col size="auto">
+          <img src="./assets/logo.png" alt="Logo" class="logo" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="welcome-message">
+    <h2>👋 Bienvenido, Supervisor</h2>
+    <p>Selecciona una opción para comenzar:</p>
+  </div>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
+
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irATutores()" class="opcion-card">
+          <ion-card-header>
+            <ion-card-title>Tutores</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            Registrar y gestionar tutores.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irAAlumnos()" class="opcion-card">
+          <ion-card-header>
+            <ion-card-title>Alumnos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            Agregar y consultar datos de alumnos.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irAGrupos()" class="opcion-card">
+          <ion-card-header>
+            <ion-card-title>Grupos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            Administrar grupos académicos.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irAMaestros()" class="opcion-card">
+          <ion-card-header>
+            <ion-card-title>Maestros</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            Registrar personal docente.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
