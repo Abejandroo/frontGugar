@@ -21,53 +21,94 @@
     <p>Selecciona una opción para comenzar:</p>
   </div>
   <ion-grid>
+    <p style="text-align: center;" >Estado General hoy: </p>
     <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
-
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irATutores()" class="opcion-card">
-          <ion-card-header>
-            <ion-card-title>Tutores</ion-card-title>
+        <ion-card class="opcion-card card-with-image-right">       
+        <ion-card-header>
+            <ion-card-title>Rutas Activas</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Registrar y gestionar tutores.
+            23/50
           </ion-card-content>
+          <img src="assets/ruta.png" alt="rutas" class="card-image-absolute">
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irAAlumnos()" class="opcion-card">
+        <ion-card  class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Alumnos</ion-card-title>
+            <ion-card-title>Notificaciones</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Agregar y consultar datos de alumnos.
+            8
           </ion-card-content>
+          <img src="assets/advertencia.png" alt="advertencia" class="card-image-absolute">
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irAGrupos()" class="opcion-card">
+        <ion-card  class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Grupos</ion-card-title>
+            <ion-card-title>
+              Rutas Pendientes
+            </ion-card-title>
+          </ion-card-header>
+           <ion-card-content>
+            5
+          </ion-card-content>
+          <img src="assets/reloj.png" alt="reloj" class="card-image-absolute">
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" size-md="5">
+        <ion-card  class="opcion-card card-with-image-right">
+          <ion-card-header>
+            <ion-card-title>Incidencias</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Administrar grupos académicos.
+            14
           </ion-card-content>
+          <img src="assets/campana.png" alt="campana" class="card-image-absolute">
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+
+    <p style="text-align: center;" >Accesos Principales:</p>
+   <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
+      <ion-col size="12" size-md="5">
+        <ion-card class="opcion-card card-with-image-right">       
+        <ion-card-header>
+            <ion-card-title> Gestión de Rutas</ion-card-title>
+          </ion-card-header>
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irAMaestros()" class="opcion-card">
+        <ion-card button (click)="irAAlumnos()" class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Maestros</ion-card-title>
+            <ion-card-title>Conductores /
+              Repartidores</ion-card-title>
           </ion-card-header>
-          <ion-card-content>
-            Registrar personal docente.
-          </ion-card-content>
         </ion-card>
       </ion-col>
 
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irAGrupos()" class="opcion-card card-with-image-right">
+          <ion-card-header>
+            <ion-card-title>
+              Supervisores
+            </ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" size-md="5">
+        <ion-card button (click)="irAMaestros()"  class="opcion-card card-with-image-right">
+          <ion-card-header>
+            <ion-card-title>Reportes Generales</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
     </ion-row>
   </ion-grid>
-
 </ion-content>
