@@ -1,6 +1,6 @@
 <ion-header [translucent]="true" class="ion-no-border">
 <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">  
-   <ion-buttons slot="start">
+<ion-buttons slot="start">
       <ion-button (click)="toggleMenu()">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
@@ -14,7 +14,6 @@
     </ion-grid>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="welcome-message">
     <h2>👋 Bienvenido, Administrador</h2>
@@ -34,7 +33,6 @@
           <img src="assets/ruta.png" alt="rutas" class="card-image-absolute">
         </ion-card>
       </ion-col>
-
       <ion-col size="12" size-md="5">
         <ion-card  class="opcion-card card-with-image-right">
           <ion-card-header>
@@ -46,7 +44,6 @@
           <img src="assets/advertencia.png" alt="advertencia" class="card-image-absolute">
         </ion-card>
       </ion-col>
-
       <ion-col size="12" size-md="5">
         <ion-card  class="opcion-card card-with-image-right">
           <ion-card-header>
@@ -72,8 +69,6 @@
         </ion-card>
       </ion-col>
     </ion-row>
-
-
     <p style="text-align: center;" >Accesos Principales:</p>
    <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
       <ion-col size="12" size-md="5">
@@ -85,16 +80,15 @@
       </ion-col>
 
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irAAlumnos()" class="opcion-card card-with-image-right">
+        <ion-card  (click)="irAAlumnos()" class="opcion-card card-with-image-right">
           <ion-card-header>
             <ion-card-title>Conductores /
               Repartidores</ion-card-title>
           </ion-card-header>
         </ion-card>
       </ion-col>
-
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irAGrupos()" class="opcion-card card-with-image-right">
+        <ion-card  (click)="irAGrupos()" class="opcion-card card-with-image-right">
           <ion-card-header>
             <ion-card-title>
               Supervisores

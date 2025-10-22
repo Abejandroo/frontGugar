@@ -5,6 +5,8 @@ import { IonContent, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonG
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { menu } from 'ionicons/icons';
+import { Auth } from 'src/app/service/auth';
+import { MenuController } from '@ionic/angular';
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
@@ -14,22 +16,21 @@ import { menu } from 'ionicons/icons';
 })
 export class AdminPage {
   constructor(private readonly router: Router,
-  //private readonly authService: AuthService,
-  //private readonly menu: MenuController,
+  private readonly authService: Auth,
+  private readonly menuC: MenuController,
 
   ) { 
    addIcons({
-  menu,
+    menu,
 });
   }
   logout() {
-  //  this.authService.logout();
+  this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
-  toggleMenu() {
-   // this.menu.toggle();
+ toggleMenu() {
+this.menuC.toggle('admin-menu');
   }
-
   irATutores() {
     this.router.navigate(['/tutores/formulario']);
   }

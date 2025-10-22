@@ -1,3 +1,20 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  @if (isAdmin()) {
+  <ion-menu side="start" menuId="admin-menu" contentId="main-content">
+    <app-menu-admin></app-menu-admin>
+  </ion-menu>
+  }
+  @if (isInstructor()) {
+  <ion-menu side="start" menuId="docente-menu" contentId="main-content">
+   <!--<app-menu-maestro></app-menu-maestro> --> 
+  </ion-menu>
+  }
+  @if (isPadre()) {
+  <ion-menu side="start" menuId="padre-menu" contentId="main-content">
+  <!-- <app-menu-padre></app-menu-padre>-->  
+  </ion-menu>
+  }
+  <div class="ion-page" id="main-content">
+    <ion-router-outlet></ion-router-outlet>
+  </div>
 </ion-app>
