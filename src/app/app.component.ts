@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, IonMenu, } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
 import { MenuAdminPage } from "./menu/menu-admin/menu-admin.page";
@@ -7,7 +7,7 @@ import { MenuAdminPage } from "./menu/menu-admin/menu-admin.page";
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonTitle, IonIcon, IonButton, IonButtons, IonToolbar, IonHeader, IonApp, IonRouterOutlet, IonMenu, MenuAdminPage],
+  imports: [ IonApp, IonRouterOutlet, IonMenu, MenuAdminPage],
   
 })
 export class AppComponent {

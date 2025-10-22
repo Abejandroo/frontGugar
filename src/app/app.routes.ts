@@ -51,6 +51,22 @@ export const routes: Routes = [
   {
     path: 'menu-admin',
     loadComponent: () => import('./menu/menu-admin/menu-admin.page').then( m => m.MenuAdminPage)
+  },  {
+    path: 'gestion-rutas',
+    loadComponent: () => import('./pages/gestion-rutas/gestion-rutas.page').then( m => m.GestionRutasPage)
   },
+  {
+    path: 'conductores',
+    loadComponent: () => import('./pages/conductores/conductores.page').then( m => m.ConductoresPage)
+  },
+  {
+    path: 'supervisores',
+    loadComponent: () => import('./pages/supervisores/supervisores.page').then( m => m.SupervisoresPage)
+  },
+  {
+    path: 'reportes',
+    loadComponent: () => import('./pages/reportes/reportes.page').then( m => m.ReportesPage)
+  },
+
 
 ];

@@ -31,20 +31,20 @@ export class AdminPage {
  toggleMenu() {
 this.menuC.toggle('admin-menu');
   }
-  irATutores() {
-    this.router.navigate(['/tutores/formulario']);
+  irARutas() {
+    this.router.navigate(['gestion-rutas']);
   }
 
-  irAAlumnos() {
-    this.router.navigate(['/alumnos/formulario']);
+  irARepartidores() {
+    this.router.navigate(['conductores']);
   }
 
-  irAGrupos() {
-    this.router.navigate(['/grupos']);
+  irASupervisores() {
+    this.router.navigate(['supervisores']);
   }
 
-  irAMaestros() {
-    this.router.navigate(['/maestros/registro']);
+  irAReportes() {
+    this.router.navigate(['reportes']);
   }
 
 }
