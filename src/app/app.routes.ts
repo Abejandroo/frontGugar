@@ -67,6 +67,18 @@ export const routes: Routes = [
     path: 'reportes',
     loadComponent: () => import('./pages/reportes/reportes.page').then( m => m.ReportesPage)
   },
+  {
+    path: 'agregarconductor',
+    loadComponent: () => import('./modal/agregarconductor/agregarconductor.page').then( m => m.AgregarconductorPage)
+  },
+  {
+    path: 'editarconductor',
+    loadComponent: () => import('./modal/editarconductor/editarconductor.page').then( m => m.EditarconductorPage)
+  },
+  {
+    path: 'eliminarconductor',
+    loadComponent: () => import('./modal/eliminarconductor/eliminarconductor.page').then( m => m.EliminarconductorPage)
+  },
 
 
 ];
