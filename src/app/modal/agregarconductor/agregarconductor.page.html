@@ -1,13 +1,120 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>agregarconductor</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Agregar Conductor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">agregarconductor</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <form [formGroup]="formInstructor" (ngSubmit)="agregarInstructor()">
+    <ion-list>
+      <ion-item>
+        <ion-input
+          label="NOMBRE"
+          type="text"
+          labelPlacement="floating"
+          placeholder="NOMBRE DEL INSTRUCTOR"
+          formControlName="nombre"
+          (input)="convertToUpperCase($event, 'nombre')"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="APELLIDOS"
+          type="text"
+          labelPlacement="floating"
+          placeholder="APELLIDOS"
+          formControlName="apellido"
+          (input)="convertToUpperCase($event, 'apellido')"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="TELEFONO"
+          labelPlacement="floating"
+          placeholder="Teléfono"
+          formControlName="telefono"
+          type="tel"
+        ></ion-input>
+        @if (formInstructor.get('telefono')?.hasError('pattern')) {
+          <ion-note color="medium">
+            El teléfono debe contener solo números.
+          </ion-note>
+        }
+        @if (formInstructor.get('telefono')?.hasError('maxlength')) {
+          <ion-note color="medium">
+            El teléfono debe tener máximo 10 dígitos.
+          </ion-note>
+        }
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="CORREO ELECTRONICO"
+          labelPlacement="floating"
+          placeholder="Correo electrónico"
+          formControlName="correo"
+          type="email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="CONTRASEÑA"
+          labelPlacement="floating"
+          placeholder="Contraseña"
+          formControlName="contrasena"
+          required
+          [type]="showPassword ? 'text' : 'password'"
+        ></ion-input>
+        <ion-icon slot="end" name="eye" (click)="togglePasswordVisibility()"></ion-icon>
+        @if (formInstructor.get('contrasena')?.hasError('minlength')) {
+          <ion-note color="medium">
+            La contraseña debe tener al menos 8 caracteres.
+          </ion-note>
+        }
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Grupo</ion-label>
+        <ion-select formControlName="grupoId" (ionChange)="cargarAlumnosDelGrupo()">
+          @for (grupo of grupos; track grupo.id) {
+            <ion-select-option [value]="grupo.id">
+              {{ grupo.nombre }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      @if (formInstructor.get('grupoId')?.touched && formInstructor.get('grupoId')?.invalid) {
+        <ion-text color="danger">
+          <p class="ion-padding-start">Debes seleccionar un grupo</p>
+        </ion-text>
+      }
+
+      <ion-item lines="none">
+        <ion-label>FOTO DEL DOCENTE</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <input type="file" (change)="onImageSelected($event)" accept="image/*" />
+      </ion-item>
+
+      @if (fotoPreview) {
+        <ion-item>
+          <img [src]="fotoPreview" style="width: 100%; max-height: 200px; object-fit: cover;" />
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-button expand="full" type="submit" [disabled]="formInstructor.invalid">
+      Agregar Instructor
+    </ion-button>
+  </form>
 </ion-content>

@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'usuario/admin',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   {
@@ -51,7 +51,8 @@ export const routes: Routes = [
   {
     path: 'menu-admin',
     loadComponent: () => import('./menu/menu-admin/menu-admin.page').then( m => m.MenuAdminPage)
-  },  {
+  },
+  {
     path: 'gestion-rutas',
     loadComponent: () => import('./pages/gestion-rutas/gestion-rutas.page').then( m => m.GestionRutasPage)
   },
