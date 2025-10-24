@@ -1,0 +1,229 @@
+ion-content {
+  --background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+}
+
+.content-wrapper {
+  padding: 16px;
+  padding-bottom: 80px;
+}
+
+.map-container {
+  height: 250px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+
+  #map {
+    z-index: 1;
+  }
+}
+
+.info-card {
+  margin-bottom: 16px;
+
+  ion-card {
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+  }
+
+  .cliente-nombre {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 4px;
+  }
+
+  .direccion {
+    font-size: 13px;
+    color: #1565c0;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+}
+
+.venta-info {
+  margin-bottom: 16px;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+
+    &.total {
+      font-weight: bold;
+      font-size: 16px;
+      padding-top: 8px;
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+
+    ion-icon {
+      font-size: 20px;
+      color: #1565c0;
+    }
+
+    .cantidad-input {
+      width: 60px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: bold;
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+
+    .value {
+      font-weight: bold;
+      color: #000;
+    }
+
+    &.total {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+
+.btn-realizado {
+  margin: 16px 0 8px 0;
+  --background: #4caf50;
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+
+  ion-button {
+    flex: 1;
+  }
+}
+
+.proximos-clientes {
+  margin-top: 16px;
+
+  .header-proximos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+
+    h3 {
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    ion-button {
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+    }
+  }
+
+  .lista-proximos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-proximo {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+
+    &.pendiente {
+      border-left: 4px solid #ffa726;
+    }
+
+    ion-card-content {
+      padding: 12px;
+    }
+
+    .proximo-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+
+      .proximo-info {
+        flex: 1;
+
+        h4 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: bold;
+          color: #000;
+        }
+
+        .proximo-estado {
+          margin: 2px 0 0 0;
+          font-size: 12px;
+          color: #666;
+        }
+      }
+    }
+
+    .proximo-direccion {
+      font-size: 12px;
+      color: #1565c0;
+      margin: 8px 0;
+      line-height: 1.4;
+    }
+
+    .proximo-detalles {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: #666;
+      flex-wrap: wrap;
+
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+
+  ion-spinner {
+    width: 50px;
+    height: 50px;
+    color: white;
+  }
+}
+
+// Estilos para el marcador del mapa
+::ng-deep .custom-div-icon {
+  background: transparent;
+  border: none;
+}

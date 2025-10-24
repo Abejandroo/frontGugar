@@ -1,0 +1,96 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volverAtras()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Ruta San Felipe - Lunes</ion-title>
+    <ion-buttons slot="end">
+      <ion-avatar style="width: 35px; height: 35px;">
+        <div style="background-color: #e91e63; color: white; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; font-weight: bold;">
+          A
+        </div>
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="content-wrapper">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando domicilios...</p>
+    </div>
+
+    <!-- Lista de domicilios -->
+    <div *ngIf="!loading" class="lista-domicilios">
+      <ion-card 
+        *ngFor="let domicilio of domicilios" 
+        class="card-domicilio"
+        [class.actual]="domicilio.id === domicilioActualId"
+        [class.realizado]="domicilio.estado === 'realizado'"
+        [class.saltado]="domicilio.estado === 'saltado'"
+        (click)="seleccionarDomicilio(domicilio)">
+        
+        <ion-card-content>
+          <div class="domicilio-header">
+            <div class="icono-estado">
+              <ion-icon 
+                [name]="getIconoEstado(domicilio.estado)" 
+                [color]="getColorEstado(domicilio.estado)">
+              </ion-icon>
+            </div>
+            
+            <div class="domicilio-info">
+              <h3>{{ domicilio.nombreNegocio || domicilio.nombreCliente }}</h3>
+              <p class="info-linea">
+                <span *ngIf="domicilio.esNegocio && domicilio.cantidadVendida">
+                  {{ domicilio.cantidadVendida }} garrafones vendidos
+                </span>
+                <span *ngIf="!domicilio.cantidadVendida">Pendiente</span>
+              </p>
+            </div>
+
+            <ion-badge 
+              [color]="getColorBadge(domicilio.estado)"
+              class="badge-estado">
+              {{ getTextoBadge(domicilio) }}
+            </ion-badge>
+          </div>
+
+          <p class="direccion">{{ domicilio.direccion }}</p>
+
+          <div class="domicilio-detalles">
+            <span class="detalle-item">
+              <ion-icon name="cube-outline"></ion-icon>
+              $ {{ domicilio.precioGarrafon }} x garrafón
+            </span>
+            <span class="detalle-item">CRÉDITO: {{ domicilio.esCredito ? 'SÍ' : 'NO' }}</span>
+            <span class="detalle-item">FACTURA: {{ domicilio.requiereFactura ? 'SÍ' : 'NO' }}</span>
+          </div>
+
+          <!-- Información adicional para domicilios saltados -->
+          <div *ngIf="domicilio.estado === 'saltado' && domicilio.motivoSalto" class="info-salto">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>Motivo: {{ domicilio.motivoSalto }}</span>
+          </div>
+
+          <!-- Información adicional para domicilios realizados -->
+          <div *ngIf="domicilio.estado === 'realizado' && domicilio.cantidadVendida" class="info-realizado">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>{{ domicilio.cantidadVendida }} garrafón(es) vendido(s) - Total: ${{ domicilio.cantidadVendida * domicilio.precioGarrafon }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Botón flotante para agregar -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button color="primary">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+</ion-content>

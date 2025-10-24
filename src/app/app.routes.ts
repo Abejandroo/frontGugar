@@ -25,7 +25,15 @@ export const routes: Routes = [
   {
     path: 'usuario/repartidor',
     loadComponent: () => import('./usuario/repartidor/repartidor.page').then( m => m.RepartidorPage)
+  },  {
+    path: 'lista-domicilios',
+    loadComponent: () => import('./pages/chofer/lista-domicilios/lista-domicilios.page').then( m => m.ListaDomiciliosPage)
   },
+  {
+    path: 'detalle-domicilio',
+    loadComponent: () => import('./pages/chofer/detalle-domicilio/detalle-domicilio.page').then( m => m.DetalleDomicilioPage)
+  },
+
 
 
 ];

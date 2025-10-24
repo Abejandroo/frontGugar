@@ -1,0 +1,142 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="abrirMenu()">
+        <ion-icon name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Ruta San Felipe - Lunes</ion-title>
+    <ion-buttons slot="end">
+      <ion-avatar style="width: 35px; height: 35px;">
+        <div style="background-color: #e91e63; color: white; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; font-weight: bold;">
+          A
+        </div>
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="content-wrapper" *ngIf="domicilioActual">
+    <!-- Mapa -->
+    <div class="map-container">
+      <div #map id="map" style="height: 100%; width: 100%;"></div>
+    </div>
+
+    <!-- Card de información del domicilio -->
+    <div class="info-card">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title class="cliente-nombre">
+            {{ domicilioActual.nombreNegocio || domicilioActual.nombreCliente }}
+          </ion-card-title>
+          <ion-card-subtitle class="direccion">
+            {{ domicilioActual.direccion }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- Información de venta -->
+          <div class="venta-info">
+            <div class="info-row">
+              <div class="info-item">
+                <ion-icon name="cube-outline"></ion-icon>
+                <span>Cantidad:</span>
+                <ion-input 
+                  type="number" 
+                  [(ngModel)]="cantidadVendida" 
+                  placeholder="0"
+                  class="cantidad-input">
+                </ion-input>
+                <span>x garrafón</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-item">
+                <span>CRÉDITO:</span>
+                <span class="value">{{ domicilioActual.esCredito ? 'SÍ' : 'NO' }}</span>
+              </div>
+              <div class="info-item">
+                <span>FACTURA:</span>
+                <span class="value">{{ domicilioActual.requiereFactura ? 'SÍ' : 'NO' }}</span>
+              </div>
+            </div>
+
+            <div class="info-row" *ngIf="cantidadVendida > 0">
+              <div class="info-item total">
+                <span>TOTAL:</span>
+                <span class="value">${{ cantidadVendida * domicilioActual.precioGarrafon }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de realizado -->
+          <ion-button 
+            expand="block" 
+            color="success" 
+            class="btn-realizado"
+            (click)="realizarVenta()"
+            [disabled]="loading">
+            <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+            REALIZADO
+          </ion-button>
+
+          <!-- Botones de acción -->
+          <div class="action-buttons">
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              color="warning"
+              (click)="mostrarAlertaSaltar()"
+              [disabled]="loading">
+              <ion-icon name="arrow-forward-circle" slot="start"></ion-icon>
+              SALTAR
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Próximos clientes -->
+    <div class="proximos-clientes">
+      <div class="header-proximos">
+        <h3>PRÓXIMOS CLIENTES</h3>
+        <ion-button fill="clear" size="small" (click)="verTodasLasRutas()">
+          VER TODOS >
+        </ion-button>
+      </div>
+
+      <div class="lista-proximos">
+        <ion-card 
+          *ngFor="let domicilio of siguientesDomicilios" 
+          class="card-proximo"
+          [class.pendiente]="domicilio.estado === 'pendiente'">
+          <ion-card-content>
+            <div class="proximo-header">
+              <ion-icon 
+                name="time" 
+                [color]="domicilio.estado === 'pendiente' ? 'warning' : 'medium'">
+              </ion-icon>
+              <div class="proximo-info">
+                <h4>{{ domicilio.nombreNegocio || domicilio.nombreCliente }}</h4>
+                <p class="proximo-estado">{{ domicilio.estado === 'pendiente' ? 'Pendiente' : 'Completado' }}</p>
+              </div>
+            </div>
+            <p class="proximo-direccion">{{ domicilio.direccion }}</p>
+            <div class="proximo-detalles">
+              <span>$ {{ domicilio.precioGarrafon }} x garrafón</span>
+              <span>CRÉDITO: {{ domicilio.esCredito ? 'SÍ' : 'NO' }}</span>
+              <span>FACTURA: {{ domicilio.requiereFactura ? 'SÍ' : 'NO' }}</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-overlay">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+</ion-content>
