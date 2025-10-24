@@ -1,15 +1,11 @@
-import { Component, OnInit,  ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-
+import { IonicModule, AlertController, ToastController } from '@ionic/angular';
 import * as L from 'leaflet';
 import { Domicilio } from '../../../models/domicilio.models';
 import { DomicilioService } from '../../../services/domicilio.service';
-import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-detalle-domicilio',
@@ -224,7 +220,6 @@ export class DetalleDomicilioPage implements OnInit {
   }
 
   abrirMenu() {
-    // Implementar apertura del menú lateral
     console.log('Abrir menú');
   }
 }

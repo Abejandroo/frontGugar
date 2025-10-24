@@ -6,11 +6,6 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  },
-  {
     path: 'auth/login',
     loadComponent: () => import('./auth/login/login.page').then( m => m.LoginPage)
   },
@@ -28,13 +23,17 @@ export const routes: Routes = [
   },
   {
     path: 'lista-domicilios',
-    loadChildren: () => import('./pages/chofer/lista-domicilios/lista-domicilios.page').then( m => m.ListaDomiciliosPage)
+    loadComponent: () => import('./pages/chofer/lista-domicilios/lista-domicilios.page').then( m => m.ListaDomiciliosPage)
   },
   {
     path: 'detalle-domicilio',
-    loadChildren: () => import('./pages/chofer/detalle-domicilio/detalle-domicilio.page').then( m => m.DetalleDomicilioPage)
+    loadComponent: () => import('./pages/chofer/detalle-domicilio/detalle-domicilio.page').then( m => m.DetalleDomicilioPage)
   },
-
-
-
+  {
+    path: '',
+    redirectTo: 'detalle-domicilio',
+    pathMatch: 'full',
+  },
+  
+  
 ];

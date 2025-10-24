@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
-import { DomicilioService } from 'src/app/services/domicilio.service';
-import { Domicilio } from 'src/app/models/domicilio.models';
-import { Router } from '@angular/router';
+import { DomicilioService } from '../../../services/domicilio.service';
+import { Domicilio } from '../../../models/domicilio.models';
 
 @Component({
   selector: 'app-lista-domicilios',
@@ -106,7 +105,6 @@ export class ListaDomiciliosPage implements OnInit {
     if (domicilio.estado === 'actual') {
       this.router.navigate(['/detalle-domicilio']);
     } else {
-      // Aquí podrías implementar la navegación a edición
       console.log('Domicilio seleccionado:', domicilio);
     }
   }
