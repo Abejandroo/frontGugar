@@ -113,8 +113,8 @@
 
 .custom-button:hover {
   background: transparent;
-  color: rgba(47, 217, 255, 0.3);
-  box-shadow: 0 0 25px rgba(47, 217, 255, 0.3);
+  color: rgba(47, 217, 255, 0.745);
+  box-shadow: 0 0 25px 745px rgba(47, 217, 255, 0.745);
 }
 
 .custom-button:hover .star-1 {
@@ -217,7 +217,7 @@
 
 .button2:hover {
   color: #ffffff;
-  border: 1px solid rgba(47, 217, 255, 0.3);
+  border: 1px solid rgba(47, 217, 255, 0.745);
 }
 
 .button2:hover:before {
@@ -252,6 +252,15 @@
   color: var(--ion-color-medium);
   cursor: pointer;
 }
+
+/* Pega esto en tu archivo login.page.scss */
+
 ion-content {
-  --background: #add8e6; /* Azul claro */
+  // Esta es la forma correcta y más segura de poner una imagen de fondo
+  --background: url('/assets/bg.png') no-repeat center center / cover;
+}
+
+ion-toolbar {
+  // Esto fuerza a la barra de navegación a ser transparente, siempre
+  --background: transparent;
 }
