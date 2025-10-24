@@ -56,11 +56,11 @@
 
       <ion-item>
         <ion-input
-          label="CORREO ELECTRONICO"
+          label="USUARIO DEL REPARTIDOR"
           labelPlacement="floating"
-          placeholder="Correo electrónico"
-          formControlName="correo"
-          type="email"
+          placeholder="Usuario del Repartidor"
+          formControlName="usuario"
+          type="text"
         ></ion-input>
       </ion-item>
 
@@ -82,11 +82,11 @@
       </ion-item>
 
       <ion-item>
-        <ion-label>Grupo</ion-label>
-        <ion-select formControlName="grupoId" (ionChange)="cargarAlumnosDelGrupo()">
-          @for (grupo of grupos; track grupo.id) {
-            <ion-select-option [value]="grupo.id">
-              {{ grupo.nombre }}
+        <ion-label>RUTA DEL REPARTIDOR</ion-label>
+        <ion-select formControlName="rutaId" (ionChange)="cargarAlumnosDelGrupo()">
+          @for (ruta of rutas; track ruta.id) {
+            <ion-select-option [value]="ruta.id">
+              {{ ruta.nombre }}
             </ion-select-option>
           }
         </ion-select>
@@ -98,19 +98,6 @@
         </ion-text>
       }
 
-      <ion-item lines="none">
-        <ion-label>FOTO DEL DOCENTE</ion-label>
-      </ion-item>
-
-      <ion-item>
-        <input type="file" (change)="onImageSelected($event)" accept="image/*" />
-      </ion-item>
-
-      @if (fotoPreview) {
-        <ion-item>
-          <img [src]="fotoPreview" style="width: 100%; max-height: 200px; object-fit: cover;" />
-        </ion-item>
-      }
     </ion-list>
 
     <ion-button expand="full" type="submit" [disabled]="formInstructor.invalid">

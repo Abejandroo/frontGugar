@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ToastController, ModalController } from '@ionic/angular'; 
-interface Grupo {
+import { close } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
+interface Rutas {
   id: number;
   nombre: string;
+
 }
+
 @Component({
   selector: 'app-agregarconductor',
   templateUrl: './agregarconductor.page.html',
@@ -17,9 +21,7 @@ interface Grupo {
 export class AgregarconductorPage {
   formInstructor!: FormGroup;
   showPassword: boolean = false;
-fotoPreview: string | ArrayBuffer | null = null;
-  fotoArchivo: File | null = null;
-    grupos: Grupo[] = [];
+  rutas: Rutas[] = [];
   constructor(
     private fb: FormBuilder,
    // private _Service: AuthService,
@@ -27,6 +29,7 @@ fotoPreview: string | ArrayBuffer | null = null;
     private modalController: ModalController,
    // private grupoService: GrupoService,
    // private maestrosService: MaestrosService
+
   ) {
     this.formInstructor = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
@@ -37,6 +40,10 @@ fotoPreview: string | ArrayBuffer | null = null;
       grupoId: ['', Validators.required],  
 
     });
+     addIcons({
+          close,
+          'close-outline': close,
+        });
     //  this.cargarGrupos();
   }
 
@@ -119,18 +126,7 @@ async agregarInstructor() {
     });
   }
 */
-onImageSelected(event: any) {
-    const archivo = event.target.files[0];
-    if (archivo) {
-      this.fotoArchivo = archivo;
 
-      const lector = new FileReader();
-      lector.onload = () => {
-        this.fotoPreview = lector.result;
-      };
-      lector.readAsDataURL(archivo);
-    }
-  }
   cargarAlumnosDelGrupo() {
     const grupoId = this.formInstructor.get('grupoId')?.value;
 
