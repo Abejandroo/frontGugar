@@ -18,7 +18,7 @@ export class HomeComponent {
 
   constructor(
  private router: Router ) { }
-       goToHome() {
+  goToRepartidores() {
     // Redirige al Home
     this.router.navigate(['/repartidores']);
 

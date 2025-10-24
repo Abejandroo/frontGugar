@@ -1,96 +1,74 @@
-<div class="dashboard-container">
-    <header class="header-section">
-        <div class="header-content">
-            <h1>BIENVENIDO</h1>
-            <h2>Esteban Pardo</h2>
-            <p>Lunes 10 de Octubre 2025</p>
-        </div>
-        <button class="menu-button">&#9776;</button>
-    </header>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenido Supervisor</title>
+  <link rel="stylesheet" href="home.component.scss" />
+</head>
+<body>
 
-    <section class="indicators-section">
-        <h3>Indicadores de hoy</h3>
-        <div class="indicators-grid">
-            <div class="indicator-card">
-                <span class="indicator-icon computer-icon">🖥️</span>
-                <p class="indicator-number">18</p>
-                <p class="indicator-label">Rutas asignadas</p>
-            </div>
-            <div class="indicator-card">
-                <span class="indicator-icon check-icon">✅</span>
-                <p class="indicator-number">5</p>
-                <p class="indicator-label">Rutas completadas</p>
-            </div>
-            <div class="indicator-card">
-                <span class="indicator-icon warning-icon">⚠️</span>
-                <p class="indicator-number">0</p>
-                <p class="indicator-label">Incidencias</p>
-            </div>
-            <div class="indicator-card">
-                <span class="indicator-icon bell-icon">🔔</span>
-                <p class="indicator-number">3</p>
-                <p class="indicator-label">Notificaciones</p>
-            </div>
-        </div>
-    </section>
+  <div class="header">
+    <h1>BIENVENIDO</h1>
+    <h2>Esteban Pardo</h2>
+    <small>Lunes 10 de Octubre 2025</small>
+  </div>
 
-    <section class="routes-section">
-        <div class="routes-header">
-            <h3>RUTAS</h3>
-            <a href="#" class="view-all-link">Ver todas &gt;</a>
-        </div>
+  <div class="indicadores">
+    <div class="card">
+      <h3>18</h3>
+      <p>Rutas asignadas</p>
+    </div>
+    <div class="card">
+      <h3>5</h3>
+      <p>Rutas completadas</p>
+    </div>
+    <div class="card">
+      <h3>0</h3>
+      <p>Incidencias</p>
+    </div>
+    <div class="card">
+      <h3>3</h3>
+      <p>Notificaciones</p>
+    </div>
+     <div class="card" (click)="goToRepartidores()">
+      <h3>3</h3>
+      <p>Repartidores</p>
+    </div>
+  </div>
 
-        <div class="routes-tabs">
-            <button class="tab-button active">Activas</button>
-            <button class="tab-button">Pendientes</button>
-            <button class="tab-button">Completadas</button>
-        </div>
+  <div class="tabs">
+    <div class="active">Activas</div>
+    <div>Pendientes</div>
+    <div>Completadas</div>
+  </div>
 
-        <div class="route-list">
-            <div class="route-card active-route">
-                <div class="route-info">
-                    <p class="route-title">SAN FELIPE DEL AGUA</p>
-                    <p class="route-subtitle">Ruta 2</p>
-                    <p class="route-driver">Chofer: JUAN RODOLFO MORALES PEREZ</p>
-                    <p class="route-progress-text">40 / 350 clientes por visitar</p>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 11.4%;"></div>
-                    </div>
-                </div>
-                <div class="route-status">
-                    <span class="status-dot active"></span>
-                    <button class="action-button">→</button>
-                </div>
-            </div>
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
 
-            <div class="route-card active-route">
-                <div class="route-info">
-                    <p class="route-title">SAN FELIPE DEL AGUA</p>
-                    <p class="route-subtitle">Ruta 2</p>
-                    <p class="route-driver">Chofer: JUAN RODOLFO MORALES PEREZ</p>
-                    <p class="route-progress-text">40 / 350 clientes por visitar</p>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 11.4%;"></div>
-                    </div>
-                </div>
-                <div class="route-status">
-                    <span class="status-dot active"></span>
-                    <button class="action-button">→</button>
-                </div>
-            </div>
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
 
-            <div class="route-card active-route partial-border">
-                <div class="route-info">
-                    <p class="route-title">SAN FELIPE DEL AGUA</p>
-                    <p class="route-subtitle">Ruta 2</p>
-                    <p class="route-driver">Chofer: JUAN RODOLFO MORALES PEREZ</p>
-                </div>
-                <div class="route-status">
-                    <span class="status-dot active"></span>
-                </div>
-            </div>
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
 
-            <div class="route-placeholder"></div>
-        </div>
-    </section>
-</div>
+</body>
+</html>

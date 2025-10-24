@@ -1,349 +1,134 @@
-/* Global Reset and Variables */
-:root {
-    --primary-color: #007bff; /* Blue */
-    --accent-color: #28a745; /* Green for active status */
-    --warning-color: #ffc107; /* Yellow */
-    --background-color: #f8ffde;
-    --card-background: #ffffff;
-    --text-color: #343a40;
-    --light-text-color: #6c757d;
-    --header-bg-color: #007bff;
-    --header-text-color: #ffffff;
-    --progress-color: #38c738;
-}
-
-/* Base Styles - CLAVES PARA EL SCROLL Y RESPONSIVE EN TODO TIPO DE PANTALLA */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    /* Aseguramos que el body ocupe al menos el 100% del viewport */
-    min-height: 100vh;
-    width: 100%;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f6f8fb;
+  color: #333;
 }
 
-.dashboard-container {
-    /* ELIMINAMOS EL max-width: 500px; para que abarque todo el ancho */
-    width: 100%; /* Opcional, pero asegura que tome el 100% del body */
-    margin: 0; /* Asegura que no haya márgenes laterales en mobile/full width */
-    background-color: var(--card-background);
-    /* Quitamos la sombra de "dispositivo" */
-    box-shadow: none;
+/* Encabezado */
+.header {
+  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
+  color: #fff;
+  padding: 20px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  text-align: left;
 }
 
-/* ----------------------------------------------------------- */
-/* Media Query para centrar el contenido en PANTALLAS GRANDES */
-/* Si no quieres que el contenido se estire demasiado en monitores,
-   aplica un max-width solo cuando la pantalla es grande (Web). */
-@media (min-width: 768px) {
-    .dashboard-container {
-        /* Restringimos el ancho en web a un tamaño cómodo y lo centramos */
-        max-width: 900px;
-        margin: 0 auto;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.15); /* Re-agregamos una sombra suave para Web */
-    }
-}
-/* ----------------------------------------------------------- */
-
-
-/* Media Query para asegurar que en pantallas muy pequeñas la tarjeta se ajuste */
-@media (max-width: 320px) {
-    .indicators-grid {
-        gap: 5px;
-        padding-bottom: 5px;
-    }
-    .indicator-card {
-        padding: 10px;
-    }
+.header h1 {
+  font-size: 1.4rem;
+  margin: 0;
 }
 
-
-/* --- Estilos de las secciones (sin cambios significativos) --- */
-
-/* Header Section */
-.header-section {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: var(--header-text-color);
-    /* Usamos vw para que el padding sea relativo al ancho en pantallas grandes */
-    padding: 2vw 3vw;
-    padding-top: 5vw;
-    position: relative;
-    overflow: hidden;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+.header h2 {
+  margin: 5px 0;
+  font-weight: 400;
+  font-size: 1rem;
 }
 
-/* Mimic background design effect */
-.header-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Usar un SVG de fondo para un escalado limpio */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><filter id="f1" x="0" y="0"><feGaussianBlur in="SourceGraphic" stdDeviation="5" /></filter></defs><path d="M0 0 C 30 10, 70 5, 100 15 L 100 0 Z" fill="%230056b3" opacity="0.4" /><path d="M0 10 C 25 25, 65 20, 100 30 L 100 0 Z" fill="%230056b3" opacity="0.6" /></svg>');
-    background-repeat: no-repeat;
-    background-size: cover;
-    opacity: 0.3;
+.header small {
+  font-size: 0.85rem;
+  opacity: 0.9;
 }
 
-.header-content {
-    position: relative;
+/* Indicadores */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 20px;
 }
 
-.header-section h1 {
-    font-size: clamp(1em, 1.2vw + 1rem, 1.5em); /* Responsive font size */
-    font-weight: 300;
-    margin: 0;
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.header-section h2 {
-    font-size: clamp(1.5em, 2vw + 1rem, 2.5em); /* Responsive font size */
-    font-weight: bold;
-    margin: 5px 0 10px;
+.card h3 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+  color: #0078ff;
 }
 
-.header-section p {
-    font-size: clamp(0.7em, 0.5vw + 0.5rem, 0.9em);
-    opacity: 0.8;
-    margin: 0;
-}
-
-.menu-button {
-    position: absolute;
-    top: 2vw; /* Posición relativa al viewport */
-    right: 3vw;
-    background: none;
-    border: 1px solid var(--header-text-color);
-    color: var(--header-text-color);
-    font-size: clamp(1em, 1.5vw + 0.5rem, 2em);
-    padding: 0.5em 0.8em;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Indicators Section */
-.indicators-section {
-    padding: 15px clamp(20px, 3vw, 40px); /* Padding responsive */
-}
-
-.indicators-section h3 {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-.indicators-grid {
-    display: grid;
-    /* 2 columnas iguales, ajusta automáticamente el tamaño */
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.indicator-card {
-    background-color: var(--card-background);
-    border-radius: 10px;
-    padding: 15px;
-    text-align: left;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-    min-height: 80px;
-}
-
-.indicator-number {
-    font-size: clamp(1.5em, 2vw + 1rem, 2.2em);
-    font-weight: bold;
-    color: var(--text-color);
-    margin: 0;
-    line-height: 1;
-}
-
-.indicator-label {
-    font-size: clamp(0.7em, 0.5vw + 0.5rem, 0.9em);
-    color: var(--light-text-color);
-    margin-top: 5px;
-}
-
-.indicator-icon {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 1.5em;
-}
-
-/* Routes Section */
-.routes-section {
-    padding: 10px clamp(20px, 3vw, 40px) 20px;
-}
-
-/* ... (El resto de estilos de Rutas, Cards, y Títulos permanecen igual,
-ya que Flexbox y Grid son inherentemente responsive) ... */
-
-.routes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.routes-header h3 {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0;
-}
-
-.view-all-link {
-    color: var(--primary-color);
-    font-size: 0.9em;
-    font-weight: 500;
-    text-decoration: none;
+.card p {
+  font-size: 0.9rem;
+  color: #666;
 }
 
 /* Tabs */
-.routes-tabs {
-    display: flex;
-    border-bottom: 2px solid #e9ecef;
-    margin-bottom: 15px;
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #777;
 }
 
-.tab-button {
-    background: none;
-    border: none;
-    padding: 10px 15px;
-    font-size: 0.9em;
-    color: var(--light-text-color);
-    cursor: pointer;
-    position: relative;
-    font-weight: 500;
-    flex-grow: 1;
+.tabs .active {
+  color: #0078ff;
+  border-bottom: 3px solid #0078ff;
+  padding-bottom: 5px;
 }
 
-.tab-button.active {
-    color: var(--primary-color);
-    font-weight: 600;
+/* Lista de rutas */
+.ruta {
+  background: #fff;
+  margin: 15px;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--primary-color);
+.ruta h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #222;
 }
 
-/* Route Cards */
-.route-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.ruta small {
+  font-size: 0.85rem;
+  color: #888;
 }
 
-.route-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: var(--card-background);
+.ruta p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: #333;
 }
 
-.route-card.partial-border {
-    border-bottom-style: dotted;
-    border-bottom-width: 2px;
-    border-bottom-color: var(--light-text-color);
-    padding-bottom: 5px;
-    box-shadow: none;
+.ruta .btn {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  background: #0078ff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
 }
 
-.route-info {
-    flex-grow: 1;
+.ruta .btn:hover {
+  background: #005ec4;
 }
 
-.route-title {
-    font-size: 1em;
-    font-weight: bold;
-    color: var(--text-color);
-    margin: 0 0 2px 0;
-}
-
-.route-subtitle {
-    font-size: 0.85em;
-    color: var(--primary-color);
-    margin: 0 0 5px 0;
-}
-
-.route-driver {
-    font-size: 0.8em;
-    color: var(--light-text-color);
-    margin: 0 0 8px 0;
-}
-
-.route-progress-text {
-    font-size: 0.75em;
-    color: var(--light-text-color);
-    margin: 0 0 5px 0;
-}
-
-.progress-bar-container {
-    width: 100%;
-    height: 5px;
-    background-color: #e9ecef;
-    border-radius: 2.5px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    background-color: var(--progress-color);
-    border-radius: 2.5px;
-    transition: width 0.3s ease-in-out;
-}
-
-.route-status {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-left: 10px;
-}
-
-.status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-}
-
-.status-dot.active {
-    background-color: var(--accent-color);
-}
-
-.action-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 1.2em;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-}
-
-.route-placeholder {
-    height: 50px;
-    border-left: 2px dotted var(--light-text-color);
-    margin-left: 15px;
+.ruta .status {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  width: 12px;
+  height: 12px;
+  background: #28c76f;
+  border-radius: 50%;
 }
