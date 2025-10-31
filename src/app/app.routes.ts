@@ -17,6 +17,10 @@ export const routes: Routes = [
     path: 'repartidores',
     loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
   },
+   {
+    path: 'rutas',
+    loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
+  },
   {
     path: '',
     redirectTo: 'login',
