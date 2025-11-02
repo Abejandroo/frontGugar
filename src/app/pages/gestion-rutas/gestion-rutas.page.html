@@ -33,6 +33,7 @@
                     <th>Repartidor</th>
                     <th>Lugar</th>
                     <th>Cantidad</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
 
@@ -41,7 +42,10 @@
     @for (grupo of grupos; track grupo.id) {
       <tr>
         <td data-label="ID">{{ grupo.id }}</td>
-        <td data-label="Grupo">{{ grupo.nombre }}</td>
+        <td data-label="Ruta">{{ grupo.nombre }}</td>
+        <td data-label="Repartidor">{{ grupo.repartidor }}</td>
+        <td data-label="Lugar">{{ grupo.lugar }}</td>
+        <td data-label="Cantidad">{{ grupo.cantidad }}</td>
         <td data-label="Acciones" class="acciones">
           <ion-button size="small" fill="clear" color="warning" (click)="abrirModalEditarGrupo(grupo)">
             <ion-icon slot="icon-only" name="create-outline"></ion-icon>

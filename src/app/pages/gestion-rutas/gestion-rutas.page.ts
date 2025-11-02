@@ -4,6 +4,9 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonGrid, IonButtons, IonCol, IonBackButton, IonRow, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
+import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
+import { EliminarrrutaPage } from 'src/app/modal/eliminarrruta/eliminarrruta.page';
 
 @Component({
   selector: 'app-gestion-rutas',
@@ -39,8 +42,8 @@ export class GestionRutasPage  {
   }
 
   async abrirModalAgregarGrupo() {
- /*   const modal = await this.modalController.create({
-      component: AgregarGrupoModalPage,
+ const modal = await this.modalController.create({
+      component: AgregarrutaPage,
       componentProps: {
         carreras: this.carreras
       }
@@ -48,12 +51,12 @@ export class GestionRutasPage  {
     await modal.present();
     modal.onDidDismiss().then(() => {
       this.actualizarGrupos();
-    });*/
+    });
   }
 
   async abrirModalEditarGrupo(grupo: any) {
-   /* const modal = await this.modalController.create({
-      component: EditarGrupoModalPage,
+    const modal = await this.modalController.create({
+      component: ModificarrutaPage,
       componentProps: {
         grupoCarreraId: grupo.id ,
         grupoSeleccionado: grupo
@@ -62,12 +65,12 @@ export class GestionRutasPage  {
     await modal.present();
     modal.onDidDismiss().then(() => {
       this.actualizarGrupos();
-    });*/
+    });
   }
 
   async abrirModalEliminarGrupo(grupo: any) {
-   /* const modal = await this.modalController.create({
-      component: EliminarGrupoModalPage,
+   const modal = await this.modalController.create({
+      component: EliminarrrutaPage,
       componentProps: {
         grupoId: grupo.id,
     grupoCarreraId: grupo.id
@@ -76,7 +79,7 @@ export class GestionRutasPage  {
     await modal.present();
     modal.onDidDismiss().then(() => {
       this.actualizarGrupos();
-    });*/
+    });
   }
 
 

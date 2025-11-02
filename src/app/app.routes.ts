@@ -79,7 +79,19 @@ export const routes: Routes = [
   {
     path: 'eliminarconductor',
     loadComponent: () => import('./modal/eliminarconductor/eliminarconductor.page').then( m => m.EliminarconductorPage)
+  },  {
+    path: 'agregarruta',
+    loadComponent: () => import('./modal/agregarruta/agregarruta.page').then( m => m.AgregarrutaPage)
   },
+  {
+    path: 'modificarruta',
+    loadComponent: () => import('./modal/modificarruta/modificarruta.page').then( m => m.ModificarrutaPage)
+  },
+  {
+    path: 'eliminarrruta',
+    loadComponent: () => import('./modal/eliminarrruta/eliminarrruta.page').then( m => m.EliminarrrutaPage)
+  },
+
 
 
 ];

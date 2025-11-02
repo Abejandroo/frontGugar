@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Agregar Ruta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-item>
+    <ion-input label="RUTA" type="text" placeholder="ESCRIBA LA RUTA... " labelPlacement="floating" [(ngModel)]="nombre"  (input)="nombre = nombre.toUpperCase()"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="agregarGrupo()">Agregar</ion-button>
+</ion-content>
+ 
