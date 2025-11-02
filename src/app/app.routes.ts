@@ -91,6 +91,18 @@ export const routes: Routes = [
     path: 'eliminarrruta',
     loadComponent: () => import('./modal/eliminarrruta/eliminarrruta.page').then( m => m.EliminarrrutaPage)
   },
+  {
+    path: 'agregar-supervisor',
+    loadComponent: () => import('./modal/agregar-supervisor/agregar-supervisor.page').then( m => m.AgregarSupervisorPage)
+  },
+  {
+    path: 'editar-supervisor',
+    loadComponent: () => import('./modal/editar-supervisor/editar-supervisor.page').then( m => m.EditarSupervisorPage)
+  },
+  {
+    path: 'eliminar-supervisor',
+    loadComponent: () => import('./modal/eliminar-supervisor/eliminar-supervisor.page').then( m => m.EliminarSupervisorPage)
+  },
 
 
 

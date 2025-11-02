@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Editar Docente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="formInstructor" (ngSubmit)="agregarInstructor()">
+    <ion-list>
+      <ion-item>
+        <ion-input label="NOMBRE" type="text" placeholder="...." labelPlacement="floating"
+          placeholder="NOMBRE DEL INSTRUCTOR" formControlName="nombre"
+          (input)="convertToUpperCase($event, 'nombre')"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="APELLIDOS" type="text" placeholder="...." labelPlacement="floating" placeholder="APELLIDOS"
+          formControlName="apellido" (input)="convertToUpperCase($event, 'apellido')"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="TELEFONO" placeholder="Teléfono" placeholder="...." labelPlacement="floating"
+          formControlName="telefono" type="tel"></ion-input>
+        @if (formInstructor.get('telefono')?.hasError('pattern')) {
+        <ion-note color="medium">
+          El teléfono debe contener solo números.
+        </ion-note>
+        }
+        @if (formInstructor.get('telefono')?.hasError('maxlength')) {
+        <ion-note color="medium">
+          El teléfono debe tener máximo 10 dígitos.
+        </ion-note>
+        }
+      </ion-item>
+      <ion-item>
+        <ion-input label="CORREO ELECTRONICO" placeholder="Correo electrónico" placeholder="...."
+          labelPlacement="floating" formControlName="correo" type="email"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="CONTRASEÑA" placeholder="..." labelPlacement="floating" formControlName="contrasena" required
+          [type]="showPassword ? 'text' : 'password'" required></ion-input>
+        <ion-icon slot="end" name="eye" (click)="togglePasswordVisibility()"></ion-icon>
+        @if (formInstructor.get('contrasena')?.hasError('minlength')) {
+        <ion-note color="medium">
+          La contraseña debe tener al menos 8 caracteres.
+        </ion-note>
+        }
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Grupo</ion-label>
+        <ion-select formControlName="grupoId" (ionChange)="cargarAlumnosDelGrupo()">
+          @for (grupo of grupos; track grupo.id) {
+          <ion-select-option [value]="grupo.id">
+            {{ grupo.nombre }}
+          </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+    </ion-list>
+    <ion-button expand="full" type="submit" [disabled]="formInstructor.invalid">
+      Actualizar Instructor
+    </ion-button>
+
+  </form>
+</ion-content>
+<!--ASI FUNCIONA DE MANERA CORRECTA EL MODAL, AL QUERER CAMBIARLO PRODUCE ERRORES, POR RECOMENDACION NO HACER CAMBIOS-->
