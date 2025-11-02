@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonGrid, IonRow, IonCard, IonCol, IonCardHeader, IonCardContent, IonCardTitle} from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonGrid, IonRow, IonCard, IonCol, IonCardHeader, IonCardContent, IonCardTitle, IonBackButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { menu } from 'ionicons/icons';
@@ -12,7 +12,7 @@ import { MenuController } from '@ionic/angular';
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
   standalone: true,
-  imports: [ IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
+  imports: [IonBackButton,  IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
 })
 export class AdminPage {
   constructor(private readonly router: Router,
