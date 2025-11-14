@@ -10,47 +10,71 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-
-  <ion-list>
-    <ion-item>
-      <ion-input 
-        label="NOMBRE DE LA RUTA" 
-        type="text" 
-        placeholder="Ej. RUTA CENTRO - LOCAL COMERCIAL - RESIDENCIA" 
-        labelPlacement="floating" 
-        [(ngModel)]="nombre"  
-        (input)="nombre = nombre.toUpperCase()">
-      </ion-input>
-    </ion-item>
-  </ion-list>
-
-  <p class="ion-text-center ion-text-muted" style="font-size: 0.8rem;">
-    <ion-icon name="finger-print"></ion-icon> Toca el mapa para trazar la ruta
-  </p>
-
-  <div class="map-container">
-    <google-map 
-      height="350px" 
-      width="100%" 
-      [center]="center" 
-      [zoom]="zoom"
-      (mapClick)="agregarPuntoAlMapa($event)">
+  
+  <form [formGroup]="formRuta">
+    <ion-list>
       
-      <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
-      
-      <map-marker *ngFor="let punto of puntosRuta" [position]="punto"></map-marker>
-    </google-map>
-  </div>
+      <ion-item>
+        <ion-input 
+          label="NOMBRE DE LA RUTA" 
+          labelPlacement="floating" 
+          placeholder="Ej. RUTA CENTRO"
+          formControlName="nombre"> </ion-input>
+      </ion-item>
 
-  <ion-button *ngIf="puntosRuta.length > 0" fill="clear" color="danger" expand="block" (click)="limpiarRuta()">
-    <ion-icon name="trash" slot="start"></ion-icon>
-    Limpiar Trazo
-  </ion-button>
+      <ion-item>
+        <ion-select label="REPARTIDOR" labelPlacement="floating" formControlName="rutaId" (ionChange)="cargarAlumnosDelGrupo()">
+          <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
+            {{ rep.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
-  <div class="ion-padding-top">
-    <ion-button expand="block" (click)="agregarGrupo()">
-      Guardar Ruta
+      <ion-text color="danger" *ngIf="formRuta.get('rutaId')?.touched && formRuta.get('rutaId')?.invalid">
+        <p class="ion-padding-start" style="font-size: 0.8rem;">Selecciona un repartidor</p>
+      </ion-text>
+
+      <ion-item>
+        <ion-input label="LUGAR DE ENTREGA" labelPlacement="floating" formControlName="lugarEntrega"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input label="CANTIDAD DE PAQUETES" type="number" labelPlacement="floating" formControlName="cantidad"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input label="ACCIONES ESPECIALES" labelPlacement="floating" formControlName="acciones"></ion-input>
+      </ion-item>
+
+    </ion-list>
+
+    <p class="ion-text-center ion-text-muted" style="margin-top: 20px;">
+      <ion-icon name="finger-print"></ion-icon> Toca el mapa para trazar la ruta
+    </p>
+
+    <div class="map-container">
+      <google-map 
+        height="350px" 
+        width="100%" 
+        [center]="center" 
+        [zoom]="zoom"
+        (mapClick)="agregarPuntoAlMapa($event)">
+        
+        <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
+        <map-marker *ngFor="let punto of puntosRuta" [position]="punto"></map-marker>
+      </google-map>
+    </div>
+
+    <ion-button *ngIf="puntosRuta.length > 0" fill="clear" color="danger" expand="block" (click)="limpiarRuta()">
+      <ion-icon name="trash" slot="start"></ion-icon>
+      Limpiar Trazo
     </ion-button>
-  </div>
 
+    <div class="ion-padding-top">
+      <ion-button expand="block" (click)="agregarGrupo()">
+        Guardar Ruta
+      </ion-button>
+    </div>
+
+  </form>
 </ion-content>

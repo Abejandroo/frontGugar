@@ -1,84 +1,95 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+// Importamos FormBuilder para crear el formulario correctamente
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import { close } from 'ionicons/icons';
+import { close, trash, fingerPrint } from 'ionicons/icons'; // Agregué iconos
 import { addIcons } from 'ionicons';
-// 1. Importamos el módulo de Google Maps
-import { GoogleMapsModule, MapInfoWindow, MapMarker } from '@angular/google-maps';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @Component({
   selector: 'app-agregarruta',
   templateUrl: './agregarruta.page.html',
   styleUrls: ['./agregarruta.page.scss'],
   standalone: true,
-  // 2. Agregamos GoogleMapsModule a los imports
-  imports: [IonicModule, CommonModule, FormsModule, GoogleMapsModule],
+  imports: [IonicModule, CommonModule, GoogleMapsModule, ReactiveFormsModule],
 })
-export class AgregarrutaPage {
-  nombre: string = '';
+export class AgregarrutaPage{
   
-  // Configuración del Mapa 🗺️
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 }; // Coordenadas de Oaxaca (o tu zona)
+  formRuta!: FormGroup;
+  repartidores: any[] = [];
+
+  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 14;
-  
-  // Aquí guardaremos los puntos de la ruta que dibuje el usuario
   puntosRuta: google.maps.LatLngLiteral[] = [];
-  
-  // Opciones para la línea que une los puntos (Polyline)
   polylineOptions: google.maps.PolylineOptions = {
-    strokeColor: '#3880ff', // Color primary de Ionic
+    strokeColor: '#3880ff',
     strokeOpacity: 1.0,
     strokeWeight: 4,
   };
 
   constructor(
     private readonly modalController: ModalController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private fb: FormBuilder
   ) {
-    addIcons({ close, 'close-outline': close });
+    addIcons({ close, 'close-outline': close, trash, 'finger-print': fingerPrint });
+    this.formRuta = this.fb.group({
+      nombre: ['', Validators.required],
+      rutaId: [null, Validators.required],
+      lugarEntrega: ['', Validators.required],
+      cantidad: ['', Validators.required],
+      acciones: ['', Validators.required],
+    });
   }
-
-  // Función para agregar un punto cuando tocan el mapa
   agregarPuntoAlMapa(event: google.maps.MapMouseEvent) {
     if (event.latLng) {
       const nuevoPunto = event.latLng.toJSON();
       this.puntosRuta.push(nuevoPunto);
-      // Forzamos la actualización del arreglo para que Angular detecte el cambio
       this.puntosRuta = [...this.puntosRuta]; 
     }
   }
 
-  // Función para limpiar la ruta si se equivocan
   limpiarRuta() {
     this.puntosRuta = [];
   }
 
-  agregarGrupo() {
-    if (!this.nombre.trim()) {
-      this.mostrarToast('Por favor escribe un nombre', 'warning');
+  async agregarGrupo() {
+    if (this.formRuta.invalid) {
+      this.mostrarToast('Por favor completa los campos obligatorios', 'warning');
+      this.formRuta.markAllAsTouched(); // Muestra los errores rojos
       return;
     }
     
     if (this.puntosRuta.length < 2) {
-       this.mostrarToast('Dibuja al menos 2 puntos en el mapa', 'warning');
+       this.mostrarToast('Dibuja la ruta en el mapa', 'warning');
        return;
     }
 
-    // AQUÍ TIENES LA RUTA LISTA EN: this.puntosRuta
-    console.log('Ruta a guardar:', this.puntosRuta);
+    // Obtenemos los valores y los convertimos a mayúsculas aquí para limpieza
+    const formValues = this.formRuta.value;
+    
+    const dataFinal = {
+      nombre: formValues.nombre.toUpperCase(),
+      repartidorId: formValues.rutaId,
+      lugarEntrega: formValues.lugarEntrega?.toUpperCase(),
+      cantidad: formValues.cantidad,
+      acciones: formValues.acciones?.toUpperCase(),
+      coordenadas: this.puntosRuta
+    };
 
-    // Simulación de guardado exitoso
-    this.mostrarToast(`Grupo ${this.nombre.toUpperCase()} creado con ruta`, 'success');
+    console.log('✅ TODO LISTO:', dataFinal);
+    this.mostrarToast('Ruta creada correctamente', 'success');
     this.cerrarModal();
+  }
+
+  cargarAlumnosDelGrupo() {
+    
   }
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2000,
-      position: 'top',
-      color: color
+      message: mensaje, duration: 2000, position: 'top', color: color
     });
     toast.present();
   }
