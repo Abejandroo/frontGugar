@@ -1,0 +1,12 @@
+.map-container {
+  margin-top: 10px;
+  border-radius: 15px;
+  overflow: hidden; /* Para que las esquinas redondeadas funcionen */
+  border: 2px solid var(--ion-color-light);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+google-map {
+  width: 100%;
+  display: block;
+}
