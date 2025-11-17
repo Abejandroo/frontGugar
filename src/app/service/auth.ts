@@ -1,27 +1,43 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Auth {
-  constructor(private readonly router: Router,  private  readonly http: HttpClient) {}
-  isAuthenticated(): boolean {
-  const usuario = this.getUsuario();
-  return !!usuario;
-}
-  getUsuario() {
-  const usuario = localStorage.getItem('usuario');
-  return usuario ? JSON.parse(usuario) : null;
-}
+  // Asegúrate que esta sea tu IP correcta (localhost o IP de red)
+  private apiUrl = 'http://localhost:3000'; 
 
-logout() {
-    localStorage.removeItem('usuario');
-    this.router.navigate(['/']);
+  constructor(private http: HttpClient) { }
+
+  login(correo: string, contrasena: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/login`, {
+      email: correo,
+      password: contrasena
+    }).pipe(
+      tap((res: any) => {
+        if (res.user) {
+          localStorage.setItem('usuario', JSON.stringify(res.user));
+          localStorage.setItem('token', 'sesion-activa'); 
+        }
+      })
+    );
+  }
+  registrar(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/usuarios`, data);
   }
 
-getAdminByCorreo(correo: string) {
-  //return this.http.get(`https://backescolar-production.up.railway.app/administradores/perfil/${correo}`);
-}
+  logout() {
+    localStorage.clear();
+  }
+  getUsuarios(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios`);
+  }
+  actualizarUsuario(id: number, data: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/usuarios/${id}`, data);
+  }
+   eliminarUsuario(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/usuarios/${id}`);
+  }
 }

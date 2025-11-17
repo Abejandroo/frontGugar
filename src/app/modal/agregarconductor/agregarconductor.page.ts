@@ -1,14 +1,16 @@
-import { Component,  } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ToastController, ModalController } from '@ionic/angular'; 
-import { close } from 'ionicons/icons';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { IonicModule, ToastController, ModalController } from '@ionic/angular';
+import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-interface Rutas {
-  id: number;
-  nombre: string;
-
-}
+import { Auth } from 'src/app/service/auth';
 
 @Component({
   selector: 'app-agregarconductor',
@@ -17,120 +19,82 @@ interface Rutas {
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule],
 })
-
 export class AgregarconductorPage {
-  formInstructor!: FormGroup;
+  formUsuario!: FormGroup;
   showPassword: boolean = false;
-  rutas: Rutas[] = [];
+
   constructor(
     private fb: FormBuilder,
-   // private _Service: AuthService,
     private toastController: ToastController,
     private modalController: ModalController,
-   // private grupoService: GrupoService,
-   // private maestrosService: MaestrosService
-
+    private authService: Auth,
   ) {
-    this.formInstructor = this.fb.group({
-      correo: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(8)]],
-      nombre: ['', [Validators.required,Validators.maxLength(30)]],
-      apellido: ['', [Validators.required,Validators.maxLength(30)]],
-      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.maxLength(10)]],
-      grupoId: ['', Validators.required],  
-
+    this.formUsuario = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      role: ['', Validators.required],
     });
-     addIcons({
-          close,
-          'close-outline': close,
-        });
-    //  this.cargarGrupos();
+
+    addIcons({
+      close,
+      'close-outline': close,
+      eye,
+      'eye-off-outline': eyeOffOutline,
+      eyeOutline,
+    });
   }
 
-async agregarInstructor() {
-  if (this.formInstructor.invalid) {
-    const toast = await this.toastController.create({
-      message: 'Por favor llena todos los campos correctamente.',
-      duration: 2000,
-      color: 'warning',
+  async registrarUsuario() {
+    if (this.formUsuario.invalid) {
+      this.mostrarToast(
+        'Por favor llena todos los campos correctamente.',
+        'warning',
+      );
+      this.formUsuario.markAllAsTouched();
+      return;
+    }
+
+    const usuarioData = this.formUsuario.value;
+    console.log('Datos listos para enviar:', usuarioData);
+
+    this.authService.registrar(usuarioData).subscribe({
+      next: async () => {
+        this.mostrarToast('Usuario registrado correctamente', 'success');
+        this.modalController.dismiss(true);
+      },
+      error: async (err) => {
+        const mensaje =
+          err.error?.message === 'El correo ya existe'
+            ? 'Este nombre de usuario ya está registrado'
+            : 'Error al registrar usuario';
+
+        this.mostrarToast(mensaje, 'danger');
+        console.error(err);
+      },
     });
-    toast.present();
-    return;
   }
 
-  const formValue = this.formInstructor.value;
-
-  const maestroData: any = {
-    nombre: formValue.nombre,
-    apellido: formValue.apellido,
-    telefono: Number(formValue.telefono),
-    correo: formValue.correo,
-    contrasena: formValue.contrasena,
-    grupoId: Number(formValue.grupoId),
-  };
-
-
- /* if (this.fotoArchivo) {
-    const base64 = await this.convertirImagenABase64(this.fotoArchivo);
-    maestroData.imagenBase64 = base64;
-  }*/
-
-/*  this.maestrosService.agregarMaestro(maestroData).subscribe({
-    next: async () => {
-      const toast = await this.toastController.create({
-        message: 'Maestro agregado correctamente',
-        duration: 2000,
-        color: 'success',
-      });
-      toast.present();
-      this.modalController.dismiss(true);
-    },
-    error: async (err) => {
-      const toast = await this.toastController.create({
-        message: 'Error al agregar maestro',
-        duration: 2000,
-        color: 'danger',
-      });
-      toast.present();
-      console.error(err);
-    },
-  });
-}*/
-}
   cerrarModal() {
     this.modalController.dismiss();
   }
 
   convertToUpperCase(event: any, controlName: string) {
     const value = (event.target as HTMLInputElement).value.toUpperCase();
-    this.formInstructor.get(controlName)?.setValue(value, { emitEvent: false });
+    this.formUsuario.get(controlName)?.setValue(value, { emitEvent: false });
   }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
- /*cargarGrupos() {
-    this.grupoService.obtenerGrupos().subscribe({
-      next: (res: any) => {
-        this.grupos = res;
-      },
-      error: async (err) => {
-        const toast = await this.toastController.create({
-          message: 'Error al cargar grupos',
-          duration: 2000,
-          color: 'danger',
-        });
-        toast.present();
-        console.error(err);
-      },
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      position: 'top',
+      color: color,
     });
+    toast.present();
   }
-*/
-
-  cargarAlumnosDelGrupo() {
-    const grupoId = this.formInstructor.get('grupoId')?.value;
-
-  }
-
 }
-

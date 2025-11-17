@@ -61,10 +61,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/conductores/conductores.page').then( m => m.ConductoresPage)
   },
   {
-    path: 'supervisores',
-    loadComponent: () => import('./pages/supervisores/supervisores.page').then( m => m.SupervisoresPage)
-  },
-  {
     path: 'reportes',
     loadComponent: () => import('./pages/reportes/reportes.page').then( m => m.ReportesPage)
   },
@@ -79,7 +75,8 @@ export const routes: Routes = [
   {
     path: 'eliminarconductor',
     loadComponent: () => import('./modal/eliminarconductor/eliminarconductor.page').then( m => m.EliminarconductorPage)
-  },  {
+  },
+  {
     path: 'agregarruta',
     loadComponent: () => import('./modal/agregarruta/agregarruta.page').then( m => m.AgregarrutaPage)
   },
@@ -91,18 +88,7 @@ export const routes: Routes = [
     path: 'eliminarrruta',
     loadComponent: () => import('./modal/eliminarrruta/eliminarrruta.page').then( m => m.EliminarrrutaPage)
   },
-  {
-    path: 'agregar-supervisor',
-    loadComponent: () => import('./modal/agregar-supervisor/agregar-supervisor.page').then( m => m.AgregarSupervisorPage)
-  },
-  {
-    path: 'editar-supervisor',
-    loadComponent: () => import('./modal/editar-supervisor/editar-supervisor.page').then( m => m.EditarSupervisorPage)
-  },
-  {
-    path: 'eliminar-supervisor',
-    loadComponent: () => import('./modal/eliminar-supervisor/eliminar-supervisor.page').then( m => m.EliminarSupervisorPage)
-  },
+
 
 
 

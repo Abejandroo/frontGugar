@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Agregar Conductor</ion-title>
+    <ion-title>Editar Usuario</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="cerrarModal()">
         <ion-icon name="close"></ion-icon>
@@ -10,62 +10,78 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="formInstructor" (ngSubmit)="agregarInstructor()">
+  <form [formGroup]="formUsuario" (ngSubmit)="actualizarUsuario()">
     <ion-list>
       <ion-item>
-        <ion-input label="NOMBRE" type="text" placeholder="...." labelPlacement="floating"
-          placeholder="NOMBRE DEL INSTRUCTOR" formControlName="nombre"
-          (input)="convertToUpperCase($event, 'nombre')"></ion-input>
+        <ion-input
+          label="NOMBRE COMPLETO"
+          type="text"
+          labelPlacement="floating"
+          placeholder="NOMBRE DEL USUARIO"
+          formControlName="name"
+          (input)="convertToUpperCase($event, 'name')"
+        ></ion-input>
       </ion-item>
       <ion-item>
-        <ion-input label="APELLIDOS" type="text" placeholder="...." labelPlacement="floating" placeholder="APELLIDOS"
-          formControlName="apellido" (input)="convertToUpperCase($event, 'apellido')"></ion-input>
+        <ion-input
+          label="NOMBRE DE USUARIO"
+          labelPlacement="floating"
+          placeholder="Ej. admin, supervisor1"
+          formControlName="email"
+          type="text"
+        ></ion-input>
       </ion-item>
+
       <ion-item>
-        <ion-input label="TELEFONO" placeholder="Teléfono" placeholder="...." labelPlacement="floating"
-          formControlName="telefono" type="tel"></ion-input>
-        @if (formInstructor.get('telefono')?.hasError('pattern')) {
-        <ion-note color="medium">
-          El teléfono debe contener solo números.
-        </ion-note>
-        }
-        @if (formInstructor.get('telefono')?.hasError('maxlength')) {
-        <ion-note color="medium">
-          El teléfono debe tener máximo 10 dígitos.
-        </ion-note>
-        }
-      </ion-item>
-      <ion-item>
-        <ion-input label="CORREO ELECTRONICO" placeholder="Correo electrónico" placeholder="...."
-          labelPlacement="floating" formControlName="correo" type="email"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-input label="CONTRASEÑA" placeholder="..." labelPlacement="floating" formControlName="contrasena" required
-          [type]="showPassword ? 'text' : 'password'" required></ion-input>
-        <ion-icon slot="end" name="eye" (click)="togglePasswordVisibility()"></ion-icon>
-        @if (formInstructor.get('contrasena')?.hasError('minlength')) {
-        <ion-note color="medium">
+        <ion-input
+          label="NUEVA CONTRASEÑA"
+          labelPlacement="floating"
+          placeholder="Dejar en blanco para no cambiar"
+          formControlName="password"
+          [type]="showPassword ? 'text' : 'password'"
+        ></ion-input>
+        <ion-icon
+          slot="end"
+          [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+          (click)="togglePasswordVisibility()"
+        ></ion-icon>
+        @if (formUsuario.get('password')?.hasError('minlength')) {
+        <ion-note color="medium" style="font-size: 0.8rem;">
           La contraseña debe tener al menos 8 caracteres.
         </ion-note>
         }
       </ion-item>
-
       <ion-item>
-        <ion-label>Rutas</ion-label>
-        <ion-select formControlName="grupoId" (ionChange)="('')">
-          @for (ruta of rutas; track ruta.id) {
-          <ion-select-option [value]="ruta.id">
-            {{ ruta.nombre }}
-          </ion-select-option>
-          }
+        <ion-label>ROL DEL USUARIO</ion-label>
+        <ion-select
+          formControlName="role"
+          placeholder="Seleccionar Rol"
+          interface="popover"
+        >
+          <ion-select-option value="admin">Administrador</ion-select-option>
+          <ion-select-option value="supervisor">Supervisor</ion-select-option>
+          <ion-select-option value="repartidor"
+            >Conductor / Repartidor</ion-select-option
+          >
         </ion-select>
       </ion-item>
 
+      @if (formUsuario.get('role')?.touched &&
+      formUsuario.get('role')?.invalid) {
+      <ion-text color="danger">
+        <p class.="ion-padding-start" style="font-size: 0.8rem;">
+          Debes seleccionar un rol
+        </p>
+      </ion-text>
+      }
     </ion-list>
-    <ion-button expand="full" type="submit" [disabled]="formInstructor.invalid">
-      Actualizar Instructor
-    </ion-button>
 
+    <ion-button
+      expand="full"
+      type="submit"
+      [disabled]="formUsuario.invalid"
+    >
+      Actualizar Usuario
+    </ion-button>
   </form>
 </ion-content>
-<!--ASI FUNCIONA DE MANERA CORRECTA EL MODAL, AL QUERER CAMBIARLO PRODUCE ERRORES, POR RECOMENDACION NO HACER CAMBIOS-->

@@ -17,7 +17,7 @@
    <ion-item>
   <ion-icon slot="start" name="person-outline"></ion-icon>
   <ion-label position="floating">Usuario</ion-label>
-  <ion-input type="email"  [(ngModel)]="correo" name="correo" required></ion-input>
+  <ion-input type="text"  [(ngModel)]="correo" name="name" required></ion-input>
 </ion-item>
  <ion-item>
   <ion-icon slot="start" name="lock-open-outline"></ion-icon>
@@ -25,7 +25,7 @@
       <ion-input
         [type]="mostrarContrasena ? 'text' : 'password'"
         [(ngModel)]="contrasena"
-        name="contrasena"
+        name="password"
         required>
       </ion-input>
       <ion-buttons slot="end">
