@@ -1,0 +1,17 @@
+<ion-app>
+<ion-header>
+  <ion-toolbar  color="primary">
+    <ion-title>Menú Admin</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content side="start" menuId="admin-menu" contentId="main-content">
+  <ion-list>
+   <ion-item button (click)="navigateToPerfil()">
+      <ion-label>Mi Perfil Admin</ion-label>
+    </ion-item>
+    <ion-item button (click)="logout()">
+      <ion-label>Cerrar Sesión</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+</ion-app>

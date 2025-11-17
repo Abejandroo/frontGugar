@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Editar Ruta</ion-title> <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <ion-item>
+    <ion-label>Seleccionar Ruta</ion-label>
+    <ion-select [(ngModel)]="grupoCarreraId" (ionChange)="onGrupoChange($event)">
+      @for (grupo of grupos; track grupo.id) {
+      <ion-select-option [value]="grupo.id">
+        {{ grupo.id + ' - ' + grupo.nombre }}
+      </ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-input label="Nombre de la Ruta" placeholder="Escriba el nombre..." labelPlacement="floating"
+      [(ngModel)]="nombre" (input)="nombre = nombre.toUpperCase()">
+    </ion-input>
+  </ion-item>
+
+  <div class="map-container" style="margin-top: 20px; margin-bottom: 20px;">
+    <p class="ion-text-center ion-text-muted" style="font-size: 0.8rem;">
+      <ion-icon name="map"></ion-icon> Edita el trazo tocando el mapa
+    </p>
+
+    <google-map 
+      height="350px" 
+      width="100%" 
+      [center]="center" 
+      [zoom]="zoom"
+      (mapClick)="agregarPuntoAlMapa($event)">
+      
+      <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
+      
+      <map-marker *ngFor="let punto of puntosRuta" [position]="punto"></map-marker>
+    </google-map>
+
+    <ion-button *ngIf="puntosRuta.length > 0" fill="clear" color="danger" expand="block" (click)="limpiarRuta()">
+      <ion-icon name="trash" slot="start"></ion-icon>
+      Borrar Trazo Actual
+    </ion-button>
+  </div>
+  <ion-button expand="block" (click)="modificarGrupo()">Guardar Cambios</ion-button>
+</ion-content>

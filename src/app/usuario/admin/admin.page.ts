@@ -1,50 +1,50 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, IonCardSubtitle, IonGrid, IonRow, IonCard, IonCol, IonCardHeader, IonCardContent, IonCardTitle, IonBackButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonGrid, IonRow, IonCard, IonCol, IonCardHeader, IonCardContent, IonCardTitle, IonBackButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { menu } from 'ionicons/icons';
-
+import { Auth } from 'src/app/service/auth';
+import { MenuController } from '@ionic/angular';
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
   standalone: true,
-  imports: [IonBackButton, IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonCardSubtitle, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonBackButton,  IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
 })
 export class AdminPage {
   constructor(private readonly router: Router,
-  //private readonly authService: AuthService,
-  //private readonly menu: MenuController,
+  private readonly authService: Auth,
+  private readonly menuC: MenuController,
 
   ) { 
    addIcons({
-  menu,
+    menu,
 });
   }
   logout() {
-  //  this.authService.logout();
+  this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
-  toggleMenu() {
-   // this.menu.toggle();
+ toggleMenu() {
+this.menuC.toggle('admin-menu');
+  }
+  irARutas() {
+    this.router.navigate(['gestion-rutas']);
   }
 
-  irATutores() {
-    this.router.navigate(['/tutores/formulario']);
+  irARepartidores() {
+    this.router.navigate(['conductores']);
   }
 
-  irAAlumnos() {
-    this.router.navigate(['/alumnos/formulario']);
+  irASupervisores() {
+    this.router.navigate(['supervisores']);
   }
 
-  irAGrupos() {
-    this.router.navigate(['/grupos']);
-  }
-
-  irAMaestros() {
-    this.router.navigate(['/maestros/registro']);
+  irAReportes() {
+    this.router.navigate(['reportes']);
   }
 
 }

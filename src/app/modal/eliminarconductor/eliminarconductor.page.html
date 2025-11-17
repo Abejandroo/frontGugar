@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Agregar Conductor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form [formGroup]="formEliminar" (ngSubmit)="confirmarEliminacion()">
+    <ion-list>
+      <ion-item>
+        <ion-label>Seleccionar Docente</ion-label>
+        <ion-select formControlName="id">
+          @for (instructor of instructores; track instructor.id) {
+          <ion-select-option [value]="instructor.id">
+            {{ instructor.nombre }}
+          </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="full" type="submit" color="danger" [disabled]="formEliminar.invalid">Eliminar
+      Docente</ion-button>
+  </form>
+</ion-content>
