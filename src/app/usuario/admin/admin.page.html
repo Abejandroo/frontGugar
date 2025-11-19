@@ -1,7 +1,5 @@
 <ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-buttons slot="start">
-    </ion-buttons>
     <ion-grid fixed>
       <ion-row class="ion-justify-content-center ion-align-items-center">
         <ion-col size="auto">
@@ -13,82 +11,107 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-   <div class="welcome-message">
-      <h2>👋 Bienvenido, {{ userName }}</h2>       <p class="fecha">{{ fechaHoy }}</p>    
-      <p>Selecciona una opción para comenzar:</p>
-    </div>
+  
+  <div class="welcome-message">
+    <h2>👋 Bienvenido, {{ userName }}</h2>
+    <p class="fecha">{{ fechaHoy }}</p>
+    <p>Resumen de operaciones:</p>
+  </div>
+
   <ion-grid>
-    <p style="text-align: center;">Estado General hoy:</p>
+    <p style="text-align: center; font-weight: 600; color: #fff;">Indicadores de hoy:</p>
+    
     <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
+      
       <ion-col size="12" size-md="5">
         <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Rutas Activas</ion-card-title>
+            <ion-card-title>Rutas Totales</ion-card-title>
+            <ion-card-subtitle style="color: #ddd;">Registradas</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            23/50
+            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
+              {{ rutasTotales }}
+            </span>
           </ion-card-content>
           <img src="assets/ruta.png" alt="rutas" class="card-image-absolute">
         </ion-card>
       </ion-col>
+
       <ion-col size="12" size-md="5">
         <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Notificaciones</ion-card-title>
+            <ion-card-title>Repartidores</ion-card-title>
+            <ion-card-subtitle style="color: #ddd;">Activos</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            8
+            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
+              {{ repartidoresTotales }}
+            </span>
           </ion-card-content>
-          <img src="assets/advertencia.png" alt="advertencia" class="card-image-absolute">
+          <img src="assets/repartidor.png" onerror="this.src='assets/logo.png'" alt="repartidores" class="card-image-absolute">
         </ion-card>
       </ion-col>
+
       <ion-col size="12" size-md="5">
         <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>
-              Rutas Pendientes
-            </ion-card-title>
+            <ion-card-title>Supervisores</ion-card-title>
+            <ion-card-subtitle style="color: #ddd;">Activos</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            5
+            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
+              {{ supervisoresTotales }}
+            </span>
           </ion-card-content>
-          <img src="assets/reloj.png" alt="reloj" class="card-image-absolute">
+          <img src="assets/supervisor.png" onerror="this.src='assets/campana.png'" alt="supervisores" class="card-image-absolute">
         </ion-card>
       </ion-col>
+
       <ion-col size="12" size-md="5">
         <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
-            <ion-card-title>Incidencias</ion-card-title>
+            <ion-card-title>Asignaciones</ion-card-title>
+            <ion-card-subtitle style="color: #ddd;">Rutas en curso</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            14
+            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
+              {{ rutasAsignadas }}
+            </span>
           </ion-card-content>
-          <img src="assets/campana.png" alt="campana" class="card-image-absolute">
+          <img src="assets/asignado.png" onerror="this.src='assets/ruta2.png'" alt="asignadas" class="card-image-absolute">
         </ion-card>
       </ion-col>
+
     </ion-row>
-    <p style="text-align: center;">Accesos Principales:</p>
-    <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
-      <ion-col size="12" size-md="5">
-        <ion-card button (click)="irARutas()" class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title> Gestión de Rutas</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
 
-      <ion-col size="12" size-md="5">
-        <ion-card button (click)="irARepartidores()" class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title>USUARIOS</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
+ <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="8" size-lg="6">
+        
+        <div class="atajos-container">
+          <h3 class="ion-text-center">Atajos</h3> <ion-card class="atajos-card">
+            <ion-list lines="none">
+              
+              <ion-item button (click)="abrirModalCrearRuta()" detail="false" class="atajo-item">
+                <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                <ion-label>Crear nueva Ruta</ion-label>
+              </ion-item>
+    
+              <ion-item button (click)="abrirModalAgregarUsuario()" detail="false" class="atajo-item">
+                <ion-icon slot="start" name="person-add-outline"></ion-icon>
+                <ion-label>Agregar Usuario</ion-label>
+              </ion-item>
+    
+              </ion-list>
+          </ion-card>
+        </div>
 
+      </ion-col>
     </ion-row>
   </ion-grid>
   <div style="height: 80px;"></div>
 </ion-content>
+
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
   <app-admin-navbar paginaActual="inicio"></app-admin-navbar>
 </ion-footer>
