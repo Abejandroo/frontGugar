@@ -210,3 +210,142 @@ ion-button {
     color: var(--ion-color-primary);
   }
 }
+
+// Estilos de la Tarjeta de Ruta
+.ruta-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: white; // Fondo blanco forzado
+  margin-bottom: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+
+  &:active,
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  // Encabezado (Este se veía bien, pero aseguramos colores)
+  ion-card-header {
+    background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+    padding: 16px;
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .map-icon {
+      font-size: 2.5rem;
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px;
+      border-radius: 12px;
+    }
+
+    ion-card-title {
+      color: white; // Siempre blanco sobre azul
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    ion-card-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+  }
+
+  ion-card-content {
+    padding: 0;
+    
+    ion-list {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      background: transparent;
+    }
+
+    ion-item {
+      --background: transparent;
+      --padding-start: 16px;
+      --inner-padding-end: 16px;
+      font-size: 0.9rem;
+      
+      ion-icon {
+        margin-right: 12px;
+        font-size: 1.2rem;
+        opacity: 0.8;
+        // Dejamos que el icono use su color (primary, danger, etc.)
+      }
+
+      h3 {
+        font-weight: 600;
+        // ✨ ARREGLO: Usamos un color gris oscuro fijo, no variable
+        color: #666666 !important; 
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+      }
+
+      p {
+        // ✨ ARREGLO: Usamos negro casi puro, para que se lea bien
+        color: #222222 !important; 
+        font-size: 1rem;
+        font-weight: 500;
+      }
+      
+      // Forzamos el label a tener opacidad completa
+      ion-label {
+        opacity: 1 !important;
+      }
+    }
+    
+    .card-actions {
+      border-top: 1px solid #eeeeee; // Borde gris claro fijo
+      padding: 8px;
+      display: flex;
+      justify-content: space-around;
+      background: #fafafa; // Fondo gris muy claro fijo
+      
+      ion-button {
+        height: 36px;
+        margin: 0 4px;
+        --padding-start: 8px;
+        --padding-end: 8px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.mensaje-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  opacity: 0.6;
+
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    color: #999999; // Gris fijo
+  }
+  
+  h3, p {
+    color: #666666; // Texto gris fijo
+  }
+}
+
+.btn-agregar {
+  margin-bottom: 20px;
+  --box-shadow: 0 4px 10px rgba(var(--ion-color-success-rgb), 0.3);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}

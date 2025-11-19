@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Detalle de Ruta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="height: 100%; width: 100%; position: relative;">
+    <google-map 
+      height="100%" 
+      width="100%" 
+      [center]="center" 
+      [zoom]="zoom">
+      
+      <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
+      
+      @if (puntosRuta.length > 0) {
+        <map-marker 
+          [position]="puntosRuta[0]"
+          title="Inicio">
+        </map-marker>
+      }
+
+      @if (puntosRuta.length > 0) {
+        <map-marker 
+          [position]="puntosRuta[puntosRuta.length - 1]"
+          title="Fin">
+        </map-marker>
+      }
+
+    </google-map>
+
+    <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+      <ion-button expand="block" shape="round" color="secondary" (click)="abrirEnGoogleMaps()">
+        <ion-icon slot="start" name="navigate-circle-outline"></ion-icon>
+        Navegar con Google Maps
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

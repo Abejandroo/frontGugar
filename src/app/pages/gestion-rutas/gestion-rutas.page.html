@@ -1,7 +1,6 @@
 <ion-header [translucent]="true" class="ion-no-border">
-<ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">  
-<ion-buttons slot="start">
-    </ion-buttons>
+  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
+    <ion-buttons slot="start"> </ion-buttons>
     <ion-grid fixed>
       <ion-row class="ion-justify-content-center ion-align-items-center">
         <ion-col size="auto">
@@ -9,77 +8,122 @@
         </ion-col>
       </ion-row>
     </ion-grid>
-     <ion-buttons slot="start">
+    <ion-buttons slot="start">
       <ion-back-button defaultHref="/usuario/admin" text=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Gestión de Rutas</ion-title>
+    </ion-toolbar>
+  </ion-header>
   <ion-grid fixed>
     <ion-row>
       <ion-col size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title class="ion-text-center">LISTADO DE RUTAS</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <div>
-              <table class="tabla-grupos">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Ruta</th>
-                    <th>Repartidor</th>
-                    <th>Lugar</th>
-                    <th>Cantidad</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-
-              @if (grupos.length > 0) {
-  <tbody>
-    @for (grupo of grupos; track grupo.id) {
-      <tr>
-        <td data-label="ID">{{ grupo.id }}</td>
-        <td data-label="Ruta">{{ grupo.nombre }}</td>
-        <td data-label="Repartidor">{{ grupo.repartidor }}</td>
-        <td data-label="Lugar">{{ grupo.lugar }}</td>
-        <td data-label="Cantidad">{{ grupo.cantidad }}</td>
-        <td data-label="Acciones" class="acciones">
-          <ion-button size="small" fill="clear" color="warning" (click)="abrirModalEditarGrupo(grupo)">
-            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-          </ion-button>
-          <ion-button size="small" fill="clear" color="danger" (click)="abrirModalEliminarGrupo(grupo)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </td>
-      </tr>
-    }
-  </tbody>
-} @else {
-  <tr>
-    <td colspan="3" style="text-align: center;">No hay rutas disponibles.</td>
-  </tr>
-}
-     </table>
-
-              <ng-template #sinGrupos>
-                <ion-note color="danger" class="mensaje-vacio">No se encontraron rutas.</ion-note>
-              </ng-template>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col size="12">
-        <ion-button expand="block" color="success" (click)="abrirModalAgregarGrupo()">
-          <ion-icon slot="start" name="person-add-outline"></ion-icon>
-          Agregar Ruta
+        <ion-button
+          expand="block"
+          color="success"
+          (click)="abrirModalAgregarGrupo()"
+        >
+          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+          Agregar Nueva Ruta
         </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
+    <ion-row>
+      @for (grupo of grupos; track grupo.id) {
+      <ion-col size="12" size-md="6" size-lg="4">
+        <ion-card class="ruta-card">
+          <ion-card-header>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <ion-icon name="map-outline" size="large" color="primary"></ion-icon>
+              <div>
+                <ion-card-title>{{ grupo.nombre }}</ion-card-title>
+                <ion-card-subtitle>ID: {{ grupo.id }}</ion-card-subtitle>
+              </div>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="none">
+              
+              <ion-item>
+                <ion-icon name="person-outline" slot="start" color="medium"></ion-icon>
+                <ion-label>
+                  <h3>Repartidor</h3>
+                  <p class="ion-text-wrap">{{ grupo.repartidor?.name || 'Sin Asignar' }}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="location-outline" slot="start" color="medium"></ion-icon>
+                <ion-label>
+                  <h3>Lugar</h3>
+                  <p class="ion-text-wrap">{{ grupo.lugarEntrega }}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="cube-outline" slot="start" color="medium"></ion-icon>
+                <ion-label>
+                  <h3>Cantidad</h3>
+                  <p>{{ grupo.cantidad }}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="map-outline" slot="start" color="secondary"></ion-icon>
+                <ion-label>
+                  <h3>Trayecto</h3>
+                  <ion-button 
+                    fill="outline" 
+                    size="small" 
+                    color="secondary" 
+                    (click)="verRutaEnMapa(grupo)">
+                    <ion-icon slot="start" name="navigate-outline"></ion-icon>
+                    Ver Ruta en Mapa
+                  </ion-button>
+                </ion-label>
+              </ion-item>
+
+              @if (grupo.acciones) {
+              <ion-item>
+                <ion-icon name="information-circle-outline" slot="start" color="medium"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                  <h3>Indicaciones</h3>
+                  <p>{{ grupo.acciones }}</p>
+                </ion-label>
+              </ion-item>
+              }
+
+            </ion-list>
+            <div class="ion-text-center ion-padding-top">
+              <ion-button
+                fill="clear"
+                color="warning"
+                (click)="abrirModalEditarGrupo(grupo)"
+              >
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button
+                fill="clear"
+                color="danger"
+                (click)="abrirModalEliminarGrupo(grupo)"
+              >
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      } @empty {
+      <ion-col size="12">
+        <div class="ion-text-center ion-padding">
+          <ion-note color="medium">No hay rutas registradas en este momento.</ion-note>
+        </div>
+      </ion-col>
+      }
+    </ion-row>
+  
 </ion-content>

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Importamos FormBuilder para crear el formulario correctamente
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import { close, trash, fingerPrint } from 'ionicons/icons'; // Agregué iconos
+import { close, trash, fingerPrint } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { Auth } from 'src/app/service/auth'; 
 
 @Component({
   selector: 'app-agregarruta',
@@ -14,10 +14,10 @@ import { GoogleMapsModule } from '@angular/google-maps';
   standalone: true,
   imports: [IonicModule, CommonModule, GoogleMapsModule, ReactiveFormsModule],
 })
-export class AgregarrutaPage{
+export class AgregarrutaPage {
   
   formRuta!: FormGroup;
-  repartidores: any[] = [];
+  repartidores: any[] = []; 
 
   center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 14;
@@ -31,17 +31,30 @@ export class AgregarrutaPage{
   constructor(
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: Auth 
   ) {
     addIcons({ close, 'close-outline': close, trash, 'finger-print': fingerPrint });
+    
     this.formRuta = this.fb.group({
       nombre: ['', Validators.required],
-      rutaId: [null, Validators.required],
+      rutaId: [null, Validators.required], 
       lugarEntrega: ['', Validators.required],
-      cantidad: ['', Validators.required],
-      acciones: ['', Validators.required],
+      cantidad: ['', [Validators.required, Validators.min(1)]],
+      acciones: [''],
+    });
+        this.cargarRepartidores();
+
+  }
+  cargarRepartidores() {
+    this.authService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.repartidores = usuarios.filter(u => u.role === 'repartidor');
+      },
+      error: (err) => console.error('Error cargando repartidores', err)
     });
   }
+
   agregarPuntoAlMapa(event: google.maps.MapMouseEvent) {
     if (event.latLng) {
       const nuevoPunto = event.latLng.toJSON();
@@ -57,35 +70,41 @@ export class AgregarrutaPage{
   async agregarGrupo() {
     if (this.formRuta.invalid) {
       this.mostrarToast('Por favor completa los campos obligatorios', 'warning');
-      this.formRuta.markAllAsTouched(); // Muestra los errores rojos
+      this.formRuta.markAllAsTouched();
       return;
     }
     
     if (this.puntosRuta.length < 2) {
-       this.mostrarToast('Dibuja la ruta en el mapa', 'warning');
+       this.mostrarToast('Dibuja la ruta en el mapa (mínimo 2 puntos)', 'warning');
        return;
     }
 
-    // Obtenemos los valores y los convertimos a mayúsculas aquí para limpieza
     const formValues = this.formRuta.value;
     
     const dataFinal = {
       nombre: formValues.nombre.toUpperCase(),
-      repartidorId: formValues.rutaId,
-      lugarEntrega: formValues.lugarEntrega?.toUpperCase(),
-      cantidad: formValues.cantidad,
-      acciones: formValues.acciones?.toUpperCase(),
+      idRepartidor: formValues.rutaId, 
+      lugarEntrega: formValues.lugarEntrega.toUpperCase(),
+      cantidad: Number(formValues.cantidad),
+      acciones: formValues.acciones ? formValues.acciones.toUpperCase() : '',
       coordenadas: this.puntosRuta
     };
 
-    console.log('✅ TODO LISTO:', dataFinal);
-    this.mostrarToast('Ruta creada correctamente', 'success');
-    this.cerrarModal();
+    console.log('Enviando ruta:', dataFinal);
+
+    this.authService.crearRuta(dataFinal).subscribe({
+      next: () => {
+        this.mostrarToast('Ruta creada correctamente', 'success');
+        this.modalController.dismiss(true);
+      },
+      error: (err) => {
+        console.error(err);
+        this.mostrarToast('Error al guardar la ruta', 'danger');
+      }
+    });
   }
 
-  cargarAlumnosDelGrupo() {
-    
-  }
+  cargarAlumnosDelGrupo() {} 
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({

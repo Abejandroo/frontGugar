@@ -12,7 +12,7 @@ import { MenuController } from '@ionic/angular';
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
   standalone: true,
-  imports: [IonBackButton,  IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
+  imports: [IonCardTitle, IonCardContent, IonCardHeader, IonCol, IonCard, IonRow, IonGrid, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
 })
 export class AdminPage {
   constructor(private readonly router: Router,
@@ -37,14 +37,6 @@ this.menuC.toggle('admin-menu');
 
   irARepartidores() {
     this.router.navigate(['conductores']);
-  }
-
-  irASupervisores() {
-    this.router.navigate(['supervisores']);
-  }
-
-  irAReportes() {
-    this.router.navigate(['reportes']);
   }
 
 }

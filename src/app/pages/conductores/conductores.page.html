@@ -15,14 +15,12 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   
-  <!-- Título principal de la página -->
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Gestión de Usuarios</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Botón de Agregar (ahora arriba) -->
   <ion-grid fixed>
     <ion-row>
       <ion-col size="12">
@@ -38,12 +36,9 @@
     </ion-row>
   </ion-grid>
 
-  <!-- ✨ ¡AQUÍ EMPIEZA LA MAGIA DE LAS CARDS! ✨ -->
   <ion-grid fixed>
     <ion-row>
-      <!-- 1. Hacemos un @for para 'usuarios' (en lugar de 'instructores') -->
       @for (usuario of usuarios; track usuario.id){
-      <!-- 2. Hacemos las cards responsivas -->
       <ion-col size="12" size-md="6" size-lg="4">
         <ion-card class="user-card">
           <ion-card-header class="ion-text-center">
@@ -52,7 +47,6 @@
               color="primary"
               style="font-size: 4rem"
             ></ion-icon>
-            <!-- 3. Usamos el 'name' de tu DTO -->
             <ion-card-title>{{ usuario.name }}</ion-card-title>
             <ion-card-subtitle>{{
               usuario.email
@@ -67,15 +61,12 @@
                   name="shield-checkmark-outline"
                   color="medium"
                 ></ion-icon>
-                <!-- 4. Usamos el 'role' de tu DTO -->
                 <ion-label class="ion-text-capitalize">{{
                   usuario.role
                 }}</ion-label>
               </ion-item>
             </ion-list>
-            
-            <!-- 5. Ponemos los botones en la base de la card -->
-           <div class="ion-padding-top ion-text-center">
+            <div class="ion-padding-top ion-text-center">
   <ion-button
     fill="clear"
     color="warning"
@@ -84,8 +75,6 @@
     <ion-icon slot="icon-only" name="create-outline"></ion-icon>
   </ion-button>
 
-  <!-- ✨ ¡AQUÍ ESTÁ EL CAMBIO! ✨ -->
-  <!-- Ahora llama a 'confirmarEliminacion' -->
   <ion-button
     fill="clear"
     color="danger"
@@ -98,7 +87,6 @@
         </ion-card>
       </ion-col>
       } @empty {
-      <!-- 6. Un 'empty' por si no hay usuarios -->
       <ion-col size="12">
         <ion-note color="medium" class="ion-padding"
           >No hay usuarios registrados.</ion-note

@@ -1,12 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonGrid, IonButtons, IonCol, IonBackButton, IonRow, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { Auth } from 'src/app/service/auth';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
-import { EliminarrrutaPage } from 'src/app/modal/eliminarrruta/eliminarrruta.page';
+import { DetalleRutaPage } from 'src/app/modal/detalle-ruta/detalle-ruta.page';
+import { addIcons } from 'ionicons';
+import {
+  createOutline,
+  trashOutline,
+  addCircleOutline,
+  mapOutline,
+  personOutline,
+  locationOutline,
+  cubeOutline,
+  informationCircleOutline,
+  navigateOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-gestion-rutas',
@@ -16,41 +27,62 @@ import { EliminarrrutaPage } from 'src/app/modal/eliminarrruta/eliminarrruta.pag
   imports: [IonicModule, ReactiveFormsModule, CommonModule, FormsModule],
 })
 export class GestionRutasPage  {
-
- carreras: any[] = [];
   grupos: any[] = [];
-  selectedCarreraId: string = '';
 
   constructor(
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    //private readonly grupoService: GrupoService  
+    private readonly authService: Auth,
   ) {
+    addIcons({
+      createOutline,
+      trashOutline,
+      addCircleOutline,
+      mapOutline,
+      personOutline,
+      locationOutline,
+      cubeOutline,
+      informationCircleOutline,
+      navigateOutline,
+    });
+        this.actualizarGrupos();
+
+  }
+  ionViewWillEnter() {
     this.actualizarGrupos();
   }
 
   actualizarGrupos() {
-   /* this.grupoService.obtenerGrupos().subscribe(
-      (data) => {
-        this.grupos = data as any[];
+    this.authService.obtenerRutas().subscribe({
+      next: (data) => {
+        this.grupos = data;
       },
-      (error) => {
-        console.error('Error al obtener grupos:', error);
+      error: (error) => {
+        this.mostrarToast('Error al cargar las rutas', 'danger');
         this.grupos = [];
-      }
-    );*/
+      },
+    });
+  }
+
+  async verRutaEnMapa(grupo: any) {
+    const modal = await this.modalController.create({
+      component: DetalleRutaPage,
+      componentProps: {
+        ruta: grupo,
+      },
+    });
+    await modal.present();
   }
 
   async abrirModalAgregarGrupo() {
- const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: AgregarrutaPage,
-      componentProps: {
-        carreras: this.carreras
-      }
     });
     await modal.present();
-    modal.onDidDismiss().then(() => {
-      this.actualizarGrupos();
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        this.actualizarGrupos();
+      }
     });
   }
 
@@ -58,29 +90,55 @@ export class GestionRutasPage  {
     const modal = await this.modalController.create({
       component: ModificarrutaPage,
       componentProps: {
-        grupoCarreraId: grupo.id ,
-        grupoSeleccionado: grupo
-      }
+        grupoSeleccionado: grupo,
+      },
     });
     await modal.present();
-    modal.onDidDismiss().then(() => {
+    modal.onDidDismiss().then((result) => {
       this.actualizarGrupos();
     });
   }
 
   async abrirModalEliminarGrupo(grupo: any) {
-   const modal = await this.modalController.create({
-      component: EliminarrrutaPage,
-      componentProps: {
-        grupoId: grupo.id,
-    grupoCarreraId: grupo.id
-          }
+    const toast = await this.toastController.create({
+      message: `¿Eliminar la ruta ${grupo.nombre}?`,
+      position: 'top',
+      color: 'danger',
+      duration: 5000,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          handler: () => {
+            this.eliminarRuta(grupo.id);
+          },
+        },
+      ],
     });
-    await modal.present();
-    modal.onDidDismiss().then(() => {
-      this.actualizarGrupos();
+    await toast.present();
+  }
+
+  eliminarRuta(id: number) {
+    this.authService.eliminarRuta(id).subscribe({
+      next: () => {
+        this.mostrarToast('Ruta eliminada correctamente', 'success');
+        this.actualizarGrupos();
+      },
+      error: (err) => {
+        this.mostrarToast('Error al eliminar la ruta', 'danger');
+      },
     });
   }
 
-
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color: color,
+    });
+    toast.present();
+  }
 }

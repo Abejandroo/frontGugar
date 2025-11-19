@@ -6,7 +6,6 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class Auth {
-  // Asegúrate que esta sea tu IP correcta (localhost o IP de red)
   private apiUrl = 'http://localhost:3000'; 
 
   constructor(private http: HttpClient) { }
@@ -39,5 +38,26 @@ export class Auth {
   }
    eliminarUsuario(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/usuarios/${id}`);
+  }
+  
+ 
+  // GESTIÓN DE RUTAS
+
+  crearRuta(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rutas`, data);
+  }
+
+  obtenerRutas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/rutas`);
+  }
+
+  obtenerRuta(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/rutas/${id}`);
+  }
+  actualizarRuta(id: number, data: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/rutas/${id}`, data);
+  }
+  eliminarRuta(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/rutas/${id}`);
   }
 }

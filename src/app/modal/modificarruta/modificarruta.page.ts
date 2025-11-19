@@ -1,65 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { IonicModule, ModalController, NavParams, ToastController, AlertController } from '@ionic/angular';
-import { close, trash, map } from 'ionicons/icons'; // Agregué iconos nuevos
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IonicModule, ModalController, NavParams, ToastController } from '@ionic/angular';
+import { close, trash, fingerPrint } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-// 1. Importamos Google Maps
 import { GoogleMapsModule } from '@angular/google-maps';
+import { Auth } from 'src/app/service/auth';
 
 @Component({
   selector: 'app-modificarruta',
   templateUrl: './modificarruta.page.html',
   styleUrls: ['./modificarruta.page.scss'],
   standalone: true,
-  // 2. Agregamos el módulo
-  imports: [IonicModule, FormsModule, ReactiveFormsModule, CommonModule, GoogleMapsModule],
+  imports: [IonicModule, CommonModule, GoogleMapsModule, ReactiveFormsModule],
 })
-export class ModificarrutaPage {
-  grupoSeleccionado: any;
-  nombre: string = '';
-  grupoCarreraId: number = 0;
-  grupos: any[] = [];
-  selectedGrupoId: string = '';
+export class ModificarrutaPage implements OnInit {
+  
+  formRuta!: FormGroup;
+  rutaSeleccionada: any; 
+  repartidores: any[] = []; 
 
-  // --- VARIABLES DEL MAPA ---
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 }; // Oaxaca
+  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 14;
-  puntosRuta: google.maps.LatLngLiteral[] = []; // Aquí se guarda el trazo
+  puntosRuta: google.maps.LatLngLiteral[] = [];
   polylineOptions: google.maps.PolylineOptions = {
     strokeColor: '#3880ff',
     strokeOpacity: 1.0,
     strokeWeight: 4,
   };
-  // --------------------------
 
   constructor(
-    private modalController: ModalController,
-    private toastController: ToastController,
-    private http: HttpClient,
-    private readonly navParams: NavParams
+    private readonly modalController: ModalController,
+    private readonly toastController: ToastController,
+    private fb: FormBuilder,
+    private authService: Auth,
+    private navParams: NavParams
   ) {
-    this.grupoSeleccionado = this.navParams.get('grupoSeleccionado');
+    addIcons({ close, 'close-outline': close, trash, 'finger-print': fingerPrint });
     
-    // Inicialización segura
-    if (this.grupoSeleccionado) {
-      this.nombre = this.grupoSeleccionado.nombre;
-      this.grupoCarreraId = this.grupoSeleccionado.carreraId;
-      // Si al abrir el modal ya venía con ruta, intentamos cargarla
-      this.cargarRutaEnMapa(this.grupoSeleccionado);
-    }
-
-    this.loadGrupos();
-    addIcons({ close, 'close-outline': close, trash, map });
+    this.formRuta = this.fb.group({
+      nombre: ['', Validators.required],
+      rutaId: [null, Validators.required],
+      lugarEntrega: ['', Validators.required],
+      cantidad: ['', [Validators.required, Validators.min(1)]],
+      acciones: [''],
+    });
   }
 
-  // --- LÓGICA DEL MAPA (IGUAL QUE EN AGREGAR) ---
+  ngOnInit() {
+    this.cargarRepartidores();
+
+    this.rutaSeleccionada = this.navParams.get('grupoSeleccionado');
+
+    if (this.rutaSeleccionada) {
+      console.log('Editando ruta:', this.rutaSeleccionada);
+      
+      this.formRuta.patchValue({
+        nombre: this.rutaSeleccionada.nombre,
+        rutaId: this.rutaSeleccionada.repartidor?.id || this.rutaSeleccionada.idRepartidor,
+        lugarEntrega: this.rutaSeleccionada.lugarEntrega,
+        cantidad: this.rutaSeleccionada.cantidad,
+        acciones: this.rutaSeleccionada.acciones
+      });
+
+      this.cargarMapaExistente();
+    }
+  }
+
+  cargarRepartidores() {
+    this.authService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.repartidores = usuarios.filter(u => u.role === 'repartidor');
+      }
+    });
+  }
+
+  cargarMapaExistente() {
+    if (this.rutaSeleccionada.coordenadas) {
+      try {
+        this.puntosRuta = typeof this.rutaSeleccionada.coordenadas === 'string'
+          ? JSON.parse(this.rutaSeleccionada.coordenadas)
+          : this.rutaSeleccionada.coordenadas;
+        
+        if (this.puntosRuta.length > 0) {
+          this.center = this.puntosRuta[0];
+          this.zoom = 15;
+        }
+      } catch (e) {
+        console.error('Error cargando mapa:', e);
+      }
+    }
+  }
+
   agregarPuntoAlMapa(event: google.maps.MapMouseEvent) {
     if (event.latLng) {
       const nuevoPunto = event.latLng.toJSON();
       this.puntosRuta.push(nuevoPunto);
-      this.puntosRuta = [...this.puntosRuta]; // Refresh para Angular
+      this.puntosRuta = [...this.puntosRuta]; 
     }
   }
 
@@ -67,88 +104,48 @@ export class ModificarrutaPage {
     this.puntosRuta = [];
   }
 
-  // Función auxiliar para leer las coordenadas del objeto
-  cargarRutaEnMapa(grupo: any) {
-    // AQUÍ ES IMPORTANTE: Asumo que en tu BD el campo se llama 'coordenadas' o 'ruta'
-    // y que viene como un string JSON o un array.
-    if (grupo && grupo.coordenadas) {
-      try {
-        // Si viene como string (ej: "[{lat:..., lng:...}]"), lo parseamos
-        if (typeof grupo.coordenadas === 'string') {
-           this.puntosRuta = JSON.parse(grupo.coordenadas);
-        } else {
-           // Si ya es objeto
-           this.puntosRuta = grupo.coordenadas;
-        }
-        
-        // Centrar el mapa en el primer punto de la ruta cargada
-        if(this.puntosRuta.length > 0) {
-            this.center = this.puntosRuta[0];
-        }
-      } catch (e) {
-        console.error('Error al leer coordenadas', e);
-      }
-    } else {
-      this.puntosRuta = []; // Si no tiene ruta, limpiamos
+  async modificarGrupo() {
+    if (this.formRuta.invalid) {
+      this.mostrarToast('Revisa los campos obligatorios', 'warning');
+      this.formRuta.markAllAsTouched();
+      return;
     }
-  }
-  // ----------------------------------------------
+    
+    if (this.puntosRuta.length < 2) {
+       this.mostrarToast('La ruta debe tener un trazo en el mapa', 'warning');
+       return;
+    }
 
-  loadGrupos() {
-    this.http.get<any[]>('https://backescolar-production.up.railway.app/grupos/getAll').subscribe({
-      next: (data) => this.grupos = data,
-      error: () => this.mostrarToastError('Error al cargar los grupos')
+    const formValues = this.formRuta.value;
+    
+    const dataFinal = {
+      nombre: formValues.nombre.toUpperCase(),
+      idRepartidor: formValues.rutaId,
+      lugarEntrega: formValues.lugarEntrega.toUpperCase(),
+      cantidad: Number(formValues.cantidad),
+      acciones: formValues.acciones ? formValues.acciones.toUpperCase() : '',
+      coordenadas: this.puntosRuta
+    };
+
+    this.authService.actualizarRuta(this.rutaSeleccionada.id, dataFinal).subscribe({
+      next: () => {
+        this.mostrarToast('Ruta actualizada con éxito', 'success');
+        this.modalController.dismiss(true);
+      },
+      error: (err) => {
+        this.mostrarToast('Error al actualizar la ruta', 'danger');
+      }
     });
   }
 
-  modificarGrupo() {
-    // Preparamos el objeto con el nombre Y las coordenadas
-    const grupoActualizado = {
-      nombre: this.nombre,
-      // Convertimos el array del mapa a string para enviarlo (o directo si tu backend recibe JSON)
-      coordenadas: JSON.stringify(this.puntosRuta) 
-    };
-
-    this.http.patch(`https://backescolar-production.up.railway.app/grupos/update/${this.grupoCarreraId}`, grupoActualizado)
-      .subscribe({
-        next: () => {
-          this.mostrarToastSuccess('Ruta modificada correctamente');
-          this.cerrarModal();
-        },
-        error: () => this.mostrarToastError('Error al modificar la ruta')
-      });
-  }
-
-  onGrupoChange(event: any) {
-    const grupo = this.grupos.find(g => g.id === this.grupoCarreraId);
-    if (grupo) {
-      this.nombre = grupo.nombre;
-      // ✨ MAGIA: Cuando cambias el select, cargamos el trazo en el mapa
-      this.cargarRutaEnMapa(grupo);
-    }
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje, duration: 2000, position: 'top', color: color
+    });
+    toast.present();
   }
 
   cerrarModal() {
     this.modalController.dismiss();
-  }
-
-  async mostrarToastSuccess(mensaje: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2000,
-      position: 'top',
-      color: 'success'
-    });
-    toast.present();
-  }
-
-  async mostrarToastError(mensaje: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2000,
-      position: 'top',
-      color: 'danger'
-    });
-    toast.present();
   }
 }
