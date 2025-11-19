@@ -105,3 +105,150 @@ ion-item .item-native ion-label {
   object-fit: contain;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
+/* --- Nuevos Estilos para los Indicadores (basados en la referencia) --- */
+
+.indicator-col {
+  display: flex; /* Asegura que la columna use todo el espacio para el centrado */
+  justify-content: center; /* Centra las tarjetas en el espacio disponible */
+}
+
+.small-indicator-card {
+  width: 100%; /* Ocupa el ancho completo de su columna */
+  max-width: 160px; /* Limita el ancho máximo para que no crezcan demasiado */
+  background: #ffffff; /* Fondo blanco */
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra sutil */
+  margin: 0; /* Sin márgenes externos ya que la columna maneja el espacio */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 10px; /* Relleno interno para espacio */
+  text-align: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  ion-card-content {
+    padding: 0; /* Quitamos el padding por defecto del card-content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .indicator-icon-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espacio entre el icono y el número */
+    margin-bottom: 5px; /* Espacio entre el número y la etiqueta */
+
+    ion-icon {
+      font-size: 1.8rem; /* Tamaño del icono */
+      // Los colores de los iconos se gestionan directamente en el HTML con `color="..."`
+    }
+
+    .indicator-value {
+      font-size: 2.2rem; /* Tamaño grande del número */
+      font-weight: 700;
+      color: #333333; /* Color oscuro para el número */
+    }
+  }
+
+  .indicator-label {
+    font-size: 0.9rem; /* Tamaño del texto de la etiqueta */
+    color: #666666; /* Color gris para el texto de la etiqueta */
+    margin: 0; /* Quitamos márgenes por defecto del párrafo */
+    line-height: 1.2;
+  }
+}
+
+/* --- Asegúrate de que los estilos existentes de .opcion-card no interfieran --- */
+/* Los indicadores no deben tener el estilo de imagen flotante a la derecha */
+.small-indicator-card.card-with-image-right img {
+  display: none; /* Oculta la imagen si la clase card-with-image-right se aplica por error */
+}
+
+// Puedes querer desactivar otros estilos de .opcion-card para .small-indicator-card
+// Si .opcion-card tiene estilos muy específicos que chocan
+.small-indicator-card {
+  background: #ffffff !important; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: none !important; 
+}
+
+.welcome-message {
+  h2, p {
+    color: var(--ion-color-light-contrast, #ffffff); /* Asegura que el texto sea blanco */
+  }
+  p {
+    font-size: 1.05rem;
+  }
+}
+.atajos-container {
+  margin-top: 25px;
+  // padding: 0 10px; <--- Quita esto si quieres que el ion-col maneje los márgenes
+  
+  h3 {
+    color: white;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    // padding-left: 5px; <--- Ya no es necesario si centramos el texto
+  }
+}
+
+.atajos-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* ✨ NUEVO: Limita el ancho máximo y centra la tarjeta en su columna */
+  max-width: 500px; 
+  margin: 0 auto; 
+  
+  padding: 5px 0; /* Reduje un poco el padding vertical para que no sea tan alto */
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+  }
+
+  .atajo-item {
+    --background: transparent;
+    --min-height: 50px; /* Reduje un poco la altura de cada item (antes 55px) */
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 1.5rem; /* Icono ligeramente más pequeño */
+      color: white;
+      margin-right: 15px;
+    }
+
+    ion-label {
+      font-size: 1rem; /* Fuente un poco más fina */
+      font-weight: 600;
+      color: white;
+      text-decoration: underline;
+      text-decoration-color: white;
+      text-underline-offset: 4px;
+    }
+
+    &:hover {
+      ion-label {
+        color: var(--ion-color-primary);
+        text-decoration-color: var(--ion-color-primary);
+      }
+      ion-icon {
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+}

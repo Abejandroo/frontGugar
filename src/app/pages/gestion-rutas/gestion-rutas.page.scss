@@ -349,3 +349,19 @@ ion-button {
   font-weight: bold;
   letter-spacing: 0.5px;
 }
+.card-actions {
+      border-top: 1px solid #eeeeee; // Borde gris claro fijo
+      padding: 8px;
+      display: flex;
+      justify-content: space-around;
+      background: #fafafa; // Fondo gris muy claro fijo
+      
+      ion-button {
+        height: 36px;
+        margin: 0 4px;
+        --padding-start: 8px;
+        --padding-end: 8px;
+        font-weight: 600;
+      }
+    }
+  

@@ -95,20 +95,23 @@
               }
 
             </ion-list>
-            <div class="ion-text-center ion-padding-top">
+            <div class="card-actions">
               <ion-button
                 fill="clear"
                 color="warning"
                 (click)="abrirModalEditarGrupo(grupo)"
               >
-                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-              </ion-button>
+               <ion-icon slot="start" name="create-outline"></ion-icon>
+              Editar
+            </ion-button>
+              
               <ion-button
                 fill="clear"
                 color="danger"
                 (click)="abrirModalEliminarGrupo(grupo)"
               >
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              Eliminar
               </ion-button>
             </div>
           </ion-card-content>
