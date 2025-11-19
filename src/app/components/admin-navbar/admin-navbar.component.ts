@@ -29,15 +29,12 @@ export class AdminNavbarComponent {
 
     switch (pagina) {
       case 'inicio':
-        // Ruta correcta según tu app.routes.ts
         this.router.navigate(['/usuario/admin']); 
         break;
       case 'rutas':
-        // ✨ CORREGIDO: Quitamos '/pages/' ✨
         this.router.navigate(['/gestion-rutas']); 
         break;
       case 'usuarios':
-        // ✨ CORREGIDO: Quitamos '/pages/' ✨
         this.router.navigate(['/conductores']); 
         break;
     }

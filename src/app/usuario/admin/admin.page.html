@@ -1,9 +1,6 @@
 <ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
     <ion-buttons slot="start">
-      <ion-button (click)="toggleMenu()">
-        <ion-icon slot="icon-only" name="menu"></ion-icon>
-      </ion-button>
     </ion-buttons>
     <ion-grid fixed>
       <ion-row class="ion-justify-content-center ion-align-items-center">
@@ -17,8 +14,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
    <div class="welcome-message">
-      <h2>👋 Bienvenido, {{ userName }}</h2> <!-- Usamos la variable dinámica -->
-      <p class="fecha">{{ fechaHoy }}</p>     <!-- Usamos la variable dinámica -->
+      <h2>👋 Bienvenido, {{ userName }}</h2>       <p class="fecha">{{ fechaHoy }}</p>    
       <p>Selecciona una opción para comenzar:</p>
     </div>
   <ion-grid>

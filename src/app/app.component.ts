@@ -2,12 +2,11 @@ import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet, IonMenu, } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
-import { MenuAdminPage } from "./menu/menu-admin/menu-admin.page";
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [ IonApp, IonRouterOutlet, IonMenu, MenuAdminPage],
+  imports: [ IonApp, IonRouterOutlet, IonMenu, ],
   
 })
 export class AppComponent {

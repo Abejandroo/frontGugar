@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Auth } from 'src/app/service/auth';
-// Importamos el componente de la barra de navegación
 import { AdminNavbarComponent } from 'src/app/components/admin-navbar/admin-navbar.component';
 import { addIcons } from 'ionicons';
 import { 

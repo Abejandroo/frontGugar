@@ -14,7 +14,7 @@ import { Auth } from 'src/app/service/auth';
   standalone: true,
   imports: [IonicModule, CommonModule, GoogleMapsModule, ReactiveFormsModule],
 })
-export class ModificarrutaPage implements OnInit {
+export class ModificarrutaPage  {
   
   formRuta!: FormGroup;
   rutaSeleccionada: any; 
@@ -45,10 +45,7 @@ export class ModificarrutaPage implements OnInit {
       cantidad: ['', [Validators.required, Validators.min(1)]],
       acciones: [''],
     });
-  }
-
-  ngOnInit() {
-    this.cargarRepartidores();
+      this.cargarRepartidores();
 
     this.rutaSeleccionada = this.navParams.get('grupoSeleccionado');
 
@@ -66,6 +63,7 @@ export class ModificarrutaPage implements OnInit {
       this.cargarMapaExistente();
     }
   }
+
 
   cargarRepartidores() {
     this.authService.getUsuarios().subscribe({
