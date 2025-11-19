@@ -16,10 +16,11 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div class="welcome-message">
-    <h2>👋 Bienvenido, Administrador</h2>
-    <p>Selecciona una opción para comenzar:</p>
-  </div>
+   <div class="welcome-message">
+      <h2>👋 Bienvenido, {{ userName }}</h2> <!-- Usamos la variable dinámica -->
+      <p class="fecha">{{ fechaHoy }}</p>     <!-- Usamos la variable dinámica -->
+      <p>Selecciona una opción para comenzar:</p>
+    </div>
   <ion-grid>
     <p style="text-align: center;">Estado General hoy:</p>
     <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
