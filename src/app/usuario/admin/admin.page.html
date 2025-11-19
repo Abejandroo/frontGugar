@@ -1,6 +1,6 @@
 <ion-header [translucent]="true" class="ion-no-border">
-<ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">  
-<ion-buttons slot="start">
+  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
+    <ion-buttons slot="start">
       <ion-button (click)="toggleMenu()">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
@@ -12,20 +12,20 @@
         </ion-col>
       </ion-row>
     </ion-grid>
-    
   </ion-toolbar>
 </ion-header>
+
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="welcome-message">
     <h2>👋 Bienvenido, Administrador</h2>
     <p>Selecciona una opción para comenzar:</p>
   </div>
   <ion-grid>
-    <p style="text-align: center;" >Estado General hoy: </p>
+    <p style="text-align: center;">Estado General hoy:</p>
     <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
       <ion-col size="12" size-md="5">
-        <ion-card class="opcion-card card-with-image-right">       
-        <ion-card-header>
+        <ion-card class="opcion-card card-with-image-right">
+          <ion-card-header>
             <ion-card-title>Rutas Activas</ion-card-title>
           </ion-card-header>
           <ion-card-content>
@@ -35,7 +35,7 @@
         </ion-card>
       </ion-col>
       <ion-col size="12" size-md="5">
-        <ion-card  class="opcion-card card-with-image-right">
+        <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
             <ion-card-title>Notificaciones</ion-card-title>
           </ion-card-header>
@@ -46,20 +46,20 @@
         </ion-card>
       </ion-col>
       <ion-col size="12" size-md="5">
-        <ion-card  class="opcion-card card-with-image-right">
+        <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
             <ion-card-title>
               Rutas Pendientes
             </ion-card-title>
           </ion-card-header>
-           <ion-card-content>
+          <ion-card-content>
             5
           </ion-card-content>
           <img src="assets/reloj.png" alt="reloj" class="card-image-absolute">
         </ion-card>
       </ion-col>
       <ion-col size="12" size-md="5">
-        <ion-card  class="opcion-card card-with-image-right">
+        <ion-card class="opcion-card card-with-image-right">
           <ion-card-header>
             <ion-card-title>Incidencias</ion-card-title>
           </ion-card-header>
@@ -70,11 +70,11 @@
         </ion-card>
       </ion-col>
     </ion-row>
-    <p style="text-align: center;" >Accesos Principales:</p>
-   <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
+    <p style="text-align: center;">Accesos Principales:</p>
+    <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
       <ion-col size="12" size-md="5">
-        <ion-card button (click)="irARutas()" class="opcion-card card-with-image-right">       
-        <ion-card-header>
+        <ion-card button (click)="irARutas()" class="opcion-card card-with-image-right">
+          <ion-card-header>
             <ion-card-title> Gestión de Rutas</ion-card-title>
           </ion-card-header>
         </ion-card>
@@ -90,4 +90,8 @@
 
     </ion-row>
   </ion-grid>
+  <div style="height: 80px;"></div>
 </ion-content>
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-admin-navbar paginaActual="inicio"></app-admin-navbar>
+</ion-footer>

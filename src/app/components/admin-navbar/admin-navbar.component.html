@@ -1,0 +1,46 @@
+<div class="navbar-container">
+  
+  <!-- 1. Botón INICIO -->
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'inicio'"
+    (click)="navegar('inicio')"> <!-- ✨ CORREGIDO: Usamos la palabra clave -->
+    <ion-icon name="home"></ion-icon>
+    
+    @if (paginaActual === 'inicio') {
+      <span>Inicio</span>
+    }
+  </div>
+
+  <!-- 2. Botón RUTAS -->
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'rutas'"
+    (click)="navegar('rutas')"> <!-- ✨ CORREGIDO: Usamos la palabra clave -->
+    <ion-icon name="compass"></ion-icon>
+    
+    @if (paginaActual === 'rutas') {
+      <span>Rutas</span>
+    }
+  </div>
+
+  <!-- 3. Botón USUARIOS -->
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'usuarios'"
+    (click)="navegar('usuarios')"> <!-- ✨ CORREGIDO: Usamos la palabra clave -->
+    <ion-icon name="people"></ion-icon>
+    
+    @if (paginaActual === 'usuarios') {
+      <span>Usuarios</span>
+    }
+  </div>
+
+  <!-- 4. Botón AJUSTES -->
+  <div 
+    class="nav-item" 
+    (click)="abrirMenu($event)">
+    <ion-icon name="settings"></ion-icon>
+  </div>
+
+</div>

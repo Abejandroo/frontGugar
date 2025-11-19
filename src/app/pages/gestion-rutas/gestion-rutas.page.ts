@@ -18,13 +18,14 @@ import {
   informationCircleOutline,
   navigateOutline,
 } from 'ionicons/icons';
+import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 
 @Component({
   selector: 'app-gestion-rutas',
   templateUrl: './gestion-rutas.page.html',
   styleUrls: ['./gestion-rutas.page.scss'],
   standalone: true,
-  imports: [IonicModule, ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [IonicModule, ReactiveFormsModule, CommonModule, FormsModule, AdminNavbarComponent],
 })
 export class GestionRutasPage  {
   grupos: any[] = [];

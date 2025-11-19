@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  width: 100%;
+  // Centramos el componente dentro del footer
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px; // Un pequeño respiro abajo
+}
+
+.navbar-container {
+  background-color: #cceeff; // Un azul cielo muy clarito (como en tu imagen)
+  border-radius: 40px; // ¡Súper redondo para efecto píldora!
+  height: 65px;
+  width: 90%; // No ocupa todo el ancho, para que flote
+  max-width: 400px; // Que no se estire demasiado en tablets
+  
+  display: flex;
+  justify-content: space-between; // Espacio entre iconos
+  align-items: center;
+  padding: 0 20px; // Espacio interno a los lados
+  
+  box-shadow: 0 10px 25px rgba(144, 194, 255, 0.3); // Sombra suave azulada
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333; 
+  padding: 10px;
+  border-radius: 30px;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+
+  ion-icon {
+    font-size: 1.6rem;
+    color: #444; // Gris oscuro para inactivos
+  }
+
+  // Estado ACTIVO (La píldora azul fuerte)
+  &.active {
+    background-color: #8cbbf1; // Azul intermedio (el del botón activo)
+    color: #0044aa; 
+    padding: 8px 20px; 
+    gap: 8px; 
+    
+    ion-icon {
+      color: #003380; // Icono activo más oscuro
+    }
+
+    span {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #003380;
+      animation: slideIn 0.3s ease;
+      white-space: nowrap;
+    }
+  }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; width: 0; transform: translateX(-10px); }
+  to { opacity: 1; width: auto; transform: translateX(0); }
+}
