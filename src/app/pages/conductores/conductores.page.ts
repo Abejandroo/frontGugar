@@ -19,13 +19,14 @@ import {
   personCircleOutline,
   shieldCheckmarkOutline,
 } from 'ionicons/icons';
+import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 
 @Component({
   selector: 'app-conductores',
   templateUrl: './conductores.page.html',
   styleUrls: ['./conductores.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, AdminNavbarComponent],
 })
 export class ConductoresPage  {
   usuarios: any[] = [];
