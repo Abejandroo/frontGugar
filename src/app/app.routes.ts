@@ -61,10 +61,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/conductores/conductores.page').then( m => m.ConductoresPage)
   },
   {
-    path: 'reportes',
-    loadComponent: () => import('./pages/reportes/reportes.page').then( m => m.ReportesPage)
-  },
-  {
     path: 'agregarconductor',
     loadComponent: () => import('./modal/agregarconductor/agregarconductor.page').then( m => m.AgregarconductorPage)
   },

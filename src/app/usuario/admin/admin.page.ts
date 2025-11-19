@@ -39,12 +39,4 @@ this.menuC.toggle('admin-menu');
     this.router.navigate(['conductores']);
   }
 
-  irASupervisores() {
-    this.router.navigate(['supervisores']);
-  }
-
-  irAReportes() {
-    this.router.navigate(['reportes']);
-  }
-
 }
