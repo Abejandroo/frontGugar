@@ -72,11 +72,7 @@ export const routes: Routes = [
     path: 'editarconductor',
     loadComponent: () => import('./modal/editarconductor/editarconductor.page').then( m => m.EditarconductorPage)
   },
-  {
-    path: 'eliminarconductor',
-    loadComponent: () => import('./modal/eliminarconductor/eliminarconductor.page').then( m => m.EliminarconductorPage)
-  },
-  {
+   {
     path: 'agregarruta',
     loadComponent: () => import('./modal/agregarruta/agregarruta.page').then( m => m.AgregarrutaPage)
   },
@@ -84,10 +80,12 @@ export const routes: Routes = [
     path: 'modificarruta',
     loadComponent: () => import('./modal/modificarruta/modificarruta.page').then( m => m.ModificarrutaPage)
   },
+  
   {
-    path: 'eliminarrruta',
-    loadComponent: () => import('./modal/eliminarrruta/eliminarrruta.page').then( m => m.EliminarrrutaPage)
+    path: 'detalle-ruta',
+    loadComponent: () => import('./modal/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage)
   },
+
 
 
 

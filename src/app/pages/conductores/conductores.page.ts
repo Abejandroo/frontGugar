@@ -6,7 +6,7 @@ import {
   IonicModule,
   ToastController,
   ModalController,
-  AlertController, // Lo dejamos por si lo usas en otro lado
+  AlertController,
 } from '@ionic/angular';
 import { Auth } from 'src/app/service/auth';
 import { AgregarconductorPage } from 'src/app/modal/agregarconductor/agregarconductor.page';
@@ -27,7 +27,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule],
 })
-export class ConductoresPage implements OnInit {
+export class ConductoresPage  {
   usuarios: any[] = [];
 
   constructor(
@@ -44,12 +44,8 @@ export class ConductoresPage implements OnInit {
       personCircleOutline,
       shieldCheckmarkOutline,
     });
+     this.obtenerUsuarios();
   }
-
-  ngOnInit() {
-    this.obtenerUsuarios();
-  }
-
   ionViewWillEnter() {
     this.obtenerUsuarios();
   }

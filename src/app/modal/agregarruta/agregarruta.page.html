@@ -23,23 +23,34 @@
       </ion-item>
 
       <ion-item>
-        <ion-select label="REPARTIDOR" labelPlacement="floating" formControlName="rutaId" (ionChange)="cargarAlumnosDelGrupo()">
-          <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
-            {{ rep.nombre }}
-          </ion-select-option>
+        <ion-select 
+          label="REPARTIDOR" 
+          labelPlacement="floating" 
+          formControlName="rutaId" 
+          placeholder="Selecciona un conductor"
+          interface="popover"> 
+          
+          @for (rep of repartidores; track rep.id) {
+            <ion-select-option [value]="rep.id">
+              {{ rep.name }} 
+            </ion-select-option>
+          }
+
         </ion-select>
       </ion-item>
 
-      <ion-text color="danger" *ngIf="formRuta.get('rutaId')?.touched && formRuta.get('rutaId')?.invalid">
-        <p class="ion-padding-start" style="font-size: 0.8rem;">Selecciona un repartidor</p>
-      </ion-text>
+      @if (formRuta.get('rutaId')?.touched && formRuta.get('rutaId')?.invalid) {
+        <ion-text color="danger">
+          <p class="ion-padding-start" style="font-size: 0.8rem;">Selecciona un repartidor</p>
+        </ion-text>
+      }
 
       <ion-item>
         <ion-input label="LUGAR DE ENTREGA" labelPlacement="floating" formControlName="lugarEntrega"></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-input label="CANTIDAD DE PAQUETES" type="number" labelPlacement="floating" formControlName="cantidad"></ion-input>
+        <ion-input label="CANTIDAD DE PAQUETES" type="number" labelPlacement="floating" formControlName="cantidad" min="0"></ion-input>
       </ion-item>
 
       <ion-item>
@@ -61,14 +72,19 @@
         (mapClick)="agregarPuntoAlMapa($event)">
         
         <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
-        <map-marker *ngFor="let punto of puntosRuta" [position]="punto"></map-marker>
+        
+        @for (punto of puntosRuta; track punto) {
+            <map-marker [position]="punto"></map-marker>
+        }
+
       </google-map>
     </div>
-
-    <ion-button *ngIf="puntosRuta.length > 0" fill="clear" color="danger" expand="block" (click)="limpiarRuta()">
-      <ion-icon name="trash" slot="start"></ion-icon>
-      Limpiar Trazo
-    </ion-button>
+    @if (puntosRuta.length > 0) {
+      <ion-button fill="clear" color="danger" expand="block" (click)="limpiarRuta()">
+        <ion-icon name="trash" slot="start"></ion-icon>
+        Limpiar Trazo
+      </ion-button>
+    }
 
     <div class="ion-padding-top">
       <ion-button expand="block" (click)="agregarGrupo()">
