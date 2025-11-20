@@ -1,12 +1,31 @@
-.map-container {
-  margin-top: 10px;
-  border-radius: 15px;
-  overflow: hidden; /* Para que las esquinas redondeadas funcionen */
-  border: 2px solid var(--ion-color-light);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+ion-item {
+  // Fondo blanco de la burbuja
+  --background: #ffffff;
+  
+  // CORRECCIÓN DE COLOR: Forzamos texto negro
+  --color: #000000; 
+  
+  // Color del placeholder (el texto de ejemplo)
+  --placeholder-color: #666666;
+  --placeholder-opacity: 0.6;
+
+  // Estilos de bordes redondeados
+  --border-radius: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  // IMPORTANTE: Esto fuerza a quitar la línea si el HTML no lo hizo
+  --border-width: 0;
+  --inner-border-width: 0;
+  
+  // Un pequeño truco para que la etiqueta (label) se destaque más
+  ion-input, ion-select {
+    --color: #000000; // Texto que escribe el usuario
+    font-weight: 500;
+  }
 }
 
-google-map {
-  width: 100%;
-  display: block;
+// Si estás usando etiquetas flotantes (floating labels), esto ayuda a que se vean bien
+ion-label {
+  color: #555555 !important; // Gris oscurito para el título
 }
