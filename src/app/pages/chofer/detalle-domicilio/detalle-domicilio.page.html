@@ -2,7 +2,7 @@
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-button (click)="abrirMenu()">
-        <ion-icon name="menu"></ion-icon>
+<!-- <ion-icon name="menu-outline"></ion-icon> -->
       </ion-button>
     </ion-buttons>
     <ion-title>Ruta San Felipe - Lunes</ion-title>
@@ -17,11 +17,50 @@
 </ion-header>
 
 <ion-content>
+  <!-- SIEMPRE mostrar el mapa, sin *ngIf -->
+  <div class="map-container">
+    <div #map id="map"></div>
+  </div>
+
+  <!-- El resto SÍ puede tener *ngIf -->
   <div class="content-wrapper" *ngIf="domicilioActual">
-    <!-- Mapa -->
-    <div class="map-container">
-      <div #map id="map" style="height: 100%; width: 100%;"></div>
+    <!-- Controles del mapa -->
+    <div class="map-controls">
+      <ion-button 
+        size="small" 
+        [color]="mostrarTodosLosPuntos ? 'primary' : 'light'"
+        (click)="toggleVistaCompleta()">
+        {{ mostrarTodosLosPuntos ? 'Ver Solo Actual' : 'Ver Ruta Completa' }}
+      </ion-button>
+      
+      <ion-button 
+        size="small" 
+        color="success"
+        (click)="iniciarNavegacion()"
+        [disabled]="!ubicacionActual || loading">
+        Iniciar Navegación
+      </ion-button>
     </div>
+
+    <!-- Info de navegación -->
+    <ion-card *ngIf="distanciaAlSiguiente && tiempoEstimado" class="nav-info-card">
+      <ion-card-content>
+        <div class="nav-info">
+          <div class="nav-item">
+            <div>
+              <div class="nav-label">Distancia</div>
+              <div class="nav-value">{{ distanciaAlSiguiente }}</div>
+            </div>
+          </div>
+          <div class="nav-item">
+            <div>
+              <div class="nav-label">Tiempo est.</div>
+              <div class="nav-value">{{ tiempoEstimado }}</div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
     <!-- Card de información del domicilio -->
     <div class="info-card">
@@ -40,7 +79,6 @@
           <div class="venta-info">
             <div class="info-row">
               <div class="info-item">
-                <ion-icon name="cube-outline"></ion-icon>
                 <span>Cantidad:</span>
                 <ion-input 
                   type="number" 
@@ -78,7 +116,6 @@
             class="btn-realizado"
             (click)="realizarVenta()"
             [disabled]="loading">
-            <ion-icon name="checkmark-circle" slot="start"></ion-icon>
             REALIZADO
           </ion-button>
 
@@ -90,7 +127,6 @@
               color="warning"
               (click)="mostrarAlertaSaltar()"
               [disabled]="loading">
-              <ion-icon name="arrow-forward-circle" slot="start"></ion-icon>
               SALTAR
             </ion-button>
           </div>
@@ -114,10 +150,6 @@
           [class.pendiente]="domicilio.estado === 'pendiente'">
           <ion-card-content>
             <div class="proximo-header">
-              <ion-icon 
-                name="time" 
-                [color]="domicilio.estado === 'pendiente' ? 'warning' : 'medium'">
-              </ion-icon>
               <div class="proximo-info">
                 <h4>{{ domicilio.nombreNegocio || domicilio.nombreCliente }}</h4>
                 <p class="proximo-estado">{{ domicilio.estado === 'pendiente' ? 'Pendiente' : 'Completado' }}</p>

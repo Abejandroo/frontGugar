@@ -161,4 +161,43 @@ export class DomicilioService {
       .slice(0, cantidad);
     return of(pendientes);
   }
+
+  // AGREGAR AL FINAL DE LA CLASE DomicilioService
+
+/**
+ * Obtiene todos los domicilios para mostrar en el mapa
+ */
+getAllDomiciliosParaMapa(): Observable<Domicilio[]> {
+  return of(this.domiciliosMock);
+}
+
+/**
+ * Obtiene solo los domicilios pendientes y el actual
+ */
+getDomiciliosPendientesYActual(): Observable<Domicilio[]> {
+  const domicilios = this.domiciliosMock.filter(
+    d => d.estado === 'pendiente' || d.estado === 'actual'
+  );
+  return of(domicilios).pipe(delay(300));
+}
+
+/**
+ * Reordena los domicilios según una nueva secuencia optimizada
+ */
+reordenarDomicilios(nuevosOrdenes: { id: number, orden: number }[]): Observable<any> {
+  nuevosOrdenes.forEach(item => {
+    const domicilio = this.domiciliosMock.find(d => d.id === item.id);
+    if (domicilio) {
+      domicilio.orden = item.orden;
+    }
+  });
+  
+  // Ordena el array
+  this.domiciliosMock.sort((a, b) => a.orden - b.orden);
+  this.domiciliosSubject.next([...this.domiciliosMock]);
+  
+  return of({ success: true, message: 'Ruta optimizada' }).pipe(delay(500));
+}
+
+
 }

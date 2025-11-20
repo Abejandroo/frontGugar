@@ -31,7 +31,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'detalle-domicilio',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   
