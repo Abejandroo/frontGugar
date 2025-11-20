@@ -1,0 +1,123 @@
+/* Hacemos que el grid ocupe todo el alto disponible */
+.full-height-grid, .full-height-row {
+  height: 100%;
+}
+
+/* --- COLUMNA IZQUIERDA (PANEL) --- */
+.panel-column {
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto; /* Scroll independiente para las instrucciones */
+  height: 100%;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+  z-index: 2; /* Para que la sombra caiga sobre el mapa */
+}
+
+.panel-header {
+  padding: 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+
+  h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.resumen-box {
+  margin-top: 10px;
+  
+  .tiempo {
+    color: #1a73e8; /* Azul Google */
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+
+  .detalles {
+    font-size: 1.1rem;
+    color: #202124;
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .direccion-origen, .direccion-destino {
+    font-size: 0.85rem;
+    color: #70757a;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Ajustes para el texto que Google genera automáticamente */
+#google-panel {
+  padding: 0;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+/* --- COLUMNA DERECHA (MAPA) --- */
+.map-column {
+  height: 100%;
+}
+
+/* REGLA RESPONSIVA: En celular, el mapa debe tener altura fija */
+@media (max-width: 768px) {
+  .panel-column {
+    height: 50%; /* Mitad pantalla */
+    order: 2; /* Poner abajo */
+  }
+  .map-column {
+    height: 50%; /* Mitad pantalla */
+    order: 1; /* Poner arriba */
+  }
+}
+/* ... tus estilos anteriores de grid ... */
+
+.kpi-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.kpi-box {
+  background: #f1f3f4;
+  border-radius: 8px;
+  padding: 10px;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  
+  .label { font-size: 0.7rem; color: #666; text-transform: uppercase; }
+  .value { font-size: 1.1rem; font-weight: bold; color: #333; }
+}
+
+#google-panel {
+  padding: 10px;
+}
+// Hacemos que el contenedor ocupe todo el alto disponible del modal
+.full-height-grid, .full-height-row {
+  height: 100%;
+  min-height: 100%; // Refuerzo para Safari
+}
+
+// Esto es crucial para el responsive
+.map-column {
+  height: 100%;
+  display: block;
+}
+
+// En celular (pantallas chicas), dividimos la altura
+@media (max-width: 768px) {
+  .panel-column { height: 50%; order: 2; }
+  .map-column { height: 50%; order: 1; }
+}

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import { close, trash, fingerPrint } from 'ionicons/icons';
+import { close, trash, fingerPrint, arrowUndo, repeat, saveOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { Auth } from 'src/app/service/auth'; 
@@ -22,6 +22,7 @@ export class AgregarrutaPage {
   center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 14;
   puntosRuta: google.maps.LatLngLiteral[] = [];
+  
   polylineOptions: google.maps.PolylineOptions = {
     strokeColor: '#3880ff',
     strokeOpacity: 1.0,
@@ -34,7 +35,13 @@ export class AgregarrutaPage {
     private fb: FormBuilder,
     private authService: Auth 
   ) {
-    addIcons({ close, 'close-outline': close, trash, 'finger-print': fingerPrint });
+    addIcons({ 
+      close, 'close-outline': close, 
+      trash, 'finger-print': fingerPrint,
+      'arrow-undo': arrowUndo,
+      'repeat': repeat,
+      'save-outline': saveOutline
+    });
     
     this.formRuta = this.fb.group({
       nombre: ['', Validators.required],
@@ -43,9 +50,10 @@ export class AgregarrutaPage {
       cantidad: ['', [Validators.required, Validators.min(1)]],
       acciones: [''],
     });
-        this.cargarRepartidores();
-
+    
+    this.cargarRepartidores();
   }
+
   cargarRepartidores() {
     this.authService.getUsuarios().subscribe({
       next: (usuarios) => {
@@ -63,6 +71,31 @@ export class AgregarrutaPage {
     }
   }
 
+  obtenerLetraMarcador(index: number): string {
+    return String.fromCharCode(65 + (index % 26));
+  }
+
+  deshacerUltimo() {
+    if (this.puntosRuta.length > 0) {
+      this.puntosRuta.pop();
+      this.puntosRuta = [...this.puntosRuta];
+    }
+  }
+
+  cerrarCircuito() {
+    if (this.puntosRuta.length < 2) {
+      this.mostrarToast('Necesitas al menos 2 puntos para cerrar un circuito', 'warning');
+      return;
+    }
+
+    const puntoInicial = this.puntosRuta[0];
+    
+    this.puntosRuta.push(puntoInicial);
+    this.puntosRuta = [...this.puntosRuta];
+    
+    this.mostrarToast('Circuito cerrado: Regreso al punto A', 'success');
+  }
+
   limpiarRuta() {
     this.puntosRuta = [];
   }
@@ -75,8 +108,8 @@ export class AgregarrutaPage {
     }
     
     if (this.puntosRuta.length < 2) {
-       this.mostrarToast('Dibuja la ruta en el mapa (mínimo 2 puntos)', 'warning');
-       return;
+      this.mostrarToast('Dibuja la ruta en el mapa (mínimo 2 puntos)', 'warning');
+      return;
     }
 
     const formValues = this.formRuta.value;
