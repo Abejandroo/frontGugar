@@ -1,0 +1,161 @@
+// VARIABLES DE COLOR Y ESTILO
+$primary-color: #0078ff;
+$secondary-color: #65c7f7;
+$accent-color: #28c76f;
+$background-color: #f6f8fb;
+$text-color: #333;
+$light-gray: #888;
+$white: #fff;
+
+// ESTILOS GENERALES
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: $background-color;
+  color: $text-color;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ENCABEZADO */
+.header {
+  background: linear-gradient(135deg, #0052d4, $secondary-color, #9cecfb);
+  color: $white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  position: relative;
+
+  .menu-btn {
+    background: none;
+    border: none;
+    color: $white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: $white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+
+  .hero {
+    flex-grow: 1;
+
+    .title {
+      font-size: 1rem;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .date {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  }
+}
+
+/* CONTENIDO */
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* LISTA DE CONDUCTORES */
+.drivers-list {
+  h2 {
+    font-size: 1.1rem;
+    color: $primary-color;
+    margin-bottom: 10px;
+  }
+
+  .driver-card {
+    background: $white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+
+    .driver-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .driver-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $text-color;
+      }
+
+      .driver-status {
+        background: $accent-color;
+        color: $white;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .driver-details {
+      margin-top: 8px;
+
+      p {
+        margin: 2px 0;
+        font-size: 0.9rem;
+        color: $light-gray;
+      }
+    }
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+
+    .avatar {
+      margin-bottom: 10px;
+    }
+
+    .hero .title {
+      font-size: 0.95rem;
+    }
+  }
+
+  .drivers-list h2 {
+    font-size: 1rem;
+  }
+
+  .driver-card {
+    padding: 12px;
+  }
+}

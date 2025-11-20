@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenido Supervisor</title>
+  <link rel="stylesheet" href="home.component.scss" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>BIENVENIDO</h1>
+    <h2>Esteban Pardo</h2>
+    <small>Lunes 10 de Octubre 2025</small>
+  </div>
+
+  <div class="indicadores">
+    <div class="card">
+      <h3>18</h3>
+      <p>Rutas asignadas</p>
+    </div>
+    <div class="card">
+      <h3>5</h3>
+      <p>Rutas completadas</p>
+    </div>
+    <div class="card">
+      <h3>0</h3>
+      <p>Incidencias</p>
+    </div>
+    <div class="card">
+      <h3>3</h3>
+      <p>Notificaciones</p>
+    </div>
+     <div class="card" (click)="goToRepartidores()">
+      <h3>3</h3>
+      <p>Repartidores</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="active">Activas</div>
+    <div>Pendientes</div>
+    <div>Completadas</div>
+  </div>
+
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
+
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
+
+  <div class="ruta">
+    <div class="status"></div>
+    <h4>SAN FELIPE DEL AGUA</h4>
+    <small>Ruta 2</small>
+    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
+    <p>40 / 350 clientes por visitar</p>
+    <button class="btn" >→</button>
+  </div>
+
+</body>
+</html>

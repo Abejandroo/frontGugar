@@ -5,12 +5,28 @@ import { Auth } from './service/auth';
 import { authGuard } from './guards/auth-guard';
 export const routes: Routes = [
   {
-    path: 'home',
+    path: 'home1',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+  },
+    {
+    path: 'login',
+    loadComponent: () => import('./supervisor/login/login.component').then((m) => m.LoginComponent),
+  },
+   {
+    path: 'home',
+    loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
+  },
+   {
+    path: 'repartidores',
+    loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
+  },
+   {
+    path: 'rutas',
+    loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {

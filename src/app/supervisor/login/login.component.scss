@@ -1,0 +1,131 @@
+/* Variables de color */
+$primary-blue: #007bff;
+$light-gray-bg: #f4f5f8;
+$input-border: #ccc;
+$text-dark: #333;
+
+/* Contenedor principal de la página */
+.page-container {
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  background-color: $light-gray-bg;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Contenedor del header azul */
+.header-wave-container {
+  height: 45vh;
+  background: $primary-blue;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.logo-text-area {
+  z-index: 10;
+  text-align: center;
+  width: 100%;
+  padding-top: 15px;
+}
+
+.app-logo {
+  max-width: 70%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.welcome-text {
+  color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 20px;
+}
+
+/* Forma de la onda SVG */
+.wave {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  transform: translateY(1px); // Evita líneas blancas
+  z-index: 2;
+}
+
+/* Contenedor del formulario */
+.login-form-container {
+  padding: 0 25px;
+  position: relative;
+  z-index: 5;
+  margin-top: -30px;
+}
+
+.back-arrow {
+  color: $primary-blue;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  display: block;
+  cursor: pointer;
+}
+
+/* Estilo para los campos de entrada */
+.input-item {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 0 15px; // Relleno horizontal
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid $input-border;
+  height: 50px; // Altura fija
+
+  .icon, .icon-end {
+    font-size: 1.2em;
+    color: $primary-blue;
+  }
+
+  .text-input {
+    flex-grow: 1; // Ocupa el espacio disponible
+    border: none;
+    outline: none;
+    padding: 0 12px;
+    font-size: 1em;
+    background: transparent;
+  }
+}
+
+/* Enlace de contraseña olvidada */
+.forgot-password-link {
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 25px;
+
+  a {
+    color: $primary-blue;
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+}
+
+/* Botón de ingreso */
+.login-button {
+  width: 100%; // Simula expand="block"
+  height: 50px;
+  background: $primary-blue;
+  color: white;
+  border: none;
+  border-radius: 5px; // Simula shape="round" de Ionic
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 1em;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

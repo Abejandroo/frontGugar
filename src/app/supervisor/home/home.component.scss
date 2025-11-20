@@ -1,0 +1,134 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f6f8fb;
+  color: #333;
+}
+
+/* Encabezado */
+.header {
+  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
+  color: #fff;
+  padding: 20px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  text-align: left;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.header h2 {
+  margin: 5px 0;
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+.header small {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Indicadores */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+  color: #0078ff;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #777;
+}
+
+.tabs .active {
+  color: #0078ff;
+  border-bottom: 3px solid #0078ff;
+  padding-bottom: 5px;
+}
+
+/* Lista de rutas */
+.ruta {
+  background: #fff;
+  margin: 15px;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.ruta h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.ruta small {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.ruta p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.ruta .btn {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  background: #0078ff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.ruta .btn:hover {
+  background: #005ec4;
+}
+
+.ruta .status {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  width: 12px;
+  height: 12px;
+  background: #28c76f;
+  border-radius: 50%;
+}

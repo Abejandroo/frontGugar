@@ -1,0 +1,154 @@
+.ruta-container {
+  background: linear-gradient(to bottom, #007bff, #3a8ef6);
+  min-height: 100vh;
+  padding: 1rem;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    color: white;
+
+    .back-button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .title {
+      flex: 1;
+      text-align: center;
+
+      .ruta {
+        font-weight: 500;
+        font-size: 1.1rem;
+
+        span {
+          font-weight: 700;
+        }
+      }
+
+      .repartidor {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        margin-top: 0.2rem;
+
+        strong {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .edit-button {
+      background: white;
+      color: #007bff;
+      border: none;
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+  }
+
+  .search-section {
+    display: flex;
+    margin-top: 1rem;
+    gap: 0.5rem;
+
+    input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 25px;
+      border: none;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-button {
+      background: white;
+      border: none;
+      border-radius: 50%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      color: #007bff;
+      cursor: pointer;
+    }
+  }
+
+  .filter {
+    margin-top: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    label {
+      font-size: 0.9rem;
+    }
+
+    select {
+      background: white;
+      border: none;
+      border-radius: 15px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.9rem;
+      color: #007bff;
+      font-weight: 500;
+    }
+  }
+
+  .clientes-count {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .clientes-list {
+    margin-top: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .cliente-card {
+      background: white;
+      color: #333;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &.selected {
+        border: 2px solid #00c853;
+      }
+
+      .cliente-info {
+        h3 {
+          font-size: 0.95rem;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        p {
+          font-size: 0.8rem;
+          margin: 0;
+          color: #555;
+        }
+      }
+
+      .dia {
+        font-size: 0.75rem;
+        color: #007bff;
+        font-weight: 500;
+      }
+    }
+  }
+}
