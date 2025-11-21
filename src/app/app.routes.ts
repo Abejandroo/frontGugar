@@ -66,8 +66,8 @@ export const routes: Routes = [
   {
     path: 'gestion-rutas',
     loadComponent: () => import('./pages/gestion-rutas/gestion-rutas.page').then( m => m.GestionRutasPage),
-    canActivate: [authGuard],  
-    data: { role: 'admin' },       
+    // canActivate: [authGuard],  
+    // data: { role: 'admin' },       
   },
   {
     path: 'conductores',

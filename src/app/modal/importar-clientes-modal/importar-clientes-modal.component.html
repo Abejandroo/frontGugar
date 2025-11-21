@@ -1,0 +1,172 @@
+<!-- src/app/components/importar-clientes-modal/importar-clientes-modal.component.html -->
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>📤 Importar Ruta desde Excel</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="import-container">
+    
+    <!-- INFO DEL SUPERVISOR -->
+    <ion-card *ngIf="supervisorDetectado && mostrarVistaPrevia" color="tertiary">
+      <ion-card-content>
+        <div class="supervisor-info">
+          <ion-icon name="person-circle"></ion-icon>
+          <div>
+            <strong>Supervisor:</strong> {{ supervisorDetectado }}<br>
+            <small *ngIf="fechaReporte">Fecha: {{ fechaReporte }}</small>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- SELECTOR DE ARCHIVO (Solo si no hay vista previa) -->
+    <ion-card *ngIf="!mostrarVistaPrevia">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="document"></ion-icon>
+          Seleccionar Archivo Excel
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <input 
+          #fileInput
+          type="file" 
+          accept=".xlsx,.xls,.csv" 
+          (change)="onFileSelected($event)"
+          style="display: none;">
+        
+        <ion-button 
+          expand="block" 
+          color="primary"
+          (click)="fileInput.click()"
+          [disabled]="loading">
+          <ion-icon name="folder-open" slot="start"></ion-icon>
+          Seleccionar Archivo
+        </ion-button>
+
+        <div *ngIf="archivoSeleccionado" class="file-info">
+          <ion-chip color="success">
+            <ion-icon name="document-text"></ion-icon>
+            <ion-label>{{ archivoSeleccionado.name }}</ion-label>
+          </ion-chip>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- MAPAS POR DÍA DE VISITA -->
+    <div *ngIf="mostrarVistaPrevia && mapasRutas.length > 0">
+      <div *ngFor="let mapaRuta of mapasRutas; let i = index" class="mapa-seccion">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              🗺️ Mapa de {{ mapaRuta.dias }}
+            </ion-card-title>
+            <ion-card-subtitle>
+              {{ mapaRuta.clientes.length }} clientes en esta ruta
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div [id]="'map-' + i" class="map-container"></div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- CARD DEL CLIENTE SELECCIONADO -->
+    <ion-card *ngIf="clienteSeleccionado" id="cliente-card" class="cliente-card">
+      <ion-card-content>
+        <!-- Mapa pequeño del cliente -->
+        <div class="mini-map">
+          <img src="https://via.placeholder.com/400x200/e0e0e0/666666?text=Mapa" alt="Mapa">
+        </div>
+
+        <!-- Información del cliente -->
+        <div class="cliente-info">
+          <div class="info-header">
+            <ion-icon name="location" color="primary"></ion-icon>
+            <div>
+              <strong>{{ clienteSeleccionado.direccion }}</strong>
+              <p class="colonia">{{ clienteSeleccionado.colonia }}</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <ion-icon name="person"></ion-icon>
+            <span>{{ clienteSeleccionado.representante }}</span>
+          </div>
+
+          <div class="info-row" *ngIf="clienteSeleccionado.nombreNegocio">
+            <ion-icon name="storefront"></ion-icon>
+            <span>{{ clienteSeleccionado.nombreNegocio }}</span>
+          </div>
+
+          <div class="info-dias">
+            <strong>{{ getDiasVisitaText(clienteSeleccionado.diasVisita) }}</strong>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Precio</span>
+              <strong>$ {{ clienteSeleccionado.precioGarrafon }}</strong>
+            </div>
+            <div class="info-item">
+              <span class="label">Crédito</span>
+              <strong>{{ clienteSeleccionado.esCredito ? 'SÍ' : 'NO' }}</strong>
+            </div>
+            <div class="info-item">
+              <span class="label">Factura</span>
+              <strong>{{ clienteSeleccionado.requiereFactura ? 'SÍ' : 'NO' }}</strong>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="action-buttons">
+            <ion-button 
+              expand="block" 
+              color="warning"
+              (click)="editarUbicacion(clienteSeleccionado)">
+              <ion-icon name="create" slot="start"></ion-icon>
+              Editar Ubicación
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>
+
+<!-- FOOTER -->
+<ion-footer *ngIf="mostrarVistaPrevia && datosExcel.length > 0">
+  <ion-toolbar>
+    <div class="footer-buttons">
+      <ion-button 
+        expand="block" 
+        color="danger"
+        fill="outline"
+        (click)="limpiarArchivo()"
+        [disabled]="loading">
+        <ion-icon name="close-circle" slot="start"></ion-icon>
+        Cancelar
+      </ion-button>
+      
+      <ion-button 
+        expand="block" 
+        color="success"
+        (click)="confirmarImportacion()"
+        [disabled]="loading">
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+        <ion-icon *ngIf="!loading" name="cloud-upload" slot="start"></ion-icon>
+        {{ loading ? 'Importando...' : `Importar ${datosExcel.length}` }}
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>
