@@ -1,123 +1,361 @@
-/* Hacemos que el grid ocupe todo el alto disponible */
-.full-height-grid, .full-height-row {
-  height: 100%;
+ion-content {
+  --background: #f5f5f5;
 }
 
-/* --- COLUMNA IZQUIERDA (PANEL) --- */
-.panel-column {
-  background: #ffffff;
-  border-right: 1px solid #e0e0e0;
-  overflow-y: auto; /* Scroll independiente para las instrucciones */
-  height: 100%;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-  z-index: 2; /* Para que la sombra caiga sobre el mapa */
+// ========================================
+// HEADER INFO
+// ========================================
+
+.ruta-header {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+  color: white;
+  padding: 16px;
 }
 
-.panel-header {
-  padding: 20px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+.ruta-meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-  h3 {
-    margin-top: 0;
-    font-size: 1.1rem;
-    color: #555;
+.personal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.personal-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+
+  ion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  div {
     display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-}
-
-.resumen-box {
-  margin-top: 10px;
-  
-  .tiempo {
-    color: #1a73e8; /* Azul Google */
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 5px 0;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
   }
 
-  .detalles {
-    font-size: 1.1rem;
-    color: #202124;
-    font-weight: 500;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  .label {
+    font-size: 10px;
+    opacity: 0.9;
+    text-transform: uppercase;
   }
 
-  .direccion-origen, .direccion-destino {
-    font-size: 0.85rem;
-    color: #70757a;
-    margin: 2px 0;
+  .value {
+    font-size: 12px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 }
 
-/* Ajustes para el texto que Google genera automáticamente */
-#google-panel {
-  padding: 0;
-  font-family: Roboto, Arial, sans-serif;
-}
+// ========================================
+// SELECTOR
+// ========================================
 
-/* --- COLUMNA DERECHA (MAPA) --- */
-.map-column {
-  height: 100%;
-}
+.selector-section {
+  background: white;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
 
-/* REGLA RESPONSIVA: En celular, el mapa debe tener altura fija */
-@media (max-width: 768px) {
-  .panel-column {
-    height: 50%; /* Mitad pantalla */
-    order: 2; /* Poner abajo */
+  ion-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
   }
-  .map-column {
-    height: 50%; /* Mitad pantalla */
-    order: 1; /* Poner arriba */
+
+  ion-select {
+    width: 100%;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
   }
 }
-/* ... tus estilos anteriores de grid ... */
 
-.kpi-container {
+// ========================================
+// ESTADÍSTICAS
+// ========================================
+
+.stats-section {
+  background: white;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.stats-header {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .fecha-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
 }
 
-.kpi-box {
-  background: #f1f3f4;
-  border-radius: 8px;
-  padding: 10px;
-  flex: 1;
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
   text-align: center;
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: #f8f8f8;
+
+  &.visitados {
+    background: #d4edda;
+    .stat-numero { color: #28a745; }
+  }
+
+  &.pendientes {
+    background: #fff3cd;
+    .stat-numero { color: #ffc107; }
+  }
+
+  &.total {
+    background: #d1ecf1;
+    .stat-numero { color: #17a2b8; }
+  }
+
+  .stat-numero {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+  }
+}
+
+.progreso-bar {
+  .progreso-texto {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+  }
+
+  ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+// ========================================
+// MAPA
+// ========================================
+
+.mapa-section {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.mapa-header {
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+
+  &:active {
+    background: #f5f5f5;
+  }
+}
+
+.mapa-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--ion-color-primary);
+  }
+
+  ion-badge {
+    font-size: 11px;
+  }
+}
+
+.mapa-container {
+  google-map {
+    width: 100%;
+  }
+}
+
+// ========================================
+// BÚSQUEDA
+// ========================================
+
+.search-section {
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+
+  ion-searchbar {
+    --background: #f5f5f5;
+    --border-radius: 20px;
+    padding: 0;
+  }
+}
+
+// ========================================
+// LISTA DE CLIENTES
+// ========================================
+
+.clientes-section {
+  padding: 16px;
+}
+
+.clientes-header {
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.clientes-lista {
   display: flex;
   flex-direction: column;
-  
-  .label { font-size: 0.7rem; color: #666; text-transform: uppercase; }
-  .value { font-size: 1.1rem; font-weight: bold; color: #333; }
+  gap: 12px;
 }
 
-#google-panel {
-  padding: 10px;
-}
-// Hacemos que el contenedor ocupe todo el alto disponible del modal
-.full-height-grid, .full-height-row {
-  height: 100%;
-  min-height: 100%; // Refuerzo para Safari
+// CARD DE CLIENTE
+.cliente-card {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &.visitado {
+    opacity: 0.6;
+    background: #f0f8f0;
+  }
+
+  &.sin-ubicacion {
+    border-left: 3px solid #ffc107;
+  }
+
+  ion-card-content {
+    padding: 12px;
+  }
 }
 
-// Esto es crucial para el responsive
-.map-column {
-  height: 100%;
-  display: block;
+.card-body {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
-// En celular (pantallas chicas), dividimos la altura
-@media (max-width: 768px) {
-  .panel-column { height: 50%; order: 2; }
-  .map-column { height: 50%; order: 1; }
+.orden-badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--ion-color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.cliente-info {
+  flex: 1;
+  min-width: 0;
+
+  .nombre {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .direccion,
+  .negocio {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 2px;
+
+    ion-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+
+    ion-badge {
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+  }
+}
+
+.acciones {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  ion-button {
+    margin: 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+}
+
+// VACÍO
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+
+  ion-icon {
+    font-size: 60px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 14px;
+  }
 }

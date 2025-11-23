@@ -1,99 +1,211 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Navegación en Ruta</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrarModal()">
-        <ion-icon name="close"></ion-icon>
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
+    <ion-title>{{ ruta.nombre }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-no-padding">
-  
-  <ion-grid class="full-height-grid ion-no-padding">
-    <ion-row class="full-height-row">
-      
-      <ion-col size-xs="12" size-md="4" class="panel-column ion-no-padding">
-        @if (resumenRuta) {
-          <div class="panel-header">
-            
-            <div class="kpi-container">
-              <div class="kpi-box">
-                <span class="label">Tiempo</span>
-                <span class="value">{{ resumenRuta.tiempo }}</span>
+<ion-content>
+
+  <!-- HEADER INFO RUTA -->
+  <div class="ruta-header">
+    <div class="ruta-meta">
+      <span>Ruta {{ ruta.id }}</span>
+    </div>
+
+    <div class="personal-grid">
+      <div class="personal-item">
+        <ion-icon name="person-outline"></ion-icon>
+        <div>
+          <span class="label">Supervisor</span>
+          <span class="value">{{ ruta.supervisor?.name || 'SIN ASIGNAR' }}</span>
+        </div>
+      </div>
+
+      <div class="personal-item">
+        <ion-icon name="car-outline"></ion-icon>
+        <div>
+          <span class="label">Repartidor</span>
+          <span class="value">{{ ruta.repartidor?.name || 'SIN ASIGNAR' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECTOR DE DÍA -->
+  <div class="selector-section">
+    <ion-label>Día de visita</ion-label>
+    <ion-select [(ngModel)]="diaSeleccionado" (ionChange)="cambiarDia()" interface="action-sheet"
+      placeholder="Selecciona un día">
+      <ion-select-option *ngFor="let dia of diasDisponibles" [value]="dia.diaSemana">
+        {{ dia.diaSemana }}
+      </ion-select-option>
+    </ion-select>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+
+  @if (diaSeleccionado) {
+  <div class="stats-section">
+    <!-- ... contenido ... -->
+    <div class="stats-header">
+      <span class="fecha-label">{{ getDiaActual() }}</span>
+      <ion-button size="small" fill="outline" color="warning" (click)="dividirRuta()">
+        <ion-icon name="cut-outline" slot="start"></ion-icon>
+        Dividir
+      </ion-button>
+    </div>
+
+    <div class="stats-cards">
+      <div class="stat-card visitados">
+        <div class="stat-numero">{{ visitados }}</div>
+        <div class="stat-label">Visitados</div>
+      </div>
+      <div class="stat-card pendientes">
+        <div class="stat-numero">{{ pendientes }}</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card total">
+        <div class="stat-numero">{{ totalClientes }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+
+    <!-- BARRA DE PROGRESO -->
+    <div class="progreso-bar">
+      <div class="progreso-texto">
+        <span>{{ visitados }} / {{ totalClientes }} domicilios visitados</span>
+      </div>
+      <ion-progress-bar [value]="totalClientes > 0 ? visitados / totalClientes : 0" color="success">
+      </ion-progress-bar>
+    </div>
+  </div>
+  }
+
+
+  <!-- MAPA COMPACTO -->
+  <div class="mapa-section" [class.expanded]="mapaExpandido">
+    <div class="mapa-header" (click)="toggleMapa()">
+      <div class="mapa-titulo">
+        <ion-icon name="map-outline"></ion-icon>
+        <span>Mapa de Ruta</span>
+        <ion-badge color="primary">{{ clientesDia.length }}</ion-badge>
+      </div>
+      <ion-icon [name]="mapaExpandido ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </div>
+
+    @if (mapaExpandido) {
+    <div class="mapa-container">
+      <!-- ... mapa ... -->
+      <google-map [height]="'300px'" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions">
+
+        <map-marker *ngFor="let marker of markers" [position]="marker.position" [label]="marker.label"
+          [title]="marker.title">
+        </map-marker>
+
+      </google-map>
+    </div>
+    }
+
+
+  </div>
+
+  <!-- BUSCADOR -->
+  <div class="search-section">
+    <ion-searchbar [(ngModel)]="textoBusqueda" (ionInput)="buscarCliente($event)"
+      placeholder="Buscar cliente o dirección" animated>
+    </ion-searchbar>
+  </div>
+
+  <!-- LISTA DE CLIENTES -->
+  <div class="clientes-section">
+    <div class="clientes-header">
+      <h3>{{ clientesFiltrados.length }} clientes</h3>
+    </div>
+
+    <div class="clientes-lista">
+      <ion-card *ngFor="let clienteRuta of clientesFiltrados; let i = index" class="cliente-card"
+        [class.visitado]="clienteRuta.visitado" [class.sin-ubicacion]="!clienteRuta.cliente.direcciones?.[0]?.latitud">
+
+        <ion-card-content>
+          <div class="card-body">
+
+            <!-- ORDEN -->
+            <div class="orden-badge">
+              {{ clienteRuta.ordenVisita || i + 1 }}
+            </div>
+
+            <!-- INFO -->
+            <div class="cliente-info">
+              <div class="nombre">
+                {{ clienteRuta.cliente.representante }}
               </div>
-              <div class="kpi-box">
-                <span class="label">Distancia</span>
-                <span class="value">{{ resumenRuta.distancia }}</span>
+
+              <div class="direccion">
+                <ion-icon name="location-outline"></ion-icon>
+                {{ clienteRuta.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}
               </div>
-              <div class="kpi-box">
-                <span class="label">Paradas</span>
-                <span class="value">{{ resumenRuta.paradas }}</span>
+
+              @if (clienteRuta.cliente.negocio) {
+              <div class="negocio">
+                <ion-icon name="business-outline"></ion-icon>
+                {{ clienteRuta.cliente.negocio }}
+              </div>
+              }
+
+              <!-- TAGS -->
+              <div class="tags">
+                <ion-badge color="primary">
+                  ${{ clienteRuta.precio?.precioPorGarrafon || 0 }}
+                </ion-badge>
+                @if (clienteRuta.es_credito) {
+                <ion-badge color="warning">
+                  CRÉDITO
+                </ion-badge>
+                }
+
+                @if (clienteRuta.requiere_factura) {
+                <ion-badge color="tertiary">
+                  FACTURA
+                </ion-badge>
+                }
+
+                @if (!clienteRuta.cliente.direcciones?.[0]?.latitud) {
+                <ion-badge color="danger">
+                  <ion-icon name="warning-outline"></ion-icon>
+                  SIN UBICACIÓN
+                </ion-badge>
+                }
               </div>
             </div>
-            <ion-button 
-              expand="block" 
-              [color]="navegando && !demoActiva ? 'danger' : 'success'" 
-              class="ion-margin-top"
-              (click)="toggleNavegacion()">
-              <ion-icon slot="start" [name]="navegando && !demoActiva ? 'stop-circle-outline' : 'navigate-circle-outline'"></ion-icon>
-              {{ navegando && !demoActiva ? 'Detener GPS' : 'Iniciar GPS Real' }}
-            </ion-button>
 
-            <ion-button 
-              expand="block" 
-              fill="outline"
-              color="tertiary" 
-              class="ion-margin-top"
-              (click)="demoActiva ? detenerDemoRecorrido() : iniciarDemoRecorrido()">
-              <ion-icon slot="start" name="play-circle-outline"></ion-icon>
-              {{ demoActiva ? 'Pausar Demo' : 'Simular Recorrido' }}
-            </ion-button>
+            <!-- ACCIONES -->
+            <div class="acciones">
+              <ion-button fill="clear" color="warning" size="small" (click)="editarCliente(clienteRuta)">
+                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+
+              <ion-button fill="clear" color="danger" size="small" (click)="eliminarCliente(clienteRuta)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
 
           </div>
-        } @else {
-          <div class="ion-padding ion-text-center">
-            <ion-spinner name="dots"></ion-spinner>
-            <p><small>Calculando ruta...</small></p>
-          </div>
-        }
+        </ion-card-content>
+      </ion-card>
 
-        <div #panelInstrucciones id="google-panel"></div>
-      </ion-col>
+      <!-- VACÍO -->
+      @if (clientesFiltrados.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="search-outline"></ion-icon>
+        <p>No se encontraron clientes</p>
+      </div>
+      }
+    </div>
+  </div>
 
-      <ion-col size-xs="12" size-md="8" class="map-column ion-no-padding">
-        <google-map 
-          height="100%" 
-          width="100%" 
-          [center]="center" 
-          [zoom]="zoom">
-          
-          @if (directionsResults$ | async; as directions) {
-            <map-directions-renderer 
-              [directions]="directions"
-              [options]="rendererOptions">
-            </map-directions-renderer>
-          }
-
-          @for (punto of puntosEntrega; track punto) {
-            <map-marker 
-              [position]="punto.position"
-              [options]="{ icon: obtenerIcono(punto.estado) }"
-              [title]="punto.titulo">
-            </map-marker>
-          }
-
-          @if (posicionRepartidor) {
-            <map-marker 
-              [position]="posicionRepartidor"
-              [options]="{ icon: icons.repartidor, zIndex: 999 }">
-            </map-marker>
-          }
-
-        </google-map>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
 </ion-content>

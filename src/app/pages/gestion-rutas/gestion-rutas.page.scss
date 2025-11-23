@@ -1,367 +1,229 @@
 .logo {
-  height: 40px;
-  width: auto;
-}
-
-ion-content {
-
-  --background: url('/assets/bg.png') no-repeat center center / cover;
-}
-
-ion-toolbar {
-  --background: transparent;
-}
-ion-item {
-  --background: transparent;
-  --color: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.5);
-  --highlight-color-focused: #ffffff;
-}
-
-ion-item .item-native ion-label {
-  color: #ffffff !important;
-}
-.welcome-message {
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 40px;
-  
-  h2, p {
-    color: #ffffff; 
-  }
-
-  h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-  }
-
-  p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-  }
-}
-
-.opcion-card {
-  background: rgba(255, 255, 255, 0.15); 
-  backdrop-filter: blur(10px);          
-  -webkit-backdrop-filter: blur(10px);  
-
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  ion-card-header {
-    background-color: transparent;
-  }
-
-  ion-card-title, ion-card-content {
-    color: #ffffff;
-  }
-  
-  ion-card-title {
-      font-weight: bold;
-      font-size: 1.5rem;
-  }
-
-  ion-card-content {
-      font-size: 0.9rem;
-      opacity: 0.85; 
-  }
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-  img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 18px;
-    margin-top: 1rem;
-  }
-}
-
-.card-layout-flex {
-  /* CAMBIOS PRINCIPALES AQUÍ */
-  display: flex;
-  flex-direction: row;     
-  justify-content: space-between;  
-  align-items: center;            
-  padding: 16px; 
-  ion-card-header {
-    padding: 0; 
-    text-align: left; 
-  }
-}
-
-.card-image-absolute {
-  position: absolute; 
-  bottom: 10px;       
-  right: 10px;        
-  
-  width: 75px;      
-  height: 75px;     
-  
+  height: 50px;
   object-fit: contain;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
-}
-/* Contenedor para scroll horizontal en móviles */
-ion-card-content > div {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
-/* Tabla con estilo profesional */
-table {
-  width: 100%;
-  min-width: 900px;
-  border-collapse: collapse;
-  font-family: var(--ion-font-family, Arial, sans-serif);
-  font-size: 14px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  border-radius: 8px;
-  overflow: hidden;
-}
+// ========================================
+// BARRA DE BÚSQUEDA CON BOTÓN
+// ========================================
 
-/* Encabezados */
-thead tr {
-  background-color: var(--ion-color-primary);
-  color: white;
-}
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 8px;
 
-thead th {
-  padding: 12px 16px;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 1px solid #ddd;
-}
+  ion-searchbar {
+    flex: 1;
+  }
 
-/* Celdas */
-tbody td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #ddd;
-  vertical-align: middle;
-}
-
-/* Hover en filas */
-tbody tr:hover {
-  background-color: var(--ion-color-primary-tint);
-  color: #1c1c1c; /* asegúrate que siga siendo visible */
-  transition: background-color 0.3s ease;
-}
-
-tbody td {
-  color: #1c1c1c; /* texto oscuro visible */
-}
-
-
-/* Columna acciones: centrar botones */
-tbody td:last-child {
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* Botones Ionic dentro de tabla */
-ion-button {
-  margin: 0 4px;
-}
-
-/* Responsividad para pantallas pequeñas */
-@media (max-width: 768px) {
-  table {
-    min-width: 600px;
+  .btn-filtro {
+    flex-shrink: 0;
+    margin: 0;
   }
 }
 
-@media (max-width: 480px) {
-  table {
-    min-width: 100%;
-    font-size: 13px;
-  }
+// ========================================
+// CARDS
+// ========================================
 
-  thead {
-    display: none; /* ocultar encabezado en móviles para diseño tipo tarjetas */
-  }
-
-  tbody tr {
-    display: block;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    padding: 12px 16px;
-    background: #fff;
-  }
-
-  tbody td {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: none;
-  }
-
-  tbody td:last-child {
-    justify-content: flex-start;
-  }
-
-  tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--ion-color-primary);
-  }
-}
-
-// Estilos de la Tarjeta de Ruta
-.ruta-card {
+.ruta-card-compact {
+  margin: 12px 0;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  background: white; // Fondo blanco forzado
-  margin-bottom: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-
-  &:active,
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  }
-
-  // Encabezado (Este se veía bien, pero aseguramos colores)
-  ion-card-header {
-    background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
-    padding: 16px;
-    
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .map-icon {
-      font-size: 2.5rem;
-      color: white;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 8px;
-      border-radius: 12px;
-    }
-
-    ion-card-title {
-      color: white; // Siempre blanco sobre azul
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    ion-card-subtitle {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-  }
-
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  
   ion-card-content {
-    padding: 0;
-    
-    ion-list {
-      padding-top: 8px;
-      padding-bottom: 8px;
-      background: transparent;
-    }
-
-    ion-item {
-      --background: transparent;
-      --padding-start: 16px;
-      --inner-padding-end: 16px;
-      font-size: 0.9rem;
-      
-      ion-icon {
-        margin-right: 12px;
-        font-size: 1.2rem;
-        opacity: 0.8;
-        // Dejamos que el icono use su color (primary, danger, etc.)
-      }
-
-      h3 {
-        font-weight: 600;
-        // ✨ ARREGLO: Usamos un color gris oscuro fijo, no variable
-        color: #666666 !important; 
-        font-size: 0.8rem;
-        margin-bottom: 2px;
-        text-transform: uppercase;
-      }
-
-      p {
-        // ✨ ARREGLO: Usamos negro casi puro, para que se lea bien
-        color: #222222 !important; 
-        font-size: 1rem;
-        font-weight: 500;
-      }
-      
-      // Forzamos el label a tener opacidad completa
-      ion-label {
-        opacity: 1 !important;
-      }
-    }
-    
-    .card-actions {
-      border-top: 1px solid #eeeeee; // Borde gris claro fijo
-      padding: 8px;
-      display: flex;
-      justify-content: space-around;
-      background: #fafafa; // Fondo gris muy claro fijo
-      
-      ion-button {
-        height: 36px;
-        margin: 0 4px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-        font-weight: 600;
-      }
-    }
+    padding: 16px;
   }
 }
 
-.mensaje-vacio {
+.card-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.estado-badge .punto-estado {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.ruta-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ruta-nombre {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.ruta-meta {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.ruta-personal {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
+  gap: 2px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #555;
+}
+
+.progreso-wrapper {
+  .progreso-texto {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+  ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.icono-flecha {
+  flex-shrink: 0;
+  font-size: 24px;
+  color: #bbb;
+}
+
+.empty-state {
   text-align: center;
-  opacity: 0.6;
-
+  padding: 60px 20px;
+  
   ion-icon {
-    font-size: 4rem;
+    font-size: 80px;
     margin-bottom: 16px;
-    color: #999999; // Gris fijo
+    color: #ccc;
   }
   
-  h3, p {
-    color: #666666; // Texto gris fijo
+  p {
+    color: #999;
+    font-size: 14px;
+  }
+}.logo {
+  height: 50px;
+  object-fit: contain;
+}
+
+// ========================================
+// BARRA DE BÚSQUEDA CON BOTÓN
+// ========================================
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 8px;
+
+  ion-searchbar {
+    flex: 1;
+  }
+
+  .btn-filtro {
+    flex-shrink: 0;
+    margin: 0;
   }
 }
 
-.btn-agregar {
-  margin-bottom: 20px;
-  --box-shadow: 0 4px 10px rgba(var(--ion-color-success-rgb), 0.3);
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-.card-actions {
-      border-top: 1px solid #eeeeee; // Borde gris claro fijo
-      padding: 8px;
-      display: flex;
-      justify-content: space-around;
-      background: #fafafa; // Fondo gris muy claro fijo
-      
-      ion-button {
-        height: 36px;
-        margin: 0 4px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-        font-weight: 600;
-      }
-    }
+// ========================================
+// CARDS
+// ========================================
+
+.ruta-card-compact {
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   
+  ion-card-content {
+    padding: 16px;
+  }
+}
+
+.card-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.estado-badge .punto-estado {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.ruta-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ruta-nombre {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.ruta-meta {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.ruta-personal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #555;
+}
+
+.progreso-wrapper {
+  .progreso-texto {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+  ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.icono-flecha {
+  flex-shrink: 0;
+  font-size: 24px;
+  color: #bbb;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  
+  ion-icon {
+    font-size: 80px;
+    margin-bottom: 16px;
+    color: #ccc;
+  }
+  
+  p {
+    color: #999;
+    font-size: 14px;
+  }
+}

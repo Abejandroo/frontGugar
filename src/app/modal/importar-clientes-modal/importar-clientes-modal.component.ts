@@ -10,6 +10,8 @@ import * as L from 'leaflet';
 import { ImportService } from '../../service/import';
 import { ClienteImport, ImportResult } from '../../models/excel-import.model';
 import { CrearPrecioModalComponent } from '../crear-precio-modal/crear-precio-modal.component';
+import { GeocodingService } from 'src/app/service/geocoding.service';
+
 
 
 
@@ -49,26 +51,26 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   mostrarVistaPrevia: boolean = false;
   fechaReporte: string = '';
   loading: boolean = false;
-  
+
   // Control de tabs
   tabSeleccionado: string = '0';
-  
+
   // Mapas por día de visita
   mapasRutas: MapaRuta[] = [];
   clienteSeleccionado: ClienteImport | null = null;
-  
+
   // Control de vista de cards
   mostrarTodasCards: boolean = false;
-  
+
   // Modal de edición
   mostrarModalEdicion: boolean = false;
   clienteEnEdicion: ClienteImport | null = null;
   mapaEdicion?: L.Map;
   marcadorEdicion?: L.Marker;
-  
+
   // Modal de confirmación custom
-  mostrarConfirmacion: boolean = false;
-  
+
+
   // Mapeo de días del Excel a las 3 rutas fijas de la BD
   private diasMap: { [key: string]: string } = {
     'LJ': 'Lunes - Jueves',
@@ -85,34 +87,35 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
   // Índices de columnas del Excel
   private columnIndexes = {
-    vis: 0, 
-    rec: 1, 
-    colonia: 2, 
+    vis: 0,
+    rec: 1,
+    colonia: 2,
     direccion: 3,
-    representante: 4, 
-    negocio: 5, 
+    representante: 4,
+    negocio: 5,
     precio: 6,
-    credito: 7, 
-    factura: 8, 
+    credito: 7,
+    factura: 8,
     numeroCte: 9
   };
 
 
   nombreRuta: string = '';
-supervisorId: number | null = null;
-repartidorId: number | null = null;
-preciosFaltantes: Array<{precio: number, cantidad: number}> = [];
-supervisores: any[] = [];
-repartidores: any[] = [];
-verificandoPrecios: boolean = false;
-mostrarSeccionValidacion: boolean = true;
+  supervisorId: number | null = null;
+  repartidorId: number | null = null;
+  preciosFaltantes: Array<{ precio: number, cantidad: number }> = [];
+  supervisores: any[] = [];
+  repartidores: any[] = [];
+  verificandoPrecios: boolean = false;
+  mostrarSeccionValidacion: boolean = true;
   constructor(
     private modalController: ModalController,
     private importService: ImportService,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private toastController: ToastController
-  ) {}
+    private toastController: ToastController,
+    private geocodingService: GeocodingService
+  ) { }
 
   ngAfterViewInit() {
     // Los mapas se inicializarán después de cargar los datos
@@ -148,8 +151,8 @@ mostrarSeccionValidacion: boolean = true;
       const workbook = XLSX.read(data, { type: 'binary' });
       const nombreHoja = workbook.SheetNames[0];
       const hoja = workbook.Sheets[nombreHoja];
-      
-      const jsonData: any[][] = XLSX.utils.sheet_to_json(hoja, { 
+
+      const jsonData: any[][] = XLSX.utils.sheet_to_json(hoja, {
         header: 1,
         defval: '',
         raw: false
@@ -161,14 +164,17 @@ mostrarSeccionValidacion: boolean = true;
 
       this.fechaReporte = this.extraerFecha(jsonData);
       this.datosExcel = this.procesarDatosExcel(jsonData);
-      
+
       // Agrupar clientes por días de visita
       this.agruparClientesPorDias();
-      
-      this.mostrarVistaPrevia = true;
 
       await loading.dismiss();
-      
+
+      await this.agruparClientesPorDias();
+
+
+      this.mostrarVistaPrevia = true;
+
       // Inicializar mapa del primer tab después de que el DOM esté listo
       setTimeout(() => {
         const firstTab = this.mapasRutas[0];
@@ -194,64 +200,64 @@ mostrarSeccionValidacion: boolean = true;
 
 
   async verificarDatosParaImportar() {
-  this.verificandoPrecios = true;
-  
-  // Obtener precios únicos
-  const preciosMap = new Map<number, number>();
-  this.datosExcel.forEach(c => {
-    preciosMap.set(c.precioGarrafon, (preciosMap.get(c.precioGarrafon) || 0) + 1);
-  });
+    this.verificandoPrecios = true;
 
-  // Verificar cuáles NO existen
-  this.preciosFaltantes = [];
-  for (const [precio, cantidad] of preciosMap) {
-    try {
-      const existe = await this.importService.verificarPrecioExiste(precio).toPromise();
-      if (!existe) {
+    // Obtener precios únicos
+    const preciosMap = new Map<number, number>();
+    this.datosExcel.forEach(c => {
+      preciosMap.set(c.precioGarrafon, (preciosMap.get(c.precioGarrafon) || 0) + 1);
+    });
+
+    // Verificar cuáles NO existen
+    this.preciosFaltantes = [];
+    for (const [precio, cantidad] of preciosMap) {
+      try {
+        const existe = await this.importService.verificarPrecioExiste(precio).toPromise();
+        if (!existe) {
+          this.preciosFaltantes.push({ precio, cantidad });
+        }
+      } catch (error) {
         this.preciosFaltantes.push({ precio, cantidad });
       }
+    }
+
+    // Cargar personal
+    try {
+      this.supervisores = await this.importService.getSupervisores().toPromise() || [];
+      this.repartidores = await this.importService.getRepartidores().toPromise() || [];
     } catch (error) {
-      this.preciosFaltantes.push({ precio, cantidad });
+      console.error('Error cargando personal:', error);
+    }
+
+    this.verificandoPrecios = false;
+  }
+
+  async crearPrecio(precioInfo: { precio: number, cantidad: number }) {
+    const modal = await this.modalController.create({
+      component: CrearPrecioModalComponent,
+      componentProps: {
+        precio: precioInfo.precio,
+        cantidad: precioInfo.cantidad
+      },
+      cssClass: 'crear-precio-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data?.creado) {
+      // Remover de la lista de faltantes
+      this.preciosFaltantes = this.preciosFaltantes.filter(p => p.precio !== precioInfo.precio);
+      await this.mostrarToast(`✅ Precio $${precioInfo.precio} creado`, 'success');
     }
   }
 
-  // Cargar personal
-  try {
-    this.supervisores = await this.importService.getSupervisores().toPromise() || [];
-    this.repartidores = await this.importService.getRepartidores().toPromise() || [];
-  } catch (error) {
-    console.error('Error cargando personal:', error);
+  get puedeImportar(): boolean {
+    return this.nombreRuta.trim().length > 0 &&
+      this.preciosFaltantes.length === 0 &&
+      !this.verificandoPrecios;
   }
-
-  this.verificandoPrecios = false;
-}
-
-async crearPrecio(precioInfo: {precio: number, cantidad: number}) {
-  const modal = await this.modalController.create({
-    component: CrearPrecioModalComponent,
-    componentProps: {
-      precio: precioInfo.precio,
-      cantidad: precioInfo.cantidad
-    },
-    cssClass: 'crear-precio-modal'
-  });
-
-  await modal.present();
-
-  const { data } = await modal.onWillDismiss();
-  
-  if (data?.creado) {
-    // Remover de la lista de faltantes
-    this.preciosFaltantes = this.preciosFaltantes.filter(p => p.precio !== precioInfo.precio);
-    await this.mostrarToast(`✅ Precio $${precioInfo.precio} creado`, 'success');
-  }
-}
-
-get puedeImportar(): boolean {
-  return this.nombreRuta.trim().length > 0 && 
-         this.preciosFaltantes.length === 0 &&
-         !this.verificandoPrecios;
-}
 
   private leerArchivo(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -322,15 +328,13 @@ get puedeImportar(): boolean {
   // AGRUPACIÓN Y MAPAS
   // ========================================
 
-  private agruparClientesPorDias() {
-    // Crear 3 grupos fijos según la estructura de la BD
+  private async agruparClientesPorDias() {
     const gruposFixed: { [key: string]: ClienteImport[] } = {
       'Lunes - Jueves': [],
       'Martes - Viernes': [],
       'Miércoles - Sábado': []
     };
 
-    // Agrupar clientes en sus rutas correspondientes
     this.datosExcel.forEach(cliente => {
       const ruta = cliente.diasVisita[0];
       if (gruposFixed[ruta]) {
@@ -338,47 +342,105 @@ get puedeImportar(): boolean {
       }
     });
 
-    // Crear mapas manteniendo el orden original del Excel
+    // Geocodificar ANTES de crear los mapas
+    const todosClientes = Object.values(gruposFixed).reduce((acc, grupo) => {
+      return acc.concat(grupo);
+    }, [] as ClienteImport[]);
+    await this.geocodificarClientes(todosClientes);
+
+    // Crear mapas
     this.mapasRutas = Object.keys(gruposFixed)
       .filter(key => gruposFixed[key].length > 0)
       .map(key => {
         const clientes = gruposFixed[key];
-        
-        // Ordenar por el número REC del Excel (orden original)
         const clientesOrdenados = clientes.sort((a, b) => a.ordenVisita - b.ordenVisita);
-        
-        // Asignar coordenadas simuladas a los que no tengan
-        const clientesConCoords = this.asignarCoordenadasSimuladas(clientesOrdenados);
-        
+
         return {
           dias: key,
           diasArray: key.split('-'),
-          clientes: clientesConCoords
+          clientes: clientesOrdenados
         };
       });
 
-    console.log('📊 Mapas agrupados (orden original del Excel):', this.mapasRutas);
+    console.log('📊 Mapas agrupados con coordenadas reales:', this.mapasRutas);
   }
 
-  private asignarCoordenadasSimuladas(clientes: ClienteImport[]): ClienteImport[] {
-    const baseLatitud = 17.0732;  // Centro de Oaxaca
-    const baseLongitud = -96.7266;
+  private async geocodificarClientes(clientes: ClienteImport[]): Promise<ClienteImport[]> {
+    // Filtrar clientes que necesitan geocodificación
+    const clientesSinCoords = clientes
+      .map((c, index) => ({ cliente: c, index }))
+      .filter(item => !item.cliente.latitud || !item.cliente.longitud);
 
-    return clientes.map((cliente) => {
-      // Si ya tiene coordenadas, mantenerlas
-      if (cliente.latitud && cliente.longitud) {
-        return cliente;
-      }
+    if (clientesSinCoords.length === 0) {
+      console.log('✅ Todos los clientes ya tienen coordenadas');
+      return clientes;
+    }
 
-      // Generar coordenadas aleatorias en un radio de ~5km
-      const offsetLat = (Math.random() - 0.5) * 0.05;
-      const offsetLng = (Math.random() - 0.5) * 0.05;
+    console.log(`📍 Geocodificando ${clientesSinCoords.length} direcciones...`);
 
-      cliente.latitud = baseLatitud + offsetLat;
-      cliente.longitud = baseLongitud + offsetLng;
-      
-      return cliente;
+    // Crear loading
+    const loading = await this.loadingController.create({
+      message: 'Geocodificando direcciones... 0/' + clientesSinCoords.length,
+      spinner: 'crescent'
     });
+    await loading.present();
+
+    // Preparar lote de direcciones
+    const direcciones = clientesSinCoords.map(item => ({
+      direccion: item.cliente.direccion,
+      colonia: item.cliente.colonia,
+      ciudad: item.cliente.ciudad || 'Oaxaca',
+      index: item.index
+    }));
+
+    // Geocodificar con progreso
+    const resultados = await this.geocodingService.geocodificarLote(
+      direcciones,
+      (current, total) => {
+        loading.message = `Geocodificando direcciones... ${current}/${total}`;
+      }
+    );
+
+    await loading.dismiss();
+
+    // Asignar coordenadas (reales o simuladas como fallback)
+    let geocodificadas = 0;
+    let fallback = 0;
+
+    clientes.forEach((cliente, index) => {
+      if (!cliente.latitud || !cliente.longitud) {
+        const coords = resultados.get(index);
+
+        if (coords) {
+          cliente.latitud = coords.lat;
+          cliente.longitud = coords.lng;
+          geocodificadas++;
+        } else {
+          // Fallback: usar coordenadas simuladas
+          const simuladas = this.geocodingService.generarCoordenadasSimuladas();
+          cliente.latitud = simuladas.lat;
+          cliente.longitud = simuladas.lng;
+          fallback++;
+        }
+      }
+    });
+
+    console.log(`✅ Geocodificadas: ${geocodificadas}, Simuladas: ${fallback}`);
+
+    // Mostrar resultado
+    if (fallback > 0) {
+      await this.mostrarToast(
+        `⚠️ ${fallback} direcciones no se pudieron geocodificar`,
+        'warning'
+      );
+    } else {
+      await this.mostrarToast(
+        `✅ ${geocodificadas} direcciones geocodificadas`,
+        'success'
+      );
+    }
+
+    return clientes;
   }
 
   // ========================================
@@ -394,7 +456,7 @@ get puedeImportar(): boolean {
     setTimeout(() => {
       const index = parseInt(nuevoTab);
       const mapaRuta = this.mapasRutas[index];
-      
+
       if (!mapaRuta) return;
 
       // Siempre recrear el mapa para evitar problemas de renderizado
@@ -417,7 +479,7 @@ get puedeImportar(): boolean {
   private inicializarMapaTab(index: number) {
     const mapaRuta = this.mapasRutas[index];
     const mapElement = document.getElementById(`map-${index}`);
-    
+
     if (!mapElement) {
       console.error(`❌ No se encontró el elemento map-${index}`);
       return;
@@ -464,7 +526,7 @@ get puedeImportar(): boolean {
       }
 
       const icono = this.crearIconoMarcador(cliente.ordenVisita);
-      
+
       L.marker([cliente.latitud, cliente.longitud], { icon: icono })
         .addTo(mapa)
         .bindPopup(`
@@ -480,7 +542,7 @@ get puedeImportar(): boolean {
 
     // Ajustar vista al conjunto de marcadores
     if (bounds.isValid()) {
-      mapa.fitBounds(bounds, { 
+      mapa.fitBounds(bounds, {
         padding: [50, 50],
         maxZoom: 15
       });
@@ -509,7 +571,7 @@ get puedeImportar(): boolean {
     const colorPrimario = '#0044AA'; // Azul Agua Gugar
     const colorSeleccionado = '#E50005'; // Rojo Agua Gugar
     const color = seleccionado ? colorSeleccionado : colorPrimario;
-    
+
     return L.divIcon({
       html: `
         <div class="custom-marker ${seleccionado ? 'selected' : ''}">
@@ -572,7 +634,7 @@ get puedeImportar(): boolean {
 
   editarDireccion(cliente: ClienteImport, event: Event) {
     event.stopPropagation();
-    
+
     // Crear copia profunda del cliente para edición
     this.clienteEnEdicion = JSON.parse(JSON.stringify(cliente));
     this.mostrarModalEdicion = true;
@@ -649,15 +711,15 @@ get puedeImportar(): boolean {
       clienteOriginal.longitud = this.clienteEnEdicion.longitud;
 
       await this.mostrarToast('✅ Dirección actualizada', 'success');
-      
+
       // Encontrar el índice de la ruta que contiene este cliente
-      const rutaIndex = this.mapasRutas.findIndex(mr => 
+      const rutaIndex = this.mapasRutas.findIndex(mr =>
         mr.clientes.some(c => c.numeroCliente === clienteOriginal.numeroCliente)
       );
 
       if (rutaIndex !== -1) {
         const mapaRuta = this.mapasRutas[rutaIndex];
-        
+
         // Destruir mapa existente
         if (mapaRuta.mapa) {
           mapaRuta.mapa.remove();
@@ -667,7 +729,7 @@ get puedeImportar(): boolean {
         // Reinicializar mapa con los datos actualizados
         setTimeout(() => {
           this.inicializarMapaTab(rutaIndex);
-          
+
           // Actualizar selección si el cliente sigue seleccionado
           if (this.clienteSeleccionado?.numeroCliente === clienteOriginal.numeroCliente) {
             this.clienteSeleccionado = clienteOriginal;
@@ -681,14 +743,14 @@ get puedeImportar(): boolean {
 
   cerrarModalEdicion() {
     this.mostrarModalEdicion = false;
-    
+
     // Limpiar mapa de edición
     if (this.mapaEdicion) {
       this.mapaEdicion.remove();
       this.mapaEdicion = undefined;
       this.marcadorEdicion = undefined;
     }
-    
+
     this.clienteEnEdicion = null;
   }
 
@@ -696,44 +758,43 @@ get puedeImportar(): boolean {
   // IMPORTACIÓN A BASE DE DATOS
   // ========================================
 
-async confirmarImportacion() {
-  if (!this.puedeImportar) {
-    await this.mostrarToast('⚠️ Completa todos los campos requeridos', 'warning');
-    return;
-  }
+  async confirmarImportacion() {
+    if (!this.puedeImportar) {
+      console.log('no se puede');
 
-  this.mostrarConfirmacion = true;
-}
-
-async procederConImportacion() {
-  this.mostrarConfirmacion = false;
-  await this.importarABaseDatos();
-}
-
-async importarABaseDatos() {
-  this.loading = true;
-  try {
-    const resultado = await this.importService.importarClientes(
-      this.datosExcel,
-      this.fechaReporte,
-      this.nombreRuta,
-      this.supervisorId || undefined,
-      this.repartidorId || undefined
-    ).toPromise();
-
-    this.loading = false;
-    
-    if (resultado && resultado.success) {
-      await this.mostrarToast('✅ Importación exitosa', 'success');
-      this.modalController.dismiss({ success: true, data: resultado });
-    } else {
-      await this.mostrarError(resultado?.message || 'Error en la importación');
+      await this.mostrarToast('⚠️ Completa todos los campos requeridos', 'warning');
+      return;
     }
-  } catch (error: any) {
-    this.loading = false;
-    await this.mostrarError(`Error: ${error.message}`);
+
+    await this.importarABaseDatos();
+
   }
-}
+
+
+  async importarABaseDatos() {
+    this.loading = true;
+    try {
+      const resultado = await this.importService.importarClientes(
+        this.datosExcel,
+        this.fechaReporte,
+        this.nombreRuta,
+        this.supervisorId || undefined,
+        this.repartidorId || undefined
+      ).toPromise();
+
+      this.loading = false;
+
+      if (resultado && resultado.success) {
+        await this.mostrarToast('✅ Importación exitosa', 'success');
+        this.modalController.dismiss({ success: true, data: resultado });
+      } else {
+        await this.mostrarError(resultado?.message || 'Error en la importación');
+      }
+    } catch (error: any) {
+      this.loading = false;
+      await this.mostrarError(`Error: ${error.message}`);
+    }
+  }
 
 
   calcularTotalVisitas(): number {
@@ -775,7 +836,7 @@ async importarABaseDatos() {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2500,
-      color, 
+      color,
       position: 'top'
     });
     await toast.present();
