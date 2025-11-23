@@ -1,62 +1,98 @@
+// src/app/services/import.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay, catchError, map } from 'rxjs/operators';
-import { ClienteImport, ImportResult } from '../models/excel-import.model.';
+import { catchError, map } from 'rxjs/operators';
+import { ClienteImport, ImportResult } from '../models/excel-import.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImportService {
-  // TODO: Cambiar por tu URL real del backend
-  private apiUrl = 'http://localhost:3000/api';
-  
-  // Modo de desarrollo (datos mock)
-  private modoDesarrollo = true; // Cambiar a false cuando tengas el backend
 
-  constructor(private http: HttpClient) {}
+  // CONFIGURACIÓN
+  private apiUrl = 'http://localhost:3000'; // ← CAMBIAR A TU URL DE PRODUCCIÓN
+  private modoDesarrollo = false; // ← Cambiar a false para usar backend real
+
+  constructor(private http: HttpClient) { }
 
   /**
-   * Importar clientes desde Excel a la base de datos
+   * Importar clientes al backend
+   * 
+   * Estructura esperada en el backend:
+   * - 1 Ruta padre (ej: "Ruta - 2024-01-15") SIN supervisor/repartidor
+   * - 3 DiaRuta (Lunes-Jueves, Martes-Viernes, Miércoles-Sábado)
+   * - N ClienteRuta (cada cliente asignado a su DiaRuta correspondiente)
+   * - El supervisor/repartidor se asignará después desde el frontend
    */
   importarClientes(
-    clientes: ClienteImport[], 
-    supervisor: string,
-    fecha: string
+    clientes: ClienteImport[],
+    fechaReporte: string,
+    nombreRuta: string,
+    supervisorId?: number,
+    repartidorId?: number  
   ): Observable<ImportResult> {
-    
-    // Si está en modo desarrollo, retorna datos mock
+
     if (this.modoDesarrollo) {
-      return this.importarClientesMock(clientes);
+      // Modo desarrollo - datos mock
+      return this.importarClientesMock(clientes, nombreRuta);
     }
 
-    // Modo producción: llamada real al backend
+    const diasACodigoMap: { [key: string]: string } = {
+      'Lunes - Jueves': 'LJ',
+      'Martes - Viernes': 'MV',
+      'Miércoles - Sábado': 'IS'
+    };
+
+    // MODO PRODUCCIÓN - Enviar al backend
+    const payload = {
+      fechaReporte: fechaReporte,
+      nombreRuta: nombreRuta,
+      clientes: clientes.map(c => ({
+        numeroCliente: c.numeroCliente,
+        nombreNegocio: c.nombreNegocio,
+        representante: c.representante,
+        colonia: c.colonia,
+        direccion: c.direccion,
+        codigoPostal: c.codigoPostal || null,
+        ciudad: c.ciudad || 'Oaxaca',
+        latitud: c.latitud || 17.0732,
+        longitud: c.longitud || -96.7266,
+        precioGarrafon: c.precioGarrafon.toString(),
+        esCredito: c.esCredito,
+        requiereFactura: c.requiereFactura,
+        diasVisita: diasACodigoMap[c.diasVisita[0]], // Solo envía la ruta asignada (ej: "Lunes-Jueves")
+        ordenVisita: c.ordenVisita.toString()
+      }))
+    };
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    const body = {
-      clientes: clientes,
-      supervisor: supervisor,
-      fecha: fecha,
-      totalClientes: clientes.length,
-      totalVisitas: this.calcularTotalVisitas(clientes)
-    };
-
-    return this.http.post<ImportResult>(`${this.apiUrl}/import/clientes`, body, { headers })
+    return this.http.post<any>(`${this.apiUrl}/rutas/importar-excel`, payload, { headers })
       .pipe(
-        map(response => {
-          console.log('✅ Respuesta del servidor:', response);
-          return response;
-        }),
+        map(response => ({
+          success: response.success || true,
+          message: response.message || '✅ Importación exitosa',
+          totalRows: clientes.length,
+          processedRows: response.clientesCreados || clientes.length,
+          errors: response.errors || [],
+          warnings: response.warnings || [],
+          rutasCreadas: response.rutasCreadas,
+          diasRutaCreados: response.diasRutaCreados,
+          clientesCreados: response.clientesCreados,
+          detalles: response.detalles
+        })),
         catchError(error => {
-          console.error('❌ Error en la importación:', error);
+          console.error('❌ Error importando:', error);
           return of({
             success: false,
-            message: `Error al conectar con el servidor: ${error.message}`,
+            message: error.error?.message || 'Error al importar clientes',
             totalRows: clientes.length,
             processedRows: 0,
-            errors: [error.message],
+            errors: [error.error?.message || error.message || 'Error desconocido'],
             warnings: []
           });
         })
@@ -64,250 +100,176 @@ export class ImportService {
   }
 
   /**
-   * Validar datos antes de importar
+   * Modo mock para desarrollo (sin backend)
    */
-  validarDatos(clientes: ClienteImport[]): Observable<any> {
+  private importarClientesMock(
+    clientes: ClienteImport[],
+    nombreRuta: string
+  ): Observable<ImportResult> {
+    console.log('📦 MODO DESARROLLO - Datos mock');
+    console.log('Nombre Ruta:', nombreRuta);
+    console.log('Clientes a importar:', clientes.length);
+
+    // Agrupar por días para simular la estructura de la BD
+    const agrupados = clientes.reduce((acc, cliente) => {
+      const dia = cliente.diasVisita[0];
+      if (!acc[dia]) acc[dia] = [];
+      acc[dia].push(cliente);
+      return acc;
+    }, {} as { [key: string]: ClienteImport[] });
+
+    console.log('Agrupación por días:', agrupados);
+
+    // Simular delay de red
+    return new Observable(observer => {
+      setTimeout(() => {
+        observer.next({
+          success: true,
+          message: `✅ ${clientes.length} clientes importados (MODO DESARROLLO)`,
+          totalRows: clientes.length,
+          processedRows: clientes.length,
+          errors: [],
+          warnings: ['⚠️ Modo desarrollo activado - no se guardó en base de datos'],
+          rutasCreadas: 1,
+          diasRutaCreados: Object.keys(agrupados).length,
+          clientesCreados: clientes.length,
+          detalles: {
+            rutaPadre: nombreRuta,
+            diasCreados: Object.keys(agrupados),
+            distribucion: Object.entries(agrupados).map(([dia, clts]) => ({
+              dia,
+              cantidad: clts.length
+            }))
+          }
+        });
+        observer.complete();
+      }, 1500);
+    });
+  }
+
+  /**
+   * Verificar conexión con el backend
+   */
+  verificarConexion(): Observable<boolean> {
     if (this.modoDesarrollo) {
-      return this.validarDatosMock(clientes);
+      console.log('🔧 Modo desarrollo - conexión simulada');
+      return of(true);
     }
 
-    return this.http.post(`${this.apiUrl}/import/validar`, { clientes })
+    return this.http.get(`${this.apiUrl}/rutas`, { observe: 'response' })
       .pipe(
+        map(response => {
+          console.log('✅ Backend conectado:', response.status);
+          return true;
+        }),
         catchError(error => {
-          console.error('Error validando datos:', error);
-          return of({ valid: false, errors: [error.message] });
+          console.error('❌ Backend no disponible:', error.message);
+          return of(false);
         })
       );
   }
 
   /**
-   * Obtener historial de importaciones
+   * Obtener todas las rutas (opcional)
    */
-  getHistorialImportaciones(): Observable<any[]> {
+  getRutas(): Observable<any[]> {
     if (this.modoDesarrollo) {
-      return this.getHistorialMock();
+      return of([]);
     }
 
-    return this.http.get<any[]>(`${this.apiUrl}/import/historial`)
+    return this.http.get<any[]>(`${this.apiUrl}/rutas`)
       .pipe(
         catchError(error => {
-          console.error('Error obteniendo historial:', error);
+          console.error('Error obteniendo rutas:', error);
           return of([]);
         })
       );
   }
 
   /**
-   * Obtener detalles de una importación específica
+   * Obtener detalles de una ruta específica
    */
-  getDetallesImportacion(importacionId: number): Observable<any> {
+  getRutaDetalle(rutaId: number): Observable<any> {
     if (this.modoDesarrollo) {
-      return of({
-        id: importacionId,
-        fecha: new Date().toISOString(),
-        supervisor: 'Mock Supervisor',
-        totalClientes: 10,
-        exitosos: 8,
-        fallidos: 2
-      }).pipe(delay(300));
+      return of(null);
     }
 
-    return this.http.get(`${this.apiUrl}/import/${importacionId}`)
+    return this.http.get<any>(`${this.apiUrl}/rutas/${rutaId}`)
       .pipe(
         catchError(error => {
-          console.error('Error obteniendo detalles:', error);
+          console.error('Error obteniendo detalle de ruta:', error);
           return of(null);
         })
       );
   }
 
   /**
-   * Verificar si un cliente ya existe
+   * Obtener clientes de un día de ruta específico
    */
-  verificarClienteExistente(numeroCliente: string): Observable<boolean> {
+  getClientesDiaRuta(diaRutaId: number): Observable<any[]> {
     if (this.modoDesarrollo) {
-      // Simular que el 10% de clientes ya existen
-      return of(Math.random() < 0.1).pipe(delay(100));
+      return of([]);
     }
 
-    return this.http.get<{ existe: boolean }>(`${this.apiUrl}/clientes/verificar/${numeroCliente}`)
+    return this.http.get<any[]>(`${this.apiUrl}/rutas/dia-ruta/${diaRutaId}/clientes`)
       .pipe(
-        map(response => response.existe),
-        catchError(() => of(false))
+        catchError(error => {
+          console.error('Error obteniendo clientes del día de ruta:', error);
+          return of([]);
+        })
       );
   }
 
   /**
-   * Descargar plantilla de ejemplo
+   * Eliminar una ruta completa (con sus días y clientes)
    */
-  descargarPlantilla(): void {
-    // Esta función se puede implementar en el componente usando XLSX
-    console.log('Descargando plantilla...');
-  }
-
-  // ==========================================
-  // MÉTODOS PRIVADOS Y MOCK DATA
-  // ==========================================
-
-  private calcularTotalVisitas(clientes: ClienteImport[]): number {
-    return clientes.reduce((total, cliente) => {
-      return total + cliente.diasVisita.length;
-    }, 0);
-  }
-
-  /**
-   * Simular importación (datos mock para desarrollo)
-   */
-  private importarClientesMock(clientes: ClienteImport[]): Observable<ImportResult> {
-    console.log('🔧 Modo desarrollo: Simulando importación...');
-    console.log('📦 Clientes a importar:', clientes);
-
-    // Simular un delay de 2 segundos como si fuera una llamada real
-    return of({
-      success: true,
-      message: 'Importación completada exitosamente (MODO DESARROLLO)',
-      totalRows: clientes.length,
-      processedRows: Math.floor(clientes.length * 0.95), // Simular 95% éxito
-      errors: this.generarErroresMock(clientes),
-      warnings: this.generarWarningsMock(clientes)
-    }).pipe(delay(2000));
-  }
-
-  private generarErroresMock(clientes: ClienteImport[]): string[] {
-    const errors: string[] = [];
-    const numErrores = Math.min(2, Math.floor(clientes.length * 0.05));
-    
-    for (let i = 0; i < numErrores; i++) {
-      const indice = Math.floor(Math.random() * clientes.length);
-      errors.push(
-        `Cliente ${clientes[indice].numeroCliente} (${clientes[indice].representante}): Error de validación simulado`
-      );
-    }
-    
-    return errors;
-  }
-
-  private generarWarningsMock(clientes: ClienteImport[]): string[] {
-    const warnings: string[] = [];
-    
-    // Simular algunas advertencias
-    const clientesSinNegocio = clientes.filter(c => !c.nombreNegocio).length;
-    if (clientesSinNegocio > 0) {
-      warnings.push(`${clientesSinNegocio} clientes sin nombre de negocio`);
-    }
-
-    const clientesConCredito = clientes.filter(c => c.esCredito).length;
-    if (clientesConCredito > 0) {
-      warnings.push(`${clientesConCredito} clientes configurados con crédito`);
-    }
-
-    const clientesConFactura = clientes.filter(c => c.requiereFactura).length;
-    if (clientesConFactura > 0) {
-      warnings.push(`${clientesConFactura} clientes requieren factura`);
-    }
-
-    return warnings;
-  }
-
-  private validarDatosMock(clientes: ClienteImport[]): Observable<any> {
-    console.log('🔧 Validando datos (MODO DESARROLLO)...');
-    
-    const erroresValidacion: string[] = [];
-    
-    clientes.forEach((cliente, index) => {
-      // Validaciones básicas
-      if (!cliente.numeroCliente) {
-        erroresValidacion.push(`Fila ${index + 1}: Falta número de cliente`);
-      }
-      if (!cliente.direccion) {
-        erroresValidacion.push(`Fila ${index + 1}: Falta dirección`);
-      }
-      if (cliente.precioGarrafon <= 0) {
-        erroresValidacion.push(`Fila ${index + 1}: Precio inválido`);
-      }
-      if (cliente.diasVisita.length === 0) {
-        erroresValidacion.push(`Fila ${index + 1}: Días de visita inválidos`);
-      }
-    });
-
-    return of({
-      valid: erroresValidacion.length === 0,
-      errors: erroresValidacion,
-      totalValidados: clientes.length,
-      validos: clientes.length - erroresValidacion.length
-    }).pipe(delay(1000));
-  }
-
-  private getHistorialMock(): Observable<any[]> {
-    return of([
-      {
-        id: 1,
-        fecha: '2025-01-15',
-        supervisor: 'ADAN FERNANDO CANSECO RODRIGUEZ',
-        totalClientes: 45,
-        exitosos: 43,
-        fallidos: 2,
-        estado: 'completado'
-      },
-      {
-        id: 2,
-        fecha: '2025-01-10',
-        supervisor: 'MARIA GARCIA LOPEZ',
-        totalClientes: 38,
-        exitosos: 38,
-        fallidos: 0,
-        estado: 'completado'
-      },
-      {
-        id: 3,
-        fecha: '2025-01-05',
-        supervisor: 'JUAN PEREZ MARTINEZ',
-        totalClientes: 52,
-        exitosos: 50,
-        fallidos: 2,
-        estado: 'completado'
-      }
-    ]).pipe(delay(500));
-  }
-
-  /**
-   * Cambiar modo de desarrollo/producción
-   */
-  setModoDesarrollo(modo: boolean): void {
-    this.modoDesarrollo = modo;
-    console.log(`🔧 Modo ${modo ? 'DESARROLLO' : 'PRODUCCIÓN'} activado`);
-  }
-
-  /**
-   * Verificar estado de conexión con el backend
-   */
-  verificarConexion(): Observable<boolean> {
+  eliminarRuta(rutaId: number): Observable<any> {
     if (this.modoDesarrollo) {
-      return of(true).pipe(delay(200));
+      console.log('🗑️ MODO DESARROLLO - Ruta eliminada (simulado)');
+      return of({ success: true, message: 'Ruta eliminada (mock)' });
     }
 
-    return this.http.get(`${this.apiUrl}/health`, { observe: 'response' })
+    return this.http.delete(`${this.apiUrl}/rutas/${rutaId}`)
       .pipe(
-        map(response => response.status === 200),
-        catchError(() => of(false))
+        catchError(error => {
+          console.error('Error eliminando ruta:', error);
+          return of({ success: false, message: error.message });
+        })
       );
   }
 
   /**
-   * Obtener configuración del servicio
-   */
-  getConfig(): { apiUrl: string; modoDesarrollo: boolean } {
-    return {
-      apiUrl: this.apiUrl,
-      modoDesarrollo: this.modoDesarrollo
-    };
-  }
+ * Verificar si un precio existe en la BD
+ */
+verificarPrecioExiste(precio: number): Observable<boolean> {
+  return this.http.get<boolean>(`${this.apiUrl}/precios/verificar/${precio}`)
+    .pipe(catchError(() => of(false)));
+}
 
-  /**
-   * Actualizar URL del API
-   */
-  setApiUrl(url: string): void {
-    this.apiUrl = url;
-    console.log(`🔗 API URL actualizada: ${url}`);
-  }
+/**
+ * Crear un nuevo precio
+ */
+crearPrecio(precioPorGarrafon: number, tipoCompra: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/precios`, {
+    precioPorGarrafon,
+    tipoCompra
+  });
+}
+
+/**
+ * Obtener lista de supervisores
+ */
+getSupervisores(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/usuarios/supervisores`)
+    .pipe(catchError(() => of([])));
+}
+
+/**
+ * Obtener lista de repartidores
+ */
+getRepartidores(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/usuarios/repartidores`)
+    .pipe(catchError(() => of([])));
+}
+
 }

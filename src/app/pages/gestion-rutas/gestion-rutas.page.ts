@@ -20,6 +20,9 @@ import {
 } from 'ionicons/icons';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 
+import { ImportarClientesModalComponent } from '../../modal/importar-clientes-modal/importar-clientes-modal.component';
+
+
 @Component({
   selector: 'app-gestion-rutas',
   templateUrl: './gestion-rutas.page.html',
@@ -51,6 +54,21 @@ export class GestionRutasPage  {
   }
   ionViewWillEnter() {
     this.actualizarGrupos();
+  }
+
+  async abrirImportador() {
+    const modal = await this.modalController.create({
+      component: ImportarClientesModalComponent,
+      cssClass: 'importar-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    if (data?.success) {
+      console.log('Importación exitosa:', data);
+      // Recargar datos o mostrar mensaje
+    }
   }
 
   actualizarGrupos() {

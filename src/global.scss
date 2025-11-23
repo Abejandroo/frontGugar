@@ -48,3 +48,32 @@ ion-menu[menuId="admin-menu"] {
 ion-backdrop {
   z-index: 9998 !important;
 }
+// Estilos globales para Leaflet
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.leaflet-popup-content {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+// Asegurar que los controles de zoom se vean
+.leaflet-control-zoom {
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.leaflet-control-zoom a {
+  background-color: white;
+  color: #333;
+  
+  &:hover {
+    background-color: #f4f4f4;
+  }
+}

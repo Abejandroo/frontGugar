@@ -13,19 +13,6 @@
 
 <ion-content>
   <div class="import-container">
-    
-    <!-- INFO DEL SUPERVISOR -->
-    <ion-card *ngIf="supervisorDetectado && mostrarVistaPrevia" color="tertiary">
-      <ion-card-content>
-        <div class="supervisor-info">
-          <ion-icon name="person-circle"></ion-icon>
-          <div>
-            <strong>Supervisor:</strong> {{ supervisorDetectado }}<br>
-            <small *ngIf="fechaReporte">Fecha: {{ fechaReporte }}</small>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
 
     <!-- SELECTOR DE ARCHIVO (Solo si no hay vista previa) -->
     <ion-card *ngIf="!mostrarVistaPrevia">
@@ -36,18 +23,9 @@
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <input 
-          #fileInput
-          type="file" 
-          accept=".xlsx,.xls,.csv" 
-          (change)="onFileSelected($event)"
-          style="display: none;">
-        
-        <ion-button 
-          expand="block" 
-          color="primary"
-          (click)="fileInput.click()"
-          [disabled]="loading">
+        <input #fileInput type="file" accept=".xlsx,.xls,.csv" (change)="onFileSelected($event)" style="display: none;">
+
+        <ion-button expand="block" color="primary" (click)="fileInput.click()" [disabled]="loading">
           <ion-icon name="folder-open" slot="start"></ion-icon>
           Seleccionar Archivo
         </ion-button>
@@ -61,85 +39,371 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- MAPAS POR DÍA DE VISITA -->
+    <!-- VALIDACIÓN Y DATOS DE IMPORTACIÓN -->
+<div *ngIf="mostrarVistaPrevia && mostrarSeccionValidacion">
+  
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="clipboard-outline"></ion-icon>
+        Datos de la Ruta
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      
+      <!-- Nombre de ruta - REQUERIDO -->
+      <ion-item>
+        <ion-label position="stacked">
+          <strong>📝 Nombre de la ruta *</strong>
+        </ion-label>
+        <ion-input 
+          [(ngModel)]="nombreRuta" 
+          placeholder="Ej: San Felipe del Agua"
+          [class.ion-invalid]="nombreRuta.trim().length === 0">
+        </ion-input>
+      </ion-item>
+
+      <!-- Fecha (solo lectura) -->
+      <ion-item *ngIf="fechaReporte">
+        <ion-label position="stacked">
+          <strong>📅 Fecha del reporte</strong>
+        </ion-label>
+        <ion-input [value]="fechaReporte" readonly></ion-input>
+      </ion-item>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ASIGNACIÓN DE PERSONAL (OPCIONAL) -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="people-outline"></ion-icon>
+        Personal (Opcional)
+      </ion-card-title>
+      <ion-card-subtitle>Puedes asignarlo después desde la pestaña Personal</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      
+      <ion-item>
+        <ion-label position="stacked">
+          <strong>👤 Supervisor</strong>
+        </ion-label>
+        <ion-select 
+          [(ngModel)]="supervisorId" 
+          placeholder="Sin asignar"
+          interface="popover">
+          <ion-select-option [value]="null">Sin asignar</ion-select-option>
+          <ion-select-option 
+            *ngFor="let sup of supervisores" 
+            [value]="sup.id">
+            {{ sup.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          <strong>🚚 Repartidor</strong>
+        </ion-label>
+        <ion-select 
+          [(ngModel)]="repartidorId" 
+          placeholder="Sin asignar"
+          interface="popover">
+          <ion-select-option [value]="null">Sin asignar</ion-select-option>
+          <ion-select-option 
+            *ngFor="let rep of repartidores" 
+            [value]="rep.id">
+            {{ rep.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- PRECIOS FALTANTES -->
+  <ion-card *ngIf="verificandoPrecios || preciosFaltantes.length > 0">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="cash-outline"></ion-icon>
+        Precios Detectados
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      
+      <div *ngIf="verificandoPrecios" class="ion-text-center ion-padding">
+        <ion-spinner></ion-spinner>
+        <p>Verificando precios en la base de datos...</p>
+      </div>
+
+      <ion-list *ngIf="!verificandoPrecios && preciosFaltantes.length > 0">
+        <ion-item *ngFor="let precio of preciosFaltantes" color="warning">
+          <ion-icon name="alert-circle" color="danger" slot="start"></ion-icon>
+          <ion-label>
+            <h3>${{ precio.precio }}</h3>
+            <p>{{ precio.cantidad }} cliente(s) - No existe en BD</p>
+          </ion-label>
+          <ion-button 
+            slot="end" 
+            size="small" 
+            color="primary"
+            (click)="crearPrecio(precio)">
+            <ion-icon name="add" slot="start"></ion-icon>
+            Crear
+          </ion-button>
+        </ion-item>
+      </ion-list>
+
+      <ion-note *ngIf="!verificandoPrecios && preciosFaltantes.length === 0" color="success">
+        ✅ Todos los precios existen en la base de datos
+      </ion-note>
+
+    </ion-card-content>
+  </ion-card>
+
+</div>
+
+    
+    <!-- TABS CON MAPAS Y DOMICILIOS -->
     <div *ngIf="mostrarVistaPrevia && mapasRutas.length > 0">
-      <div *ngFor="let mapaRuta of mapasRutas; let i = index" class="mapa-seccion">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              🗺️ Mapa de {{ mapaRuta.dias }}
-            </ion-card-title>
-            <ion-card-subtitle>
-              {{ mapaRuta.clientes.length }} clientes en esta ruta
-            </ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <div [id]="'map-' + i" class="map-container"></div>
-          </ion-card-content>
-        </ion-card>
+
+      <!-- Segment para los tabs -->
+      <ion-segment [value]="tabSeleccionado" (ionChange)="cambiarTab($event)" mode="md" scrollable>
+        <ion-segment-button *ngFor="let mapaRuta of mapasRutas; let i = index" [value]="i.toString()">
+          <ion-label>
+            <strong>{{ mapaRuta.dias }}</strong>
+            <br>
+            <small>{{ mapaRuta.clientes.length }} clientes</small>
+          </ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- Contenido del tab seleccionado -->
+      <div *ngFor="let mapaRuta of mapasRutas; let i = index">
+        <div *ngIf="tabSeleccionado === i.toString()" class="tab-content">
+
+          <!-- Mapa -->
+          <ion-card class="map-card">
+            <ion-card-header>
+              <ion-card-title class="map-title">
+                <ion-icon name="map-outline"></ion-icon>
+                {{ mapaRuta.dias }}
+              </ion-card-title>
+              <ion-card-subtitle class="map-subtitle">
+                <ion-icon name="location-outline"></ion-icon>
+                {{ mapaRuta.clientes.length }} domicilios
+              </ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div [id]="'map-' + i" class="map-container"></div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- CARD DEL CLIENTE SELECCIONADO (Aparece dinámicamente) -->
+          <div *ngIf="clienteSeleccionado" class="cliente-seleccionado-wrapper" [@slideIn]>
+            <ion-card class="cliente-seleccionado-card">
+              <ion-card-content>
+                <div class="cliente-detail">
+
+                  <!-- Header con badge y botón cerrar -->
+                  <div class="detail-header">
+                    <div class="header-left">
+                      <div class="orden-badge-large">
+                        {{ clienteSeleccionado.ordenVisita }}
+                      </div>
+                      <div class="detail-info">
+                        <div class="cliente-nombre">
+                          {{ clienteSeleccionado.nombreNegocio || clienteSeleccionado.representante }}
+                        </div>
+                        <div class="cliente-direccion">
+                          <ion-icon name="location"></ion-icon>
+                          {{ clienteSeleccionado.direccion }}
+                        </div>
+                        <div class="cliente-colonia">
+                          {{ clienteSeleccionado.colonia }}
+                        </div>
+                      </div>
+                    </div>
+                    <ion-button fill="clear" size="small" class="close-button" (click)="cerrarSeleccion()">
+                      <ion-icon name="close" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </div>
+
+                  <!-- Información adicional -->
+                  <div class="detail-body">
+                    <div class="info-row" *ngIf="clienteSeleccionado.nombreNegocio">
+                      <ion-icon name="person-outline"></ion-icon>
+                      <span>{{ clienteSeleccionado.representante }}</span>
+                    </div>
+
+                    <div class="info-tags">
+                      <div class="tag tag-precio">
+                        <ion-icon name="cash-outline"></ion-icon>
+                        <span>${{ clienteSeleccionado.precioGarrafon }}</span>
+                      </div>
+
+                      <ion-badge *ngIf="clienteSeleccionado.esCredito" color="warning">
+                        Crédito
+                      </ion-badge>
+
+                      <ion-badge *ngIf="clienteSeleccionado.requiereFactura" color="tertiary">
+                        Factura
+                      </ion-badge>
+                    </div>
+
+                    <ion-button expand="block" class="edit-button"
+                      (click)="editarDireccion(clienteSeleccionado, $event)">
+                      <ion-icon name="create-outline" slot="start"></ion-icon>
+                      Editar ubicación
+                    </ion-button>
+                  </div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+
+          <!-- Lista de domicilios (3 o todas) -->
+          <div class="domicilios-list">
+            <div class="list-header">
+              <div class="list-title">
+                <ion-icon name="list-outline"></ion-icon>
+                <span>Lista de domicilios</span>
+              </div>
+              <ion-button size="small" fill="clear" class="toggle-button" (click)="toggleVerTodasCards()">
+                {{ mostrarTodasCards ? 'Ver menos' : 'Ver todas (' + mapaRuta.clientes.length + ')' }}
+                <ion-icon [name]="mostrarTodasCards ? 'chevron-up' : 'chevron-down'" slot="end"></ion-icon>
+              </ion-button>
+            </div>
+
+            <div class="cards-container">
+              <ion-card *ngFor="let cliente of getClientesAMostrar()"
+                [class.selected]="clienteSeleccionado?.numeroCliente === cliente.numeroCliente"
+                (click)="seleccionarClienteDesdeCard(cliente, i)" class="domicilio-card" button>
+                <ion-card-content>
+                  <div class="domicilio-content">
+
+                    <!-- Badge de orden -->
+                    <div class="orden-badge">
+                      {{ cliente.ordenVisita }}
+                    </div>
+
+                    <!-- Información -->
+                    <div class="domicilio-info">
+                      <div class="domicilio-nombre">
+                        {{ cliente.nombreNegocio || cliente.representante }}
+                      </div>
+                      <div class="domicilio-direccion">
+                        <ion-icon name="location-outline"></ion-icon>
+                        {{ cliente.direccion }}
+                      </div>
+                      <div class="domicilio-tags">
+                        <span class="tag-small">${{ cliente.precioGarrafon }}</span>
+                        <span class="tag-small" *ngIf="cliente.esCredito">Crédito</span>
+                        <span class="tag-small" *ngIf="cliente.requiereFactura">Factura</span>
+                      </div>
+                    </div>
+
+                    <!-- Botón editar -->
+                    <ion-button fill="clear" size="small" class="edit-icon-button"
+                      (click)="editarDireccion(cliente, $event)">
+                      <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
-    <!-- CARD DEL CLIENTE SELECCIONADO -->
-    <ion-card *ngIf="clienteSeleccionado" id="cliente-card" class="cliente-card">
-      <ion-card-content>
-        <!-- Mapa pequeño del cliente -->
-        <div class="mini-map">
-          <img src="https://via.placeholder.com/400x200/e0e0e0/666666?text=Mapa" alt="Mapa">
-        </div>
+    <!-- MODAL PARA EDITAR DIRECCIÓN -->
+    <ion-modal #editModal [isOpen]="mostrarModalEdicion" (didDismiss)="cerrarModalEdicion()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar color="primary">
+            <ion-title>Editar Dirección</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="cerrarModalEdicion()">
+                <ion-icon name="close"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
 
-        <!-- Información del cliente -->
-        <div class="cliente-info">
-          <div class="info-header">
-            <ion-icon name="location" color="primary"></ion-icon>
-            <div>
-              <strong>{{ clienteSeleccionado.direccion }}</strong>
-              <p class="colonia">{{ clienteSeleccionado.colonia }}</p>
-            </div>
-          </div>
+        <ion-content *ngIf="clienteEnEdicion">
+          <div class="edit-content">
 
-          <div class="info-row">
-            <ion-icon name="person"></ion-icon>
-            <span>{{ clienteSeleccionado.representante }}</span>
-          </div>
+            <!-- Vista previa del mapa con nueva ubicación -->
+            <ion-card>
+              <ion-card-header>
+                <ion-card-subtitle>Ubicación Actual</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content>
+                <div id="edit-map" class="edit-map"></div>
+              </ion-card-content>
+            </ion-card>
 
-          <div class="info-row" *ngIf="clienteSeleccionado.nombreNegocio">
-            <ion-icon name="storefront"></ion-icon>
-            <span>{{ clienteSeleccionado.nombreNegocio }}</span>
-          </div>
+            <!-- Formulario de edición -->
+            <ion-card>
+              <ion-card-content>
+                <ion-list>
 
-          <div class="info-dias">
-            <strong>{{ getDiasVisitaText(clienteSeleccionado.diasVisita) }}</strong>
-          </div>
+                  <ion-item>
+                    <ion-label position="stacked">
+                      <strong>Dirección</strong>
+                    </ion-label>
+                    <ion-input [(ngModel)]="clienteEnEdicion.direccion" placeholder="Ingrese la dirección">
+                    </ion-input>
+                  </ion-item>
 
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Precio</span>
-              <strong>$ {{ clienteSeleccionado.precioGarrafon }}</strong>
-            </div>
-            <div class="info-item">
-              <span class="label">Crédito</span>
-              <strong>{{ clienteSeleccionado.esCredito ? 'SÍ' : 'NO' }}</strong>
-            </div>
-            <div class="info-item">
-              <span class="label">Factura</span>
-              <strong>{{ clienteSeleccionado.requiereFactura ? 'SÍ' : 'NO' }}</strong>
-            </div>
-          </div>
+                  <ion-item>
+                    <ion-label position="stacked">
+                      <strong>Colonia</strong>
+                    </ion-label>
+                    <ion-input [(ngModel)]="clienteEnEdicion.colonia" placeholder="Ingrese la colonia">
+                    </ion-input>
+                  </ion-item>
 
-          <!-- Botones de acción -->
-          <div class="action-buttons">
-            <ion-button 
-              expand="block" 
-              color="warning"
-              (click)="editarUbicacion(clienteSeleccionado)">
-              <ion-icon name="create" slot="start"></ion-icon>
-              Editar Ubicación
-            </ion-button>
+                  <ion-item>
+                    <ion-label position="stacked">
+                      <strong>Latitud</strong>
+                    </ion-label>
+                    <ion-input type="number" [(ngModel)]="clienteEnEdicion.latitud"
+                      (ionChange)="actualizarMapaEdicion()" placeholder="Ej: 17.0732">
+                    </ion-input>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label position="stacked">
+                      <strong>Longitud</strong>
+                    </ion-label>
+                    <ion-input type="number" [(ngModel)]="clienteEnEdicion.longitud"
+                      (ionChange)="actualizarMapaEdicion()" placeholder="Ej: -96.7266">
+                    </ion-input>
+                  </ion-item>
+
+                </ion-list>
+
+                <div class="edit-actions">
+                  <ion-button expand="block" color="medium" fill="outline" (click)="cerrarModalEdicion()">
+                    Cancelar
+                  </ion-button>
+
+                  <ion-button expand="block" color="primary" (click)="guardarEdicion()">
+                    <ion-icon name="save" slot="start"></ion-icon>
+                    Guardar Cambios
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+
           </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
 
   </div>
 </ion-content>
@@ -148,21 +412,12 @@
 <ion-footer *ngIf="mostrarVistaPrevia && datosExcel.length > 0">
   <ion-toolbar>
     <div class="footer-buttons">
-      <ion-button 
-        expand="block" 
-        color="danger"
-        fill="outline"
-        (click)="limpiarArchivo()"
-        [disabled]="loading">
+      <ion-button expand="block" color="danger" fill="outline" (click)="limpiarArchivo()" [disabled]="loading">
         <ion-icon name="close-circle" slot="start"></ion-icon>
         Cancelar
       </ion-button>
-      
-      <ion-button 
-        expand="block" 
-        color="success"
-        (click)="confirmarImportacion()"
-        [disabled]="loading">
+
+      <ion-button expand="block" color="success" (click)="confirmarImportacion()" [disabled]="loading">
         <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
         <ion-icon *ngIf="!loading" name="cloud-upload" slot="start"></ion-icon>
         {{ loading ? 'Importando...' : `Importar ${datosExcel.length}` }}

@@ -1,16 +1,3 @@
-export interface ExcelRowData {
-  vis: string;
-  rec: number;
-  colonia: string;
-  direccion: string;
-  representante: string;
-  negocio: string;
-  precio: number;
-  credito: string;
-  factura: string;
-  numeroCte: string;
-}
-
 // src/app/models/excel-import.model.ts
 
 export interface ClienteImport {
@@ -22,11 +9,12 @@ export interface ClienteImport {
   precioGarrafon: number;
   esCredito: boolean;
   requiereFactura: boolean;
-  diasVisita: string[];
+  diasVisita: string[]; // Array con un solo elemento: la ruta asignada
   ordenVisita: number;
-  supervisor: string;
-  latitud?: number;    // ← AGREGAR
-  longitud?: number;   // ← AGREGAR
+  latitud?: number;
+  longitud?: number;
+  codigoPostal?: string;
+  ciudad?: string;
 }
 
 export interface ImportResult {
@@ -36,4 +24,8 @@ export interface ImportResult {
   processedRows: number;
   errors: string[];
   warnings: string[];
+  rutasCreadas?: number;
+  diasRutaCreados?: number;
+  clientesCreados?: number;
+  detalles?: any;
 }
