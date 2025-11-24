@@ -46,4 +46,17 @@ export class RutaServiceTs {
     eliminarRuta(rutaId: number): Observable<any> {
     return this.http.delete(`${this.url}/rutas/${rutaId}`);
   }
+
+  obtenerRutaPorId(id: number): Observable<any> {
+  return this.http.get<any>(`${this.url}/rutas/${id}`);
+}
+
+actualizarRuta(id: number, data: any): Observable<any> {
+  return this.http.put(`${this.url}/rutas/${id}`, data);
+}
+
+
+eliminarClienteDeRuta(diaRutaId: number, clienteId: number): Observable<any> {
+  return this.http.delete(`${this.url}/rutas/dia-ruta/${diaRutaId}/cliente/${clienteId}`);
+}
 }

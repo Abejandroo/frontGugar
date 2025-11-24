@@ -77,3 +77,60 @@ ion-backdrop {
     background-color: #f4f4f4;
   }
 }
+
+// ========================================
+// FIX: OVERLAYS DE IONIC
+// ========================================
+
+// Forzar z-index correcto para todos los overlays
+ion-alert,
+ion-action-sheet,
+ion-loading,
+ion-toast,
+ion-modal {
+  z-index: 20001 !important;
+}
+
+ion-backdrop {
+  z-index: 20000 !important;
+}
+
+// Alert personalizado para dividir ruta
+.custom-alert-dividir {
+  --backdrop-opacity: 0.5;
+  
+  .alert-wrapper {
+    --width: 90%;
+    --max-width: 400px;
+  }
+  
+  .alert-input {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+// Action sheets (selects)
+ion-action-sheet {
+  --backdrop-opacity: 0.4;
+  
+  .action-sheet-wrapper {
+    .action-sheet-button {
+      font-size: 16px;
+    }
+  }
+}
+
+.custom-action-sheet {
+  --backdrop-opacity: 0.4;
+  z-index: 20001 !important;
+  
+  .action-sheet-wrapper {
+    z-index: 20002 !important;
+    
+    .action-sheet-button {
+      font-size: 16px;
+    }
+  }
+}

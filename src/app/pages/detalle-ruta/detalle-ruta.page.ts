@@ -1,0 +1,662 @@
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, AlertController, ToastController, ModalController } from '@ionic/angular';
+import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { Auth } from 'src/app/service/auth';
+import { DirectionsService } from 'src/app/service/directions.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Geolocation } from '@capacitor/geolocation';
+import { addIcons } from 'ionicons';
+import {
+  arrowBack,
+  checkmark,
+  map,
+  searchOutline,
+  businessOutline,
+  locationOutline,
+  trashOutline,
+  warningOutline,
+  cutOutline,
+  location,
+  eye,
+  eyeOff,
+  closeCircle
+} from 'ionicons/icons';
+import * as L from 'leaflet';
+import { DividirRutaModalComponent } from 'src/app/modal/dividir-ruta-modal/dividir-ruta-modal.component';
+
+@Component({
+  selector: 'app-detalle-ruta',
+  templateUrl: './detalle-ruta.page.html',
+  styleUrls: ['./detalle-ruta.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule]
+})
+export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('mapaLeaflet', { static: false }) mapaElement!: ElementRef;
+
+  ruta: any = {
+    nombre: '',
+    supervisor_id: null,
+    idRepartidor: null,
+    diasRuta: []
+  };
+
+  rutaId!: number;
+  hayaCambios: boolean = false;
+
+  // Personal
+  supervisores: any[] = [];
+  repartidores: any[] = [];
+
+  // Día seleccionado
+  diaSeleccionado: string = '';
+  diasDisponibles: any[] = [];
+  clientesDia: any[] = [];
+
+  // Búsqueda
+  textoBusqueda: string = '';
+  clientesFiltrados: any[] = [];
+
+  // Cliente seleccionado
+  clienteSeleccionado: any = null;
+
+  // Monitoreo
+  monitoreando: boolean = false;
+  watchId: string | null = null;
+  markerRepartidor: L.Marker | null = null;
+
+  // Mapa Leaflet
+  private mapa: L.Map | null = null;
+  private markers: Map<number, L.Marker> = new Map();
+
+  // Stats
+  totalClientes: number = 0;
+  visitados: number = 0;
+  pendientes: number = 0;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private rutasService: RutaServiceTs,
+    private authService: Auth,
+    private directionsService: DirectionsService,
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private modalController: ModalController
+  ) {
+    addIcons({
+      arrowBack,
+      checkmark,
+      map,
+      searchOutline,
+      businessOutline,
+      locationOutline,
+      trashOutline,
+      warningOutline,
+      cutOutline,
+      location,
+      eye,
+      eyeOff,
+      closeCircle
+    });
+  }
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.rutaId = +params['id'];
+      this.cargarPersonal();
+      this.cargarRuta();
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.inicializarMapa();
+    }, 500);
+  }
+
+  ngOnDestroy() {
+    if (this.watchId) {
+      Geolocation.clearWatch({ id: this.watchId });
+    }
+  }
+
+  cargarPersonal() {
+    this.authService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.supervisores = usuarios.filter(u => u.role === 'supervisor');
+        this.repartidores = usuarios.filter(u => u.role === 'repartidor');
+      }
+    });
+  }
+
+  cargarRuta() {
+    this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
+      next: (data) => {
+        this.ruta = data;
+        this.cargarDiasDisponibles();
+      },
+      error: (err) => {
+        console.error('Error cargando ruta:', err);
+        this.mostrarToast('Error al cargar la ruta', 'danger');
+        this.volver();
+      }
+    });
+  }
+
+  cargarDiasDisponibles() {
+    if (this.ruta.diasRuta && this.ruta.diasRuta.length > 0) {
+      this.diasDisponibles = this.ruta.diasRuta;
+
+      const hoy = new Date().getDay();
+      let diaDefault = this.diasDisponibles[0];
+
+      if (hoy === 1 || hoy === 4) {
+        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Lunes - Jueves') || diaDefault;
+      } else if (hoy === 2 || hoy === 5) {
+        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Martes - Viernes') || diaDefault;
+      } else if (hoy === 3 || hoy === 6) {
+        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Miércoles - Sábado') || diaDefault;
+      }
+
+      this.diaSeleccionado = diaDefault.diaSemana;
+      this.cambiarDia();
+    }
+  }
+
+  cambiarDia() {
+    const dia = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+    if (dia && dia.clientesRuta) {
+      this.clientesDia = dia.clientesRuta.sort((a: any, b: any) =>
+        (a.ordenVisita || 0) - (b.ordenVisita || 0)
+      );
+
+      this.clientesFiltrados = [...this.clientesDia];
+      this.clienteSeleccionado = null;
+      this.calcularEstadisticas();
+      this.actualizarMapa();
+    }
+  }
+
+  calcularEstadisticas() {
+    this.totalClientes = this.clientesDia.length;
+    this.visitados = this.clientesDia.filter(c => c.visitado).length;
+    this.pendientes = this.totalClientes - this.visitados;
+  }
+
+  // ========================================
+  // MAPA LEAFLET
+  // ========================================
+
+  inicializarMapa() {
+    if (this.mapa) {
+      this.mapa.remove();
+    }
+
+    const mapElement = this.mapaElement?.nativeElement;
+    if (!mapElement) return;
+
+    this.mapa = L.map(mapElement).setView([17.0732, -96.7266], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(this.mapa);
+
+    if (this.clientesDia.length > 0) {
+      this.actualizarMapa();
+    }
+  }
+
+  actualizarMapa() {
+    if (!this.mapa) return;
+
+    // Limpiar markers anteriores
+    this.markers.forEach(marker => marker.remove());
+    this.markers.clear();
+
+    const bounds: L.LatLngBoundsExpression = [];
+
+    // SÍ, los puntos vienen de la BD (latitud y longitud)
+    this.clientesDia.forEach((clienteRuta, index) => {
+      const cliente = clienteRuta.cliente;
+      const direccion = cliente.direcciones?.[0];
+
+      if (direccion && direccion.latitud && direccion.longitud) {
+        const latlng: L.LatLngExpression = [direccion.latitud, direccion.longitud];
+        bounds.push(latlng);
+
+        const iconHtml = `
+          <div class="marker-custom">
+            <div class="marker-numero">${clienteRuta.ordenVisita || index + 1}</div>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'custom-marker-icon',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32]
+        });
+
+        const marker = L.marker(latlng, { icon: customIcon })
+          .bindPopup(`
+            <strong>${cliente.representante}</strong><br>
+            ${direccion.direccion}
+          `)
+          .on('click', () => {
+            this.seleccionarCliente(clienteRuta);
+          })
+          .addTo(this.mapa!);
+
+        this.markers.set(clienteRuta.id, marker);
+      }
+    });
+
+    if (bounds.length > 0) {
+      this.mapa.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+
+  seleccionarCliente(clienteRuta: any) {
+    this.clienteSeleccionado = clienteRuta;
+
+    // Scroll suave hacia arriba
+    setTimeout(() => {
+      const content = document.querySelector('ion-content');
+      content?.scrollToPoint(0, 700, 500);
+    }, 100);
+  }
+
+  deseleccionarCliente() {
+    this.clienteSeleccionado = null;
+  }
+
+  seleccionarClienteEnMapa(clienteRuta: any) {
+    const direccion = clienteRuta.cliente.direcciones?.[0];
+    if (direccion && direccion.latitud && direccion.longitud) {
+      this.clienteSeleccionado = clienteRuta;
+
+      if (this.mapa) {
+        this.mapa.setView([direccion.latitud, direccion.longitud], 16);
+      }
+
+      const marker = this.markers.get(clienteRuta.id);
+      if (marker) {
+        marker.openPopup();
+      }
+
+      // Scroll al mapa
+      setTimeout(() => {
+        const mapaElement = document.getElementById('mapa-leaflet');
+        mapaElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
+  // ========================================
+  // MONITOREO EN TIEMPO REAL
+  // ========================================
+
+  async iniciarMonitoreo() {
+    if (this.monitoreando) {
+      this.detenerMonitoreo();
+      return;
+    }
+
+    try {
+      const permisos = await Geolocation.checkPermissions();
+      if (permisos.location !== 'granted') {
+        await Geolocation.requestPermissions();
+      }
+
+      this.monitoreando = true;
+      this.mostrarToast('Monitoreando repartidor...', 'success');
+
+      // Tracking GPS cada 5 segundos
+      this.watchId = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        },
+        (position, err) => {
+          if (err) {
+            console.error('Error GPS:', err);
+            return;
+          }
+
+          if (position) {
+            this.actualizarPosicionRepartidor({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            });
+          }
+        }
+      );
+
+    } catch (error) {
+      console.error('Error iniciando monitoreo:', error);
+      this.mostrarToast('Error al acceder al GPS', 'danger');
+    }
+  }
+
+  detenerMonitoreo() {
+    this.monitoreando = false;
+
+    if (this.watchId) {
+      Geolocation.clearWatch({ id: this.watchId });
+      this.watchId = null;
+    }
+
+    if (this.markerRepartidor) {
+      this.markerRepartidor.remove();
+      this.markerRepartidor = null;
+    }
+
+    this.mostrarToast('Monitoreo detenido', 'medium');
+  }
+
+  actualizarPosicionRepartidor(posicion: { lat: number; lng: number }) {
+    if (!this.mapa) return;
+
+    // Eliminar marker anterior
+    if (this.markerRepartidor) {
+      this.markerRepartidor.remove();
+    }
+
+    // Crear ícono de repartidor
+    const iconHtml = `
+      <div class="marker-repartidor">
+        <ion-icon name="car" style="color: white; font-size: 20px;"></ion-icon>
+      </div>
+    `;
+
+    const repartidorIcon = L.divIcon({
+      html: iconHtml,
+      className: 'custom-repartidor-icon',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20]
+    });
+
+    this.markerRepartidor = L.marker([posicion.lat, posicion.lng], {
+      icon: repartidorIcon
+    })
+      .bindPopup(`
+      <strong>🚗 ${this.ruta.repartidor?.name || 'Repartidor'}</strong><br>
+      Ubicación en tiempo real
+    `)
+      .addTo(this.mapa);
+
+    console.log('📍 Posición actualizada:', posicion);
+  }
+
+  // ========================================
+  // DIVIDIR RUTA
+  // ========================================
+
+  async dividirRuta() {
+    if (this.clientesDia.length < 4) {
+      this.mostrarToast('Se necesitan al menos 4 clientes para dividir', 'warning');
+      return;
+    }
+
+    const puntoMedio = Math.floor(this.clientesDia.length / 2);
+
+    const modal = await this.modalController.create({
+      component: DividirRutaModalComponent,
+      componentProps: {
+        totalClientes: this.clientesDia.length,
+        puntoCorteDefault: puntoMedio,
+        diaSemana: this.diaSeleccionado
+      },
+      cssClass: 'modal-dividir-ruta',
+      backdropDismiss: true
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data?.confirmar) {
+      await this.ejecutarDivision(data.puntoCorte);
+    }
+  }
+
+  async ejecutarDivision(puntoCorte: number) {
+    const loading = await this.toastController.create({
+      message: 'Dividiendo ruta...',
+      duration: 0
+    });
+    await loading.present();
+
+    try {
+      // Dividir clientes en 2 grupos
+      const grupo1 = this.clientesDia.slice(0, puntoCorte);
+      const grupo2 = this.clientesDia.slice(puntoCorte);
+
+      // Calcular rutas optimizadas con Google Directions API
+      const rutaOptimizada1 = await this.calcularRutaOptimizada(grupo1);
+      const rutaOptimizada2 = await this.calcularRutaOptimizada(grupo2);
+
+      await loading.dismiss();
+
+      // Mostrar confirmación
+      const confirmAlert = await this.alertController.create({
+        header: 'División Completada',
+        message: `
+          <strong>Sub-ruta A:</strong> ${grupo1.length} clientes<br>
+          Distancia: ${(rutaOptimizada1.totalDistance / 1000).toFixed(1)} km<br>
+          Tiempo: ${Math.floor(rutaOptimizada1.totalDuration / 60)} min<br><br>
+          <strong>Sub-ruta B:</strong> ${grupo2.length} clientes<br>
+          Distancia: ${(rutaOptimizada2.totalDistance / 1000).toFixed(1)} km<br>
+          Tiempo: ${Math.floor(rutaOptimizada2.totalDuration / 60)} min
+        `,
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          {
+            text: 'Crear Sub-rutas',
+            handler: () => {
+              // TODO: Guardar en BD
+              this.mostrarToast('Sub-rutas creadas (función en desarrollo)', 'success');
+            }
+          }
+        ]
+      });
+
+      await confirmAlert.present();
+
+    } catch (error) {
+      await loading.dismiss();
+      console.error('Error dividiendo ruta:', error);
+      this.mostrarToast('Error al dividir ruta', 'danger');
+    }
+  }
+
+  async calcularRutaOptimizada(clientes: any[]) {
+    if (clientes.length === 0) {
+      return { totalDistance: 0, totalDuration: 0, steps: [] };
+    }
+
+    const puntos = clientes
+      .filter(cr => cr.cliente.direcciones?.[0]?.latitud)
+      .map(cr => ({
+        lat: cr.cliente.direcciones[0].latitud,
+        lng: cr.cliente.direcciones[0].longitud
+      }));
+
+    if (puntos.length < 2) {
+      console.warn('Menos de 2 puntos con ubicación, usando distancia estimada');
+
+      // Calcular distancia en línea recta (fallback)
+      let distanciaTotal = 0;
+      for (let i = 0; i < puntos.length - 1; i++) {
+        distanciaTotal += this.directionsService.calcularDistancia(puntos[i], puntos[i + 1]);
+      }
+
+      return {
+        totalDistance: distanciaTotal,
+        totalDuration: distanciaTotal / 8.33, // ~30 km/h promedio
+        steps: []
+      };
+    }
+
+    try {
+      const origen = puntos[0];
+      const destino = puntos[puntos.length - 1];
+      const waypoints = puntos.slice(1, -1).slice(0, 25); // Límite de Google: 25 waypoints
+
+      const ruta = await this.directionsService.calcularRuta(origen, destino, waypoints);
+
+      if (!ruta) {
+        throw new Error('No se pudo calcular la ruta');
+      }
+
+      return ruta;
+
+    } catch (error) {
+      console.error('Error en calcularRutaOptimizada:', error);
+
+      // Fallback: calcular distancia en línea recta
+      let distanciaTotal = 0;
+      for (let i = 0; i < puntos.length - 1; i++) {
+        distanciaTotal += this.directionsService.calcularDistancia(puntos[i], puntos[i + 1]);
+      }
+
+      return {
+        totalDistance: distanciaTotal,
+        totalDuration: distanciaTotal / 8.33,
+        steps: []
+      };
+    }
+  }
+
+  // ========================================
+  // EDICIÓN
+  // ========================================
+
+  marcarCambio() {
+    this.hayaCambios = true;
+  }
+
+  async guardarCambios() {
+    if (!this.hayaCambios) return;
+
+    const datosActualizados = {
+      nombre: this.ruta.nombre,
+      idSupervisor: this.ruta.supervisor_id,
+      idRepartidor: this.ruta.idRepartidor
+    };
+
+    this.rutasService.actualizarRuta(this.rutaId, datosActualizados).subscribe({
+      next: () => {
+        this.hayaCambios = false;
+        this.mostrarToast('Cambios guardados correctamente', 'success');
+        this.cargarRuta();
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        this.mostrarToast('Error al guardar cambios', 'danger');
+      }
+    });
+  }
+
+  // ========================================
+  // ACCIONES DE CLIENTES
+  // ========================================
+
+  buscarCliente(event: any) {
+    const busqueda = event.target.value.toLowerCase();
+
+    if (!busqueda) {
+      this.clientesFiltrados = [...this.clientesDia];
+      return;
+    }
+
+    this.clientesFiltrados = this.clientesDia.filter(cr => {
+      const cliente = cr.cliente;
+      return cliente.representante.toLowerCase().includes(busqueda) ||
+        cliente.negocio?.toLowerCase().includes(busqueda) ||
+        cliente.direcciones?.[0]?.direccion.toLowerCase().includes(busqueda);
+    });
+  }
+
+  editarUbicacionCliente(clienteRuta: any) {
+    this.mostrarToast('Función en desarrollo', 'warning');
+  }
+
+  async eliminarClienteDeRuta(clienteRuta: any) {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Cliente',
+      message: `¿Eliminar a ${clienteRuta.cliente.representante} de esta ruta del día ${this.diaSeleccionado}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+            this.rutasService.eliminarClienteDeRuta(diaRuta.id, clienteRuta.cliente.id).subscribe({
+              next: () => {
+                this.mostrarToast('Cliente eliminado de la ruta', 'success');
+                this.deseleccionarCliente();
+                this.cargarRuta();
+              },
+              error: (err) => {
+                console.error('Error:', err);
+                this.mostrarToast('Error al eliminar cliente', 'danger');
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ========================================
+  // UTILIDADES
+  // ========================================
+
+  getDiaActual(): string {
+    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return dias[new Date().getDay()];
+  }
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+
+  volver() {
+    if (this.hayaCambios) {
+      this.alertController.create({
+        header: 'Cambios sin guardar',
+        message: '¿Descartar los cambios?',
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          {
+            text: 'Descartar',
+            role: 'destructive',
+            handler: () => {
+              this.detenerMonitoreo();
+              this.router.navigate(['/gestion-rutas']);
+            }
+          }
+        ]
+      }).then(alert => alert.present());
+    } else {
+      this.detenerMonitoreo();
+      this.router.navigate(['/gestion-rutas']);
+    }
+  }
+}

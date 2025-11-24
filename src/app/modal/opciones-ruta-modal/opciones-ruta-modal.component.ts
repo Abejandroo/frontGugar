@@ -1,3 +1,4 @@
+// src/app/components/opciones-ruta-modal/opciones-ruta-modal.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
@@ -20,17 +21,12 @@ import { IonicModule, ModalController } from '@ionic/angular';
       <ion-list>
         <ion-item button (click)="seleccionar('ver')">
           <ion-icon name="eye-outline" slot="start" color="primary"></ion-icon>
-          <ion-label>Ver Detalles</ion-label>
-        </ion-item>
-
-        <ion-item button (click)="seleccionar('editar')">
-          <ion-icon name="create-outline" slot="start" color="warning"></ion-icon>
-          <ion-label>Editar Ruta</ion-label>
+          <ion-label>Ver Detalle</ion-label>
         </ion-item>
 
         <ion-item button (click)="seleccionar('eliminar')" lines="none">
           <ion-icon name="trash-outline" slot="start" color="danger"></ion-icon>
-          <ion-label color="danger">Eliminar</ion-label>
+          <ion-label color="danger">Eliminar Ruta</ion-label>
         </ion-item>
       </ion-list>
     </ion-content>

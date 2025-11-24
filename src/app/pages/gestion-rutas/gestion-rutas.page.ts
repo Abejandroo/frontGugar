@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
-import { DetalleRutaPage } from 'src/app/modal/detalle-ruta/detalle-ruta.page';
+import { DetalleRutaPage } from 'src/app/pages/detalle-ruta/detalle-ruta.page';
 import { ImportarClientesModalComponent } from '../../modal/importar-clientes-modal/importar-clientes-modal.component';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 import { addIcons } from 'ionicons';
@@ -18,6 +18,7 @@ import {
   filterOutline
 } from 'ionicons/icons';
 import { OpcionesRutaModalComponent } from 'src/app/modal/opciones-ruta-modal/opciones-ruta-modal.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gestion-rutas',
@@ -45,7 +46,8 @@ export class GestionRutasPage implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private actionSheetController: ActionSheetController,
-    private rutasService: RutaServiceTs
+    private rutasService: RutaServiceTs,
+    private router: Router
   ) {
     addIcons({
       addCircleOutline,
@@ -232,13 +234,9 @@ export class GestionRutasPage implements OnInit {
   }
 }
 
-  async verDetallesRuta(ruta: any) {
-    const modal = await this.modalController.create({
-      component: DetalleRutaPage,
-      componentProps: { ruta }
-    });
-    await modal.present();
-  }
+verDetallesRuta(ruta: any) {
+  this.router.navigate(['/detalle-ruta', ruta.id]);
+}
 
   async editarRuta(ruta: any) {
     const modal = await this.modalController.create({
