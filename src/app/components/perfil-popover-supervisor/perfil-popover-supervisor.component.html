@@ -1,0 +1,31 @@
+<ion-footer class="ion-no-border">
+  <div class="navbar-container">
+    <div 
+      class="nav-item" 
+      [class.active]="paginaActual === 'inicio'"
+      (click)="navegar('inicio')">
+      <ion-icon name="home"></ion-icon>
+      <span *ngIf="paginaActual === 'inicio'">Inicio</span>
+    </div>
+    <div 
+      class="nav-item" 
+      [class.active]="paginaActual === 'rutas'"
+      (click)="navegar('rutas')">
+      <ion-icon name="compass"></ion-icon>
+      <span *ngIf="paginaActual === 'rutas'">Rutas</span>
+    </div>
+    <div 
+      class="nav-item" 
+      [class.active]="paginaActual === 'clientes'"
+      (click)="navegar('clientes')">
+      <ion-icon name="people"></ion-icon>
+      <span *ngIf="paginaActual === 'clientes'">Clientes</span>
+    </div>
+    <div 
+      class="nav-item" 
+      (click)="abrirMenu($event)">
+      <ion-icon name="settings"></ion-icon>
+    </div>
+
+  </div>
+</ion-footer>

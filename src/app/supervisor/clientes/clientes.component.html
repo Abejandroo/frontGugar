@@ -1,0 +1,110 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
+    <ion-grid fixed>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+        <ion-col size="auto">
+          <img src="./assets/logo.png" alt="Logo" class="logo" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  
+  <!-- 1. ENCABEZADO (Estilo Azul Degradado) -->
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>CLIENTES</h1>
+        <small>Gestiona tu cartera de clientes</small>
+      </div>
+      <!-- Contador discreto -->
+      <div class="badge-count">
+        {{ clientes.length }}
+      </div>
+    </div>
+
+    <!-- Buscador Integrado en el Header -->
+    <div class="search-container">
+      <ion-searchbar 
+        placeholder="Buscar cliente..." 
+        [debounce]="500" 
+        (ionInput)="buscarCliente($event)"
+        mode="ios">
+      </ion-searchbar>
+    </div>
+  </div>
+
+  <!-- 2. LISTA DE CLIENTES -->
+  <div class="lista-container">
+    
+    @if (cargando) {
+      <!-- Skeleton Loading (Efecto de carga bonito) -->
+      @for (item of [1,2,3,4]; track item) {
+        <div class="card skeleton-card">
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+        </div>
+      }
+    } @else {
+      
+      <!-- Lista Real -->
+      @for (cliente of clientesFiltrados; track cliente.id) {
+        <div class="card cliente-card">
+          <!-- Icono lateral decorativo -->
+          <div class="icon-side">
+            <div class="avatar-circle">
+              {{ obtenerIniciales(cliente.nombre) }}
+            </div>
+          </div>
+
+          <div class="info-side">
+            <h3>{{ cliente.nombre }}</h3>
+            
+            <p class="dato">
+              <ion-icon name="call-outline"></ion-icon> 
+              {{ cliente.telefono }}
+            </p>
+            
+            <p class="dato">
+              <ion-icon name="mail-outline"></ion-icon> 
+              {{ cliente.correo }}
+            </p>
+            
+            <!-- Badge de Tipo de Precio -->
+            <span class="precio-badge">
+              {{ cliente.tipoPrecio?.nombre || 'Precio ID: ' + cliente.tipoPrecioId }}
+            </span>
+          </div>
+
+          <!-- Botón de Opciones (Editar/Eliminar) -->
+          <button class="btn-more" (click)="abrirOpciones(cliente)">
+            <ion-icon name="ellipsis-vertical"></ion-icon>
+          </button>
+        </div>
+      } @empty {
+        <!-- Estado Vacío -->
+        <div class="empty-state">
+          <ion-icon name="people-outline"></ion-icon>
+          <p>No se encontraron clientes</p>
+        </div>
+      }
+    }
+
+  </div>
+
+  <!-- Espacio para que no se tape con el footer -->
+  <div style="height: 100px;"></div>
+
+  <!-- BOTÓN FLOTANTE PARA AGREGAR -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" style="margin-bottom: 60px; margin-right: 10px;">
+    <ion-fab-button (click)="abrirModalCrear()" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-supervisor-navbar paginaActual="clientes"></app-supervisor-navbar>
+</ion-footer>

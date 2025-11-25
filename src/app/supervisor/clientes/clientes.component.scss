@@ -1,12 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+ion-content {
+  --background: #f6f8fb;
+  font-family: 'Poppins', sans-serif;
+}
+
+// --- ENCABEZADO ---
+.header {
+  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
+  padding: 30px 20px 40px 20px; // Extra padding bottom para el buscador
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 0 4px 20px rgba(0, 82, 212, 0.25);
+  position: relative;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    margin-top: 20px;
+
+    h1 {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    small {
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+    }
+
+    .badge-count {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+  }
+}
+
+// --- BUSCADOR ---
+.search-container {
+  ion-searchbar {
+    --background: #ffffff;
+    --border-radius: 14px;
+    --placeholder-color: #888;
+    --icon-color: #0052d4;
+    --box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 0;
+  }
+}
+
+// --- LISTA ---
+.lista-container {
+  padding: 10px 15px;
+  margin-top: -10px; // Para acercarlo al header
+}
+
+.cliente-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Lado izquierdo: Avatar
+  .icon-side {
+    margin-right: 15px;
+    .avatar-circle {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      color: #0052d4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+  }
+
+  // Centro: Info
+  .info-side {
+    flex: 1;
+    
+    h3 {
+      margin: 0 0 5px 0;
+      font-size: 1.1rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .dato {
+      margin: 2px 0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      ion-icon { color: #888; font-size: 0.9rem; }
+    }
+
+    .precio-badge {
+      display: inline-block;
+      margin-top: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+  }
+
+  // Botón de opciones (tres puntos)
+  .btn-more {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 1.2rem;
+    padding: 10px;
+    margin-right: -10px;
+  }
+}
+
+// --- ESTADOS ---
+.skeleton-card {
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: #999;
+  
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+  }
+}
+.logo {
+  height: 40px;
+  width: auto;
+}
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   background-color: #f6f8fb;
   color: #333;
-}
-ion-content {
-
-  --background: url('/assets/bg.png') no-repeat center center / cover;
 }
 
 /* Encabezado */

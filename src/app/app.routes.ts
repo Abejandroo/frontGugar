@@ -8,12 +8,9 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
-    {
-    path: 'loginS',
-    loadComponent: () => import('./supervisor/login/login.component').then((m) => m.LoginComponent),
-  },
+    
    {
-    path: 'Supervisores',
+    path: 'supervisores/home',
     loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
   },
    {
@@ -42,14 +39,6 @@ export const routes: Routes = [
     loadComponent: () => import('./usuario/admin/admin.page').then( m => m.AdminPage),
     canActivate: [authGuard],  
     data: { role: 'admin' },      
-    providers: [
-      Auth,
-      provideHttpClient()
-    ]
-  },
-  {
-    path: 'usuario/supervisor',
-    loadComponent: () => import('./usuario/supervisor/supervisor.page').then( m => m.SupervisorPage),
     providers: [
       Auth,
       provideHttpClient()
@@ -104,6 +93,28 @@ export const routes: Routes = [
     canActivate: [authGuard], data: { role: 'admin' }
 
   },
+   {
+    path: 'supervisores/clientes',
+    loadComponent: () => import('./supervisor/clientes/clientes.component').then((m) => m.ClientesComponent),
+        canActivate: [authGuard], data: { role: 'supervisor' }
+  },
+  {
+    path: 'supervisores/rutas',
+    loadComponent: () => import('./supervisor/rutas/rutas.component').then((m) => m.RutasComponent),
+      canActivate: [authGuard], data: { role: 'supervisor' }
+  },  {
+    path: 'agregar-cliente',
+    loadComponent: () => import('./modal/agregar-cliente/agregar-cliente.page').then( m => m.AgregarClientePage)
+  },
+  {
+    path: 'editar-cliente',
+    loadComponent: () => import('./modal/editar-cliente/editar-cliente.page').then( m => m.EditarClientePage)
+  },
+  {
+    path: 'eliminar-cliente',
+    loadComponent: () => import('./modal/eliminar-cliente/eliminar-cliente.page').then( m => m.EliminarClientePage)
+  },
+
 
 
 

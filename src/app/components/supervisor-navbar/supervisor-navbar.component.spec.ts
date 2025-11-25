@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { LoginComponent } from './login.component';
+import { SupervisorNavbarComponent } from './supervisor-navbar.component';
 
-describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
+describe('SupervisorNavbarComponent', () => {
+  let component: SupervisorNavbarComponent;
+  let fixture: ComponentFixture<SupervisorNavbarComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ],
+      declarations: [ SupervisorNavbarComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(SupervisorNavbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
