@@ -102,7 +102,8 @@ export const routes: Routes = [
     path: 'supervisores/rutas',
     loadComponent: () => import('./supervisor/rutas/rutas.component').then((m) => m.RutasComponent),
       canActivate: [authGuard], data: { role: 'supervisor' }
-  },  {
+  },
+  {
     path: 'agregar-cliente',
     loadComponent: () => import('./modal/agregar-cliente/agregar-cliente.page').then( m => m.AgregarClientePage)
   },
@@ -114,6 +115,21 @@ export const routes: Routes = [
     path: 'eliminar-cliente',
     loadComponent: () => import('./modal/eliminar-cliente/eliminar-cliente.page').then( m => m.EliminarClientePage)
   },
+  {
+    path: 'supervisores/precios',
+    loadComponent: () => import('./supervisor/precios/precios.page').then( m => m.PreciosPage)
+  },
+  {
+    path: 'agregarprecio',
+    loadComponent: () => import('./modal/agregarprecio/agregarprecio.page').then( m => m.AgregarprecioPage)
+  },
+  {
+    path: 'editarprecio',
+    loadComponent: () => import('./modal/editarprecio/editarprecio.page').then( m => m.EditarprecioPage)
+  },
+  
+
+  
 
 
 

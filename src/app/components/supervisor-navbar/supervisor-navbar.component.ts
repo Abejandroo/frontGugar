@@ -35,6 +35,9 @@ export class SupervisorNavbarComponent {
       case 'rutas':
         this.router.navigate(['/supervisores/rutas']); 
         break;
+      case 'precios':
+        this.router.navigate(['/supervisores/precios']); 
+        break;
     }
   }
 

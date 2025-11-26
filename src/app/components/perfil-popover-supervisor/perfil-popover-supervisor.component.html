@@ -23,6 +23,13 @@
     </div>
     <div 
       class="nav-item" 
+      [class.active]="paginaActual === 'precios'"
+      (click)="navegar('precios')">
+      <ion-icon name="pricetag"></ion-icon>
+      <span *ngIf="paginaActual === 'precios'">Precios</span>
+    </div>
+    <div 
+      class="nav-item" 
       (click)="abrirMenu($event)">
       <ion-icon name="settings"></ion-icon>
     </div>
