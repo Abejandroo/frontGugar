@@ -11,11 +11,11 @@ import { PrecioService } from 'src/app/service/precio';
   templateUrl: './agregarprecio.page.html',
   styleUrls: ['./agregarprecio.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule] // <--- Importante
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule] 
 })
-export class AgregarprecioPage implements OnInit {
+export class AgregarprecioPage  {
 
-  @Input() precioEditar: any; // Por si lo usas para editar después
+  @Input() precioEditar: any; 
   
   formPrecio: FormGroup;
   cargando: boolean = false;
@@ -28,20 +28,14 @@ export class AgregarprecioPage implements OnInit {
   ) {
     addIcons({ close, pricetagOutline, cashOutline, saveOutline });
 
-    // Validaciones según tu Entity de NestJS
     this.formPrecio = this.fb.group({
-      tipoCompra: ['', [Validators.required, Validators.minLength(3)]], // Ej: "Mayorista"
-      precioPorGarrafon: ['', [Validators.required, Validators.min(0)]] // Ej: 12.50
+      tipoCompra: ['', [Validators.required, Validators.minLength(3)]], 
+      precioPorGarrafon: ['', [Validators.required, Validators.min(0)]] 
     });
-  }
-
-  ngOnInit() {
-    // Si recibimos un precio para editar, llenamos el formulario
-    if (this.precioEditar) {
+     if (this.precioEditar) {
       this.formPrecio.patchValue(this.precioEditar);
     }
   }
-
   cerrarModal() {
     this.modalCtrl.dismiss();
   }
@@ -54,17 +48,13 @@ export class AgregarprecioPage implements OnInit {
 
     this.cargando = true;
 
-    // 1. OBTENEMOS LOS DATOS DEL FORMULARIO
     const rawData = this.formPrecio.value;
 
-    // 2. HACEMOS LA CONVERSIÓN MANUAL (El truco mágico ✨)
     const datos = {
       tipoCompra: rawData.tipoCompra,
-      // Convertimos "50" (string) a 50 (number)
       precioPorGarrafon: Number(rawData.precioPorGarrafon) 
     };
 
-    // 3. ENVIAMOS 'datos' (YA CONVERTIDOS) EN LUGAR DE 'this.formPrecio.value'
     let peticion;
     if (this.precioEditar) {
       peticion = this.precioService.actualizarPrecio(this.precioEditar.id, datos);
@@ -83,9 +73,8 @@ export class AgregarprecioPage implements OnInit {
       },
       error: async (err) => {
         this.cargando = false;
-        console.error('Error detallado:', err); // Mira aquí en la consola
+        console.error('Error detallado:', err); 
         
-        // TIP: Esto te mostrará en el toast exactamente qué falló (ej: "precioPorGarrafon must be a number")
         const mensajeError = err.error?.message ? err.error.message.toString() : 'Error al guardar';
         
         await this.mostrarToast(mensajeError, 'danger');

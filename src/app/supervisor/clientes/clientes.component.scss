@@ -5,33 +5,29 @@ ion-content {
   font-family: 'Poppins', sans-serif;
 }
 
-// --- ENCABEZADO ---
+// --- ENCABEZADO AZUL ---
 .header {
   background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
-  padding: 30px 20px 40px 20px; // Extra padding bottom para el buscador
+  padding: 30px 20px 40px 20px;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   box-shadow: 0 4px 20px rgba(0, 82, 212, 0.25);
   position: relative;
+  
+  // ✨ AJUSTE CLAVE: Para que el azul suba detrás del logo y la barra de estado
+  padding-top: calc(var(--ion-safe-area-top) + 50px); 
+  margin-top: -60px; 
 
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    margin-top: 20px;
+    margin-top: 10px;
 
-    h1 {
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.8rem;
-      margin: 0;
-    }
-    small {
-      color: rgba(255,255,255,0.9);
-      font-size: 0.9rem;
-    }
-
+    h1 { color: #fff; font-weight: 700; font-size: 1.8rem; margin: 0; }
+    small { color: rgba(255,255,255,0.9); font-size: 0.9rem; }
+    
     .badge-count {
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(5px);
@@ -41,6 +37,16 @@ ion-content {
       font-weight: bold;
     }
   }
+}
+
+// --- LOGO (ESTE ERA EL CULPABLE) ---
+.logo {
+  height: 40px; // Tamaño controlado
+  width: auto;
+  object-fit: contain;
+  margin-top: 10px; // Un poco de espacio arriba
+  position: relative;
+  z-index: 10; // Para asegurar que quede encima del fondo
 }
 
 // --- BUSCADOR ---
@@ -55,605 +61,133 @@ ion-content {
   }
 }
 
-// --- LISTA ---
+// --- CONTENEDOR PRINCIPAL ---
 .lista-container {
-  padding: 10px 15px;
-  margin-top: -10px; // Para acercarlo al header
+  padding: 20px;
+  margin-top: -20px; // Sube un poco sobre el header azul
 }
 
+// --- GRID SYSTEM (CUADRÍCULA VERTICAL) ---
+.grid-clientes {
+  display: grid;
+  // Tarjetas adaptables (mínimo 160px de ancho)
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+  gap: 15px;
+}
+
+// --- TARJETA DE CLIENTE ---
 .cliente-card {
   background: #fff;
-  border-radius: 16px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 24px; 
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  text-align: center;
   display: flex;
-  align-items: center;
-  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
   transition: transform 0.2s;
+  
+  // Altura mínima para que se vean uniformes y "grandes"
+  min-height: 240px; 
 
-  &:active {
-    transform: scale(0.98);
+  &:active { transform: scale(0.98); }
+
+  // Icono Circular con Iniciales
+  .icon-header {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px auto;
+    font-weight: 700;
+    font-size: 1.3rem;
   }
 
-  // Lado izquierdo: Avatar
-  .icon-side {
-    margin-right: 15px;
-    .avatar-circle {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
-      color: #0052d4;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-  }
-
-  // Centro: Info
-  .info-side {
-    flex: 1;
-    
+  .info {
     h3 {
-      margin: 0 0 5px 0;
       font-size: 1.1rem;
       color: #333;
-      font-weight: 600;
+      margin: 0 0 5px 0;
+      font-weight: 700;
+      white-space: nowrap; 
+      overflow: hidden;
+      text-overflow: ellipsis; 
     }
 
     .dato {
-      margin: 2px 0;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #666;
+      margin: 4px 0;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 5px;
-
-      ion-icon { color: #888; font-size: 0.9rem; }
+      
+      ion-icon { font-size: 1rem; color: #999; }
     }
 
     .precio-badge {
-      display: inline-block;
-      margin-top: 6px;
+      margin-top: 10px;
       background: #e8f5e9;
       color: #2e7d32;
       font-size: 0.75rem;
-      padding: 2px 8px;
-      border-radius: 6px;
       font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
-  // Botón de opciones (tres puntos)
-  .btn-more {
-    background: transparent;
-    border: none;
-    color: #999;
-    font-size: 1.2rem;
-    padding: 10px;
-    margin-right: -10px;
-  }
-}
-
-// --- ESTADOS ---
-.skeleton-card {
-  height: 90px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 50px 20px;
-  color: #999;
-  
-  ion-icon {
-    font-size: 4rem;
-    margin-bottom: 10px;
-    opacity: 0.5;
-  }
-}
-.logo {
-  height: 40px;
-  width: auto;
-}
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: #f6f8fb;
-  color: #333;
-}
-
-/* Encabezado */
-.header {
-  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
-  color: #fff;
-  padding: 20px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  text-align: left;
-}
-
-.header h1 {
-  font-size: 1.4rem;
-  margin: 0;
-}
-
-.header h2 {
-  margin: 5px 0;
-  font-weight: 400;
-  font-size: 1rem;
-}
-
-.header small {
-  font-size: 0.85rem;
-  opacity: 0.9;
-}
-
-/* Indicadores */
-.indicadores {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 20px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 12px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-  margin: 5px 0;
-  font-size: 1.2rem;
-  color: #0078ff;
-}
-
-.card p {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 15px;
-  font-weight: 600;
-  color: #777;
-}
-
-.tabs .active {
-  color: #0078ff;
-  border-bottom: 3px solid #0078ff;
-  padding-bottom: 5px;
-}
-
-/* Lista de rutas */
-.ruta {
-  background: #fff;
-  margin: 15px;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.ruta h4 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #222;
-}
-
-.ruta small {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.ruta p {
-  margin: 6px 0;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.ruta .btn {
-  position: absolute;
-  right: 15px;
-  bottom: 15px;
-  background: #0078ff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s;
-}
-
-.ruta .btn:hover {
-  background: #005ec4;
-}
-
-.ruta .status {
-  position: absolute;
-  right: 20px;
-  top: 15px;
-  width: 12px;
-  height: 12px;
-  background: #28c76f;
-  border-radius: 50%;
-}
-.logo {
-  height: 40px;
-  width: auto;
-}
-ion-toolbar {
-  --background: transparent;
-}
-ion-item {
-  --background: transparent;
-  --color: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.5);
-  --highlight-color-focused: #ffffff;
-}
-
-ion-item .item-native ion-label {
-  color: #ffffff !important;
-}
-.welcome-message {
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 40px;
-  
-  h2, p {
-    color: #ffffff; 
-  }
-
-  h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-  }
-
-  p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-  }
-}
-
-.opcion-card {
-  background: rgba(255, 255, 255, 0.15); 
-  backdrop-filter: blur(10px);          
-  -webkit-backdrop-filter: blur(10px);  
-
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  ion-card-header {
-    background-color: transparent;
-  }
-
-  ion-card-title, ion-card-content {
-    color: #ffffff;
-  }
-  
-  ion-card-title {
-      font-weight: bold;
-      font-size: 1.5rem;
-  }
-
-  ion-card-content {
-      font-size: 0.9rem;
-      opacity: 0.85; 
-  }
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-  img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 18px;
-    margin-top: 1rem;
-  }
-}
-
-.card-layout-flex {
-  /* CAMBIOS PRINCIPALES AQUÍ */
-  display: flex;
-  flex-direction: row;     
-  justify-content: space-between;  
-  align-items: center;            
-  padding: 16px; 
-  ion-card-header {
-    padding: 0; 
-    text-align: left; 
-  }
-}
-
-.card-image-absolute {
-  position: absolute; 
-  bottom: 10px;       
-  right: 10px;        
-  
-  width: 75px;      
-  height: 75px;     
-  
-  object-fit: contain;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
-}
-/* --- Nuevos Estilos para los Indicadores (basados en la referencia) --- */
-
-.indicator-col {
-  display: flex; /* Asegura que la columna use todo el espacio para el centrado */
-  justify-content: center; /* Centra las tarjetas en el espacio disponible */
-}
-
-.small-indicator-card {
-  width: 100%; /* Ocupa el ancho completo de su columna */
-  max-width: 160px; /* Limita el ancho máximo para que no crezcan demasiado */
-  background: #ffffff; /* Fondo blanco */
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra sutil */
-  margin: 0; /* Sin márgenes externos ya que la columna maneja el espacio */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 15px 10px; /* Relleno interno para espacio */
-  text-align: center;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-  }
-
-  ion-card-content {
-    padding: 0; /* Quitamos el padding por defecto del card-content */
+  // Botones de Acción (Abajo)
+  .actions {
+    margin-top: 15px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    width: 100%;
-  }
+    gap: 12px;
+    border-top: 1px solid #f4f4f4;
+    padding-top: 10px;
 
-  .indicator-icon-value {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px; /* Espacio entre el icono y el número */
-    margin-bottom: 5px; /* Espacio entre el número y la etiqueta */
+    .btn-icon {
+      background: #f9f9f9;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      color: #666;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.2s;
 
-    ion-icon {
-      font-size: 1.8rem; /* Tamaño del icono */
-      // Los colores de los iconos se gestionan directamente en el HTML con `color="..."`
-    }
-
-    .indicator-value {
-      font-size: 2.2rem; /* Tamaño grande del número */
-      font-weight: 700;
-      color: #333333; /* Color oscuro para el número */
-    }
-  }
-
-  .indicator-label {
-    font-size: 0.9rem; /* Tamaño del texto de la etiqueta */
-    color: #666666; /* Color gris para el texto de la etiqueta */
-    margin: 0; /* Quitamos márgenes por defecto del párrafo */
-    line-height: 1.2;
-  }
-}
-
-/* --- Asegúrate de que los estilos existentes de .opcion-card no interfieran --- */
-/* Los indicadores no deben tener el estilo de imagen flotante a la derecha */
-.small-indicator-card.card-with-image-right img {
-  display: none; /* Oculta la imagen si la clase card-with-image-right se aplica por error */
-}
-
-// Puedes querer desactivar otros estilos de .opcion-card para .small-indicator-card
-// Si .opcion-card tiene estilos muy específicos que chocan
-.small-indicator-card {
-  background: #ffffff !important; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  border: none !important; 
-}
-
-.welcome-message {
-  h2, p {
-    color: var(--ion-color-light-contrast, #ffffff); /* Asegura que el texto sea blanco */
-  }
-  p {
-    font-size: 1.05rem;
-  }
-}
-.atajos-container {
-  margin-top: 25px;
-  // padding: 0 10px; <--- Quita esto si quieres que el ion-col maneje los márgenes
-  
-  h3 {
-    color: white;
-    font-weight: 700;
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    // padding-left: 5px; <--- Ya no es necesario si centramos el texto
-  }
-}
-
-.atajos-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  /* ✨ NUEVO: Limita el ancho máximo y centra la tarjeta en su columna */
-  max-width: 500px; 
-  margin: 0 auto; 
-  
-  padding: 5px 0; /* Reduje un poco el padding vertical para que no sea tan alto */
-
-  ion-list {
-    background: transparent;
-    padding: 0;
-  }
-
-  .atajo-item {
-    --background: transparent;
-    --min-height: 50px; /* Reduje un poco la altura de cada item (antes 55px) */
-    cursor: pointer;
-
-    ion-icon {
-      font-size: 1.5rem; /* Icono ligeramente más pequeño */
-      color: white;
-      margin-right: 15px;
-    }
-
-    ion-label {
-      font-size: 1rem; /* Fuente un poco más fina */
-      font-weight: 600;
-      color: white;
-      text-decoration: underline;
-      text-decoration-color: white;
-      text-underline-offset: 4px;
-    }
-
-    &:hover {
-      ion-label {
-        color: var(--ion-color-primary);
-        text-decoration-color: var(--ion-color-primary);
-      }
-      ion-icon {
-        color: var(--ion-color-primary);
-      }
-    }
-  }
-}.welcome-message {
-  margin-bottom: 20px;
-  h2 { font-weight: 700; color: #fff; margin-bottom: 5px; }
-  .fecha { color: var(--ion-color-medium); font-size: 0.9rem; margin-top: 0; }
-  p { color: #fff; opacity: 0.8; margin-top: 5px;}
-}
-
-// KPIS
-.kpi-card {
-  margin: 0;
-  background: #2c2f36;
-  color: white;
-  border-radius: 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  height: 100%;
-
-  h1 { font-size: 2.2rem; font-weight: 800; margin: 0; }
-  p { margin: 5px 0 0; font-size: 0.8rem; color: #aaa; }
-
-  .bg-icon {
-    position: absolute;
-    bottom: -15px;
-    right: -10px;
-    font-size: 4.5rem;
-    opacity: 0.08;
-    transform: rotate(-15deg);
-    pointer-events: none;
-  }
-
-  &.success { border-bottom: 3px solid var(--ion-color-success); }
-  &.danger { border-bottom: 3px solid var(--ion-color-danger); }
-  &.tertiary { border-bottom: 3px solid var(--ion-color-tertiary); }
-}
-
-// TABS (Segment)
-ion-segment {
-  background: #2c2f36;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 15px;
-  
-  ion-segment-button {
-    --indicator-color: var(--ion-color-primary);
-    --color: #888;
-    --color-checked: #fff;
-    font-weight: 600;
-  }
-}
-
-// LISTA DE RUTAS
-.ruta-list {
-  background: transparent;
-  padding-top: 10px;
-
-  .ruta-card {
-    background: #2c2f36;
-    margin-bottom: 15px;
-    border-radius: 16px;
-    position: relative;
-    overflow: hidden; 
-    
-    // Barrita lateral dinámica
-    .status-bar {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 6px;
+      &.edit { color: #ffb300; } // Amarillo
+      &.delete { color: #e53935; } // Rojo
       
-      &.success { background: var(--ion-color-success); }
-      &.warning { background: var(--ion-color-warning); }
-      &.danger { background: var(--ion-color-danger); }
-      &.medium { background: var(--ion-color-medium); }
-    }
-
-    ion-card-header {
-      padding-bottom: 5px;
-      padding-left: 20px; 
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      small { color: #666; font-weight: bold; }
-    }
-
-    ion-card-title {
-      font-size: 1.1rem; color: #fff; font-weight: 700;
-    }
-
-    ion-card-subtitle {
-      display: flex; align-items: center; gap: 5px;
-      margin-top: 5px; color: #aaa;
-      ion-icon { color: var(--ion-color-tertiary); }
-    }
-
-    ion-card-content {
-      padding-left: 20px;
-      .progreso-info {
-        display: flex; justify-content: space-between;
-        font-size: 0.8rem; color: #fff; margin-bottom: 5px;
-      }
-      ion-progress-bar { border-radius: 4px; height: 6px; }
+      &:active { background: #eee; }
     }
   }
 }
 
+// Estado Vacío
 .empty-state {
-  text-align: center; padding: 40px; color: #666;
-  ion-icon { margin-bottom: 10px; color: #444; }
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  ion-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+}
+
+// Skeleton Loading
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

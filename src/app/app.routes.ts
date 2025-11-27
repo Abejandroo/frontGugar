@@ -111,10 +111,7 @@ export const routes: Routes = [
     path: 'editar-cliente',
     loadComponent: () => import('./modal/editar-cliente/editar-cliente.page').then( m => m.EditarClientePage)
   },
-  {
-    path: 'eliminar-cliente',
-    loadComponent: () => import('./modal/eliminar-cliente/eliminar-cliente.page').then( m => m.EliminarClientePage)
-  },
+  
   {
     path: 'supervisores/precios',
     loadComponent: () => import('./supervisor/precios/precios.page').then( m => m.PreciosPage)

@@ -3,47 +3,98 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline } from 'ionicons/icons';
-import { Cliente } from 'src/app/service/cliente';
+import { close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline, mapOutline, homeOutline, locationOutline } from 'ionicons/icons';
+import { Cliente } from 'src/app/service/cliente'; 
+import { PrecioService } from 'src/app/service/precio';
+import { GoogleMapsModule } from '@angular/google-maps'; 
 
 @Component({
   selector: 'app-agregar-cliente',
   templateUrl: './agregar-cliente.page.html',
   styleUrls: ['./agregar-cliente.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule] // <--- Importante: ReactiveFormsModule
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule] 
 })
-export class AgregarClientePage implements OnInit {
+export class AgregarClientePage {
 
   formCliente: FormGroup;
   cargando: boolean = false;
+  listaPrecios: any[] = [];
 
-  // Lista temporal de precios (Lo ideal es traerlos de tu API)
-  listaPrecios: any[] = [
-    { id: 1, nombre: 'Precio Público' },
-    { id: 2, nombre: 'Precio Mayorista' },
-    { id: 3, nombre: 'Precio VIP' }
-  ];
+  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 }; 
+  zoom = 15;
+  markerPosition: google.maps.LatLngLiteral | undefined; 
+  
+  mapOptions: google.maps.MapOptions = {
+    disableDefaultUI: true, 
+    zoomControl: true,
+    streetViewControl: false
+  };
+  pinOptions: google.maps.MarkerOptions = {
+    draggable: false,
+    animation: google.maps.Animation.DROP, 
+  };
 
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
     private clienteService: Cliente,
+    private precioService: PrecioService,
     private toastCtrl: ToastController
   ) {
-    addIcons({ close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline });
+    addIcons({ close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline, mapOutline, homeOutline, locationOutline });
 
-    // Validaciones según tu DTO de NestJS
     this.formCliente = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       telefono: ['', [Validators.required, Validators.maxLength(15)]],
       correo: ['', [Validators.required, Validators.email]],
-      tipoPrecioId: [null, [Validators.required]] // Obligatorio seleccionar precio
+      tipoPrecioId: [null, [Validators.required]],
+      
+      calle: ['', [Validators.required]],
+      colonia: ['', [Validators.required]],
+      referencia: [''],
+      
+      latitud: [null, [Validators.required]], 
+      longitud: [null, [Validators.required]]
+    });
+     this.cargarPreciosReales();
+    this.obtenerUbicacionActual();
+  }
+
+  precioSeleccionado(event: any) {
+    console.log('Precio seleccionado ID:', event.detail.value);
+  }
+
+  cargarPreciosReales() {
+    this.precioService.obtenerPrecios().subscribe({
+      next: (res) => this.listaPrecios = res,
+      error: (err) => console.error(err)
     });
   }
 
-  ngOnInit() {
-    // Aquí deberías llamar a: this.precioService.getPrecios().subscribe(...)
+  agregarMarcador(event: google.maps.MapMouseEvent) {
+    if (event.latLng) {
+      const lat = event.latLng.lat();
+      const lng = event.latLng.lng();
+      
+      this.markerPosition = { lat, lng };
+      
+      this.formCliente.patchValue({
+        latitud: lat,
+        longitud: lng
+      });
+    }
+  }
+
+  obtenerUbicacionActual() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        this.center = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+      });
+    }
   }
 
   cerrarModal() {
@@ -52,7 +103,11 @@ export class AgregarClientePage implements OnInit {
 
   async guardarCliente() {
     if (this.formCliente.invalid) {
-      this.formCliente.markAllAsTouched(); // Para que se pongan rojos los campos vacíos
+      this.formCliente.markAllAsTouched();
+      // Si falta el mapa, avisamos
+      if (!this.formCliente.value.latitud) {
+        this.mostrarToast('Por favor, selecciona la ubicación en el mapa.', 'warning');
+      }
       return;
     }
 
@@ -63,23 +118,19 @@ export class AgregarClientePage implements OnInit {
       next: async (res) => {
         this.cargando = false;
         await this.mostrarToast('Cliente registrado con éxito', 'success');
-        this.modalCtrl.dismiss({ registrado: true }); // Avisamos que sí se guardó
+        this.modalCtrl.dismiss({ registrado: true });
       },
       error: async (err) => {
         this.cargando = false;
         console.error(err);
-        await this.mostrarToast('Error al guardar el cliente', 'danger');
+        const msg = err.error?.message || 'Error al guardar';
+        await this.mostrarToast(msg, 'danger');
       }
     });
   }
 
   async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastCtrl.create({
-      message: mensaje,
-      duration: 2000,
-      color: color,
-      position: 'bottom'
-    });
+    const toast = await this.toastCtrl.create({ message: mensaje, duration: 2000, color, position: 'bottom' });
     toast.present();
   }
 }

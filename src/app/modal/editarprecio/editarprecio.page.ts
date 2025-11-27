@@ -13,7 +13,7 @@ import { PrecioService } from 'src/app/service/precio';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule]
 })
-export class EditarprecioPage implements OnInit {
+export class EditarprecioPage  {
 
   @Input() precio: any; 
   
@@ -32,16 +32,14 @@ export class EditarprecioPage implements OnInit {
       tipoCompra: ['', [Validators.required, Validators.minLength(3)]],
       precioPorGarrafon: ['', [Validators.required, Validators.min(0)]]
     });
-  }
-
-  ngOnInit() {
-    if (this.precio) {
+     if (this.precio) {
       this.formPrecio.patchValue({
         tipoCompra: this.precio.tipoCompra,
         precioPorGarrafon: this.precio.precioPorGarrafon
       });
     }
   }
+
 
   cerrarModal() {
     this.modalCtrl.dismiss();
@@ -55,14 +53,12 @@ export class EditarprecioPage implements OnInit {
 
     this.cargando = true;
 
-    // Convertimos datos
     const rawData = this.formPrecio.value;
     const datos = {
       tipoCompra: rawData.tipoCompra,
       precioPorGarrafon: Number(rawData.precioPorGarrafon)
     };
 
-    // Llamamos al servicio de ACTUALIZAR usando el ID del precio recibido
     this.precioService.actualizarPrecio(this.precio.id, datos).subscribe({
       next: async (res) => {
         this.cargando = false;

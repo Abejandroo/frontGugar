@@ -15,7 +15,7 @@ import { PrecioService } from 'src/app/service/precio';
   standalone: true,
   imports: [IonicModule, CommonModule, SupervisorNavbarComponent]
 })
-export class PreciosPage implements OnInit {
+export class PreciosPage  {
 
   precios: any[] = [];
   cargando: boolean = true;
@@ -26,11 +26,10 @@ export class PreciosPage implements OnInit {
     private toastCtrl: ToastController
   ) {
     addIcons({ add, pricetag, createOutline, trashOutline, walletOutline, close });
+    this.cargarPrecios();
+
   }
 
-  ngOnInit() {
-    this.cargarPrecios();
-  }
 
   cargarPrecios() {
     this.cargando = true;
@@ -45,7 +44,6 @@ export class PreciosPage implements OnInit {
       }
     });
   }
-// Función para CREAR
   async abrirModalCrear() {
     const modal = await this.modalCtrl.create({
       component: AgregarprecioPage
@@ -53,15 +51,11 @@ export class PreciosPage implements OnInit {
     await modal.present();
     
     const { data } = await modal.onDidDismiss();
-
-    // --- CORRECCIÓN AQUÍ ---
-    // Verificamos si existe 'data' y si tiene ALGUNA señal de éxito
     if (data && (data.registrado || data.actualizado)) {
-      this.cargarPrecios(); // <--- ¡Recargamos la lista!
+      this.cargarPrecios(); 
     }
   }
 
-  // Función para EDITAR
   async abrirModalEditar(precioSeleccionado: any) {
     const modal = await this.modalCtrl.create({
       component: EditarprecioPage,
@@ -71,12 +65,10 @@ export class PreciosPage implements OnInit {
     
     const { data } = await modal.onDidDismiss();
     
-    // --- CORRECCIÓN AQUÍ ---
     if (data && (data.registrado || data.actualizado)) {
-      this.cargarPrecios(); // <--- ¡Recargamos la lista!
+      this.cargarPrecios(); 
     }
   }
-  // --- SOLUCIÓN: CONFIRMACIÓN NATIVA ---
   confirmarEliminar(precio: any) {
     // window.confirm es del navegador, no depende de Ionic. ¡Siempre sale!
     if (window.confirm(`¿Estás seguro de eliminar "${precio.tipoCompra}"?`)) {
@@ -85,7 +77,6 @@ export class PreciosPage implements OnInit {
   }
 
   eliminar(id: number) {
-    // Ponemos cargando para que se note que algo pasa
     this.cargando = true; 
     
     this.precioService.eliminarPrecio(id).subscribe({
