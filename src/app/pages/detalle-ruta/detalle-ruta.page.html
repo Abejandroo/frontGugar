@@ -1,0 +1,265 @@
+<ion-header>
+  <ion-toolbar color="primary" class="toolbar-destacado">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="btn-header">
+        <ion-icon name="arrow-back" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="titulo-destacado">Detalle de Ruta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="guardarCambios()" [disabled]="!hayaCambios" class="btn-header">
+        <ion-icon name="checkmark" size="large" [color]="hayaCambios ? 'success' : 'light'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- NOMBRE EDITABLE -->
+  <div class="nombre-section">
+    <ion-input [(ngModel)]="ruta.nombre" (ionChange)="marcarCambio()" placeholder="Nombre de la ruta"
+      class="nombre-input">
+    </ion-input>
+    <div class="ruta-numero">Ruta {{ ruta.id }}</div>
+  </div>
+
+  <!-- ASIGNACIONES (Supervisor y Repartidor en misma línea) -->
+  <div class="asignaciones-section">
+    <div class="asignacion-col">
+      <div class="asignacion-label">SUPERVISOR</div>
+      <ion-select [(ngModel)]="ruta.supervisor_id" (ionChange)="marcarCambio()" interface="action-sheet"
+        [interfaceOptions]="{
+        cssClass: 'custom-action-sheet',
+        backdropDismiss: false
+      }" placeholder="Sin asignar" class="select-personal">
+        <ion-select-option [value]="null">Sin asignar</ion-select-option>
+        <ion-select-option *ngFor="let sup of supervisores" [value]="sup.id">
+          {{ sup.name }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+
+    <div class="asignacion-col">
+      <div class="asignacion-label">REPARTIDOR</div>
+      <ion-select [(ngModel)]="ruta.idRepartidor" (ionChange)="marcarCambio()" interface="action-sheet"
+        [interfaceOptions]="{
+        cssClass: 'custom-action-sheet',
+        backdropDismiss: false
+      }" placeholder="Sin asignar" class="select-personal">
+        <ion-select-option [value]="null">Sin asignar</ion-select-option>
+        <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
+          {{ rep.name }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+  </div>
+
+  <!-- SELECTOR DE DÍA -->
+  <div class="dia-section">
+    <div class="dia-label">DÍA DE VISITA</div>
+    <ion-select [(ngModel)]="diaSeleccionado" (ionChange)="cambiarDia()" interface="action-sheet" [interfaceOptions]="{
+      cssClass: 'custom-action-sheet',
+      backdropDismiss: false
+    }" placeholder="Selecciona un día" class="select-dia">
+      <ion-select-option *ngFor="let dia of diasDisponibles" [value]="dia.diaSemana">
+        {{ dia.diaSemana }}
+      </ion-select-option>
+    </ion-select>
+  </div>
+
+
+  <!-- MAPA FIJO -->
+  <div class="mapa-fijo">
+    <div class="mapa-header-info">
+      <div class="mapa-titulo">
+        <ion-icon name="map"></ion-icon>
+        <span>Ubicaciones</span>
+      </div>
+      <ion-badge color="primary">{{ clientesDia.length }} puntos</ion-badge>
+    </div>
+    <div #mapaLeaflet id="mapa-leaflet" class="leaflet-map"></div>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+  @if (diaSeleccionado) {
+  <div class="stats-section">
+    <div class="stats-cards">
+      <div class="stat-card visitados">
+        <div class="stat-numero">{{ visitados }}</div>
+        <div class="stat-label">Visitados</div>
+      </div>
+      <div class="stat-card pendientes">
+        <div class="stat-numero">{{ pendientes }}</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card total">
+        <div class="stat-numero">{{ totalClientes }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+
+    <!-- BARRA DE PROGRESO -->
+    <div class="progreso-bar">
+      <div class="progreso-texto">
+        <span>{{ visitados }} / {{ totalClientes }} domicilios visitados</span>
+        <span class="progreso-porcentaje">
+          {{ totalClientes > 0 ? ((visitados / totalClientes) * 100).toFixed(0) : 0 }}%
+        </span>
+      </div>
+      <ion-progress-bar [value]="totalClientes > 0 ? visitados / totalClientes : 0" color="success">
+      </ion-progress-bar>
+    </div>
+
+    <!-- BOTÓN DIVIDIR -->
+    <ion-button expand="block" fill="outline" color="warning" size="small" (click)="dividirRuta()">
+      <ion-icon name="cut-outline" slot="start"></ion-icon>
+      Dividir Ruta
+    </ion-button>
+  </div>
+
+  <!-- Después del botón "Dividir Ruta" -->
+  <ion-button expand="block" color="tertiary" size="small" [disabled]="!ruta.repartidor" (click)="iniciarMonitoreo()">
+    <ion-icon [name]="monitoreando ? 'eye-off' : 'eye'" slot="start"></ion-icon>
+    {{ monitoreando ? 'Detener Monitoreo' : 'Monitorear Repartidor' }}
+  </ion-button>
+  }
+
+  <!-- BUSCADOR -->
+  <div class="search-section">
+    <ion-searchbar [(ngModel)]="textoBusqueda" (ionInput)="buscarCliente($event)"
+      placeholder="Buscar cliente o dirección" animated>
+    </ion-searchbar>
+  </div>
+
+  <!-- LISTA DE CLIENTES -->
+  <div class="clientes-section">
+    <div class="clientes-header">
+      <h3>{{ clientesFiltrados.length }} clientes</h3>
+    </div>
+
+    <!-- CLIENTE SELECCIONADO (APARECE ARRIBA) -->
+    @if (clienteSeleccionado) {
+    <ion-card class="cliente-card destacado" (click)="deseleccionarCliente()">
+      <ion-card-header>
+        <ion-card-subtitle>
+          <ion-icon name="location"></ion-icon>
+          Seleccionado en el mapa
+          <ion-icon name="close-circle" slot="end"></ion-icon>
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="card-row">
+          <div class="orden-numero">{{ clienteSeleccionado.ordenVisita }}</div>
+
+          <div class="cliente-datos">
+            <h4>{{ clienteSeleccionado.cliente.representante }}</h4>
+
+            @if (clienteSeleccionado.cliente.negocio) {
+            <p class="negocio">
+              <ion-icon name="business-outline"></ion-icon>
+              {{ clienteSeleccionado.cliente.negocio }}
+            </p>
+            }
+
+            <p class="direccion">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ clienteSeleccionado.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}
+            </p>
+
+            <div class="badges">
+              <ion-badge color="primary">${{ clienteSeleccionado.precio?.precioPorGarrafon || 0 }}</ion-badge>
+              @if (clienteSeleccionado.es_credito) {
+              <ion-badge color="warning">Crédito</ion-badge>
+              }
+              @if (clienteSeleccionado.requiere_factura) {
+              <ion-badge color="tertiary">Factura</ion-badge>
+              }
+            </div>
+          </div>
+
+          <div class="botones-accion">
+            <ion-button fill="clear" color="secondary"
+              (click)="editarUbicacionCliente(clienteSeleccionado); $event.stopPropagation()">
+              <ion-icon slot="icon-only" name="create"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger"
+              (click)="eliminarClienteDeRuta(clienteSeleccionado); $event.stopPropagation()">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    }
+
+    <!-- LISTA COMPLETA -->
+    <ion-list lines="none">
+      <ion-item-sliding *ngFor="let clienteRuta of clientesFiltrados; let i = index">
+
+        <ion-item button [class.visitado]="clienteRuta.visitado"
+          [class.seleccionado]="clienteSeleccionado?.id === clienteRuta.id"
+          (click)="seleccionarClienteEnMapa(clienteRuta)">
+
+          <div class="orden-circulo" slot="start">{{ clienteRuta.ordenVisita || i + 1 }}</div>
+
+          <ion-label>
+            <h3>{{ clienteRuta.cliente.representante }}</h3>
+
+            @if (clienteRuta.cliente.negocio) {
+            <p class="negocio-texto">
+              <ion-icon name="business-outline"></ion-icon>
+              {{ clienteRuta.cliente.negocio }}
+            </p>
+            }
+
+            <p class="direccion-texto">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ clienteRuta.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}
+            </p>
+
+            <div class="badges-row">
+              <ion-badge color="primary">${{ clienteRuta.precio?.precioPorGarrafon || 0 }}</ion-badge>
+              @if (clienteRuta.es_credito) {
+              <ion-badge color="warning">Crédito</ion-badge>
+              }
+              @if (clienteRuta.requiere_factura) {
+              <ion-badge color="tertiary">Factura</ion-badge>
+              }
+              @if (!clienteRuta.cliente.direcciones?.[0]?.latitud) {
+              <ion-badge color="danger">
+                <ion-icon name="warning-outline"></ion-icon>
+                Sin ubicación
+              </ion-badge>
+              }
+            </div>
+          </ion-label>
+
+          @if (clienteRuta.visitado) {
+          <ion-icon name="checkmark-circle" color="success" slot="end"></ion-icon>
+          }
+        </ion-item>
+
+        <!-- OPCIONES DESLIZABLES -->
+        <ion-item-options side="end">
+          <ion-item-option color="secondary" (click)="editarUbicacionCliente(clienteRuta)">
+            <ion-icon name="create" slot="icon-only"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="eliminarClienteDeRuta(clienteRuta)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+    </ion-list>
+
+    @if (clientesFiltrados.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="search-outline"></ion-icon>
+      <p>No se encontraron clientes</p>
+    </div>
+    }
+  </div>
+
+</ion-content>
