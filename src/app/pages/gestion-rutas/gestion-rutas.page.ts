@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController, ActionSheetController } from '@ionic/angular';
+import { IonicModule, ModalController, ToastController, ActionSheetController, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
@@ -30,7 +30,7 @@ import { Router } from '@angular/router';
 export class GestionRutasPage implements OnInit {
   rutas: any[] = [];
   rutasFiltradas: any[] = [];
-  
+
   filtroEstado: string = 'todos';
   textoBusqueda: string = '';
   mostrarFiltros: boolean = false;
@@ -45,7 +45,7 @@ export class GestionRutasPage implements OnInit {
   constructor(
     private modalController: ModalController,
     private toastController: ToastController,
-    private actionSheetController: ActionSheetController,
+    private alertController: AlertController,
     private rutasService: RutaServiceTs,
     private router: Router
   ) {
@@ -208,35 +208,35 @@ export class GestionRutasPage implements OnInit {
   // ========================================
 
   async abrirOpcionesRuta(ruta: any) {
-  const modal = await this.modalController.create({
-    component: OpcionesRutaModalComponent,
-    componentProps: { ruta },
-    breakpoints: [0, 0.5, 0.75],
-    initialBreakpoint: 0.5
-  });
+    const modal = await this.modalController.create({
+      component: OpcionesRutaModalComponent,
+      componentProps: { ruta },
+      breakpoints: [0, 0.5, 0.75],
+      initialBreakpoint: 0.5
+    });
 
-  await modal.present();
+    await modal.present();
 
-  const { data } = await modal.onWillDismiss();
+    const { data } = await modal.onWillDismiss();
 
-  if (data?.accion) {
-    switch (data.accion) {
-      case 'ver':
-        await this.verDetallesRuta(ruta);
-        break;
-      case 'editar':
-        await this.editarRuta(ruta);
-        break;
-      case 'eliminar':
-        await this.eliminarRuta(ruta);
-        break;
+    if (data?.accion) {
+      switch (data.accion) {
+        case 'ver':
+          await this.verDetallesRuta(ruta);
+          break;
+        case 'editar':
+          await this.editarRuta(ruta);
+          break;
+        case 'eliminar':
+          await this.eliminarRuta(ruta);
+          break;
+      }
     }
   }
-}
 
-verDetallesRuta(ruta: any) {
-  this.router.navigate(['/detalle-ruta', ruta.id]);
-}
+  verDetallesRuta(ruta: any) {
+    this.router.navigate(['/detalle-ruta', ruta.id]);
+  }
 
   async editarRuta(ruta: any) {
     const modal = await this.modalController.create({
@@ -244,7 +244,7 @@ verDetallesRuta(ruta: any) {
       componentProps: { grupoSeleccionado: ruta }
     });
     await modal.present();
-    
+
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.cargarRutas();
@@ -252,28 +252,52 @@ verDetallesRuta(ruta: any) {
   }
 
   async eliminarRuta(ruta: any) {
-    const toast = await this.toastController.create({
-      message: `¿Eliminar la ruta ${ruta.nombre}?`,
-      position: 'top',
-      color: 'danger',
-      duration: 5000,
+    const totalClientes = ruta.diasRuta?.reduce((sum: number, dia: any) =>
+      sum + (dia.clientesRuta?.length || 0), 0) || 0;
+
+    const alert = await this.alertController.create({
+      header: '⚠️ Eliminar Ruta',
+      message: `
+        <div style="text-align: left;">
+          <p><strong>¿Estás seguro de eliminar "Ruta Centro"?</strong></p>
+          <ul>
+            <li><strong>45</strong> clientes asignados</li>
+            <li><strong>3</strong> días de ruta</li>
+          </ul>
+        </div>
+    `,
+      cssClass: 'alert-eliminar-ruta',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'alert-button-cancel'
+        },
         {
           text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'alert-button-eliminar',
           handler: () => {
-            this.rutasService.eliminarRuta(ruta.id).subscribe({
-              next: () => {
-                this.mostrarToast('Ruta eliminada', 'success');
-                this.cargarRutas();
-              },
-              error: () => this.mostrarToast('Error al eliminar', 'danger')
-            });
+            this.confirmarEliminacion(ruta);
           }
         }
       ]
     });
-    await toast.present();
+
+    await alert.present();
+  }
+
+  private confirmarEliminacion(ruta: any) {
+    this.rutasService.eliminarRuta(ruta.id).subscribe({
+      next: () => {
+        this.mostrarToast(`Ruta "${ruta.nombre}" eliminada correctamente`, 'success');
+        this.cargarRutas();
+      },
+      error: (err) => {
+        console.error('Error eliminando ruta:', err);
+        this.mostrarToast('Error al eliminar la ruta', 'danger');
+      }
+    });
   }
 
   async abrirModalAgregarGrupo() {
@@ -281,7 +305,7 @@ verDetallesRuta(ruta: any) {
       component: AgregarrutaPage
     });
     await modal.present();
-    
+
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.cargarRutas();
@@ -294,7 +318,7 @@ verDetallesRuta(ruta: any) {
       cssClass: 'importar-modal'
     });
     await modal.present();
-    
+
     const { data } = await modal.onWillDismiss();
     if (data?.success) {
       this.cargarRutas();

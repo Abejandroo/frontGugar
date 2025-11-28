@@ -59,4 +59,41 @@ actualizarRuta(id: number, data: any): Observable<any> {
 eliminarClienteDeRuta(diaRutaId: number, clienteId: number): Observable<any> {
   return this.http.delete(`${this.url}/rutas/dia-ruta/${diaRutaId}/cliente/${clienteId}`);
 }
+
+
+
+agregarDiaARuta(data: {
+  rutaId: number;
+  diaSemana: string;
+  clientesIds: number[];
+}): Observable<any> {
+  return this.http.post(`${this.url}/rutas/agregar-dia`, data);
+}
+
+crearRutaConDia(data: {
+  nombre: string;
+  supervisorId: number | null;
+  repartidorId: number | null;
+  diaSemana: string;
+  clientesIds: number[];
+}): Observable<any> {
+  return this.http.post(`${this.url}/rutas/crear-con-dia`, data);
+}
+
+
+
+obtenerClientesDisponibles(diaRutaId?: number): Observable<any[]> {
+  const url = diaRutaId 
+    ? `${this.url}/rutas/clientes-disponibles/${diaRutaId}`
+    : `${this.url}/rutas/clientes-disponibles`;
+  
+  return this.http.get<any[]>(url);
+}
+
+
+
+
+
+
+
 }

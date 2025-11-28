@@ -21,10 +21,13 @@ import {
   location,
   eye,
   eyeOff,
-  closeCircle
+  closeCircle,
+  create
 } from 'ionicons/icons';
 import * as L from 'leaflet';
-import { DividirRutaModalComponent } from 'src/app/modal/dividir-ruta-modal/dividir-ruta-modal.component';
+import { DividirRutaModalComponent } from '../../modal/dividir-ruta-modal/dividir-ruta-modal.component';
+import { DetalleClienteModalComponent } from '../../modal/detalle-cliente-modal/detalle-cliente-modal.component';
+
 
 @Component({
   selector: 'app-detalle-ruta',
@@ -99,7 +102,8 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       location,
       eye,
       eyeOff,
-      closeCircle
+      closeCircle,
+      create 
     });
   }
 
@@ -567,56 +571,94 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // ACCIONES DE CLIENTES
   // ========================================
 
-  buscarCliente(event: any) {
-    const busqueda = event.target.value.toLowerCase();
+// ========================================
+// ACCIONES DE CLIENTES
+// ========================================
 
-    if (!busqueda) {
-      this.clientesFiltrados = [...this.clientesDia];
-      return;
-    }
-
-    this.clientesFiltrados = this.clientesDia.filter(cr => {
-      const cliente = cr.cliente;
-      return cliente.representante.toLowerCase().includes(busqueda) ||
-        cliente.negocio?.toLowerCase().includes(busqueda) ||
-        cliente.direcciones?.[0]?.direccion.toLowerCase().includes(busqueda);
-    });
+buscarCliente(event: any) {
+  const busqueda = event.target.value.toLowerCase();
+  
+  if (!busqueda) {
+    this.clientesFiltrados = [...this.clientesDia];
+    return;
   }
 
-  editarUbicacionCliente(clienteRuta: any) {
-    this.mostrarToast('Función en desarrollo', 'warning');
+  this.clientesFiltrados = this.clientesDia.filter(cr => {
+    const cliente = cr.cliente;
+    return cliente.representante.toLowerCase().includes(busqueda) ||
+           cliente.negocio?.toLowerCase().includes(busqueda) ||
+           cliente.direcciones?.[0]?.direccion.toLowerCase().includes(busqueda);
+  });
+}
+
+async editarUbicacionCliente(clienteRuta: any) {
+  const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+  
+  const modal = await this.modalController.create({
+    component: DetalleClienteModalComponent,
+    componentProps: {
+      clienteRuta: clienteRuta,
+      diaSemana: this.diaSeleccionado,
+      diaRutaId: diaRuta?.id
+    },
+    cssClass: 'modal-detalle-cliente',
+    backdropDismiss: true
+  });
+
+  await modal.present();
+
+  const { data } = await modal.onWillDismiss();
+
+  if (data?.eliminar) {
+    await this.eliminarClienteDeRutaDirecto(clienteRuta);
   }
+}
 
-  async eliminarClienteDeRuta(clienteRuta: any) {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Cliente',
-      message: `¿Eliminar a ${clienteRuta.cliente.representante} de esta ruta del día ${this.diaSeleccionado}?`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-
-            this.rutasService.eliminarClienteDeRuta(diaRuta.id, clienteRuta.cliente.id).subscribe({
-              next: () => {
-                this.mostrarToast('Cliente eliminado de la ruta', 'success');
-                this.deseleccionarCliente();
-                this.cargarRuta();
-              },
-              error: (err) => {
-                console.error('Error:', err);
-                this.mostrarToast('Error al eliminar cliente', 'danger');
-              }
-            });
-          }
+async eliminarClienteDeRuta(clienteRuta: any) {
+  const alert = await this.alertController.create({
+    header: 'Eliminar Cliente',
+    subHeader: 'El cliente permanecerá en el sistema',
+    message: `¿Eliminar a ${clienteRuta.cliente.representante} de la ruta del día ${this.diaSeleccionado}?`,
+    cssClass: 'alert-eliminar-cliente',
+    backdropDismiss: false, // ✅ Solo se cierra con botones
+    buttons: [
+      { 
+        text: 'Cancelar', 
+        role: 'cancel'
+      },
+      {
+        text: 'Eliminar',
+        role: 'destructive',
+        handler: () => {
+          this.eliminarClienteDeRutaDirecto(clienteRuta);
+          return true; // ✅ Cierra el alert
         }
-      ]
-    });
+      }
+    ]
+  });
 
-    await alert.present();
+  await alert.present();
+}
+private eliminarClienteDeRutaDirecto(clienteRuta: any) {
+  const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+  
+  if (!diaRuta) {
+    this.mostrarToast('Error: día de ruta no encontrado', 'danger');
+    return;
   }
+  
+  this.rutasService.eliminarClienteDeRuta(diaRuta.id, clienteRuta.cliente.id).subscribe({
+    next: () => {
+      this.mostrarToast('Cliente eliminado de la ruta', 'success');
+      this.deseleccionarCliente();
+      this.cargarRuta();
+    },
+    error: (err) => {
+      console.error('Error eliminando cliente:', err);
+      this.mostrarToast('Error al eliminar cliente', 'danger');
+    }
+  });
+}
 
   // ========================================
   // UTILIDADES
