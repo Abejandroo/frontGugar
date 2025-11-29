@@ -42,6 +42,10 @@ import {
   eyeOutline,
   warningOutline,
   waterOutline,
+  volumeHigh,
+  flag,
+  volumeMute,
+  pauseCircle,
 } from 'ionicons/icons';
 
 @Component({
@@ -90,7 +94,10 @@ export class AppComponent {
   'eye-outline': eyeOutline,
   'warning-outline': warningOutline,
   'water-outline': waterOutline,
-  
+  'volume-high': volumeHigh,
+  'flag':flag,
+  'volume-mute':volumeMute,
+  'pause-circle': pauseCircle,
 });
  }
   isAdmin() {

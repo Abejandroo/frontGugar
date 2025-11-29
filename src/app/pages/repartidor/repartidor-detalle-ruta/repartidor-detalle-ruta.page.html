@@ -7,6 +7,10 @@
     </ion-buttons>
     <ion-title>{{ diaRuta?.nombre || 'Ruta' }}</ion-title>
     <ion-buttons slot="end">
+      <!-- Toggle Voz -->
+      <ion-button (click)="toggleVoz()" [color]="vozHabilitada ? 'light' : 'medium'">
+        <ion-icon [name]="vozHabilitada ? 'volume-high' : 'volume-mute'"></ion-icon>
+      </ion-button>
       <ion-badge color="light">
         {{ clientesVisitadosCount }}/{{ clientesOrdenados.length }}
       </ion-badge>
@@ -38,6 +42,11 @@
           <ion-icon name="time"></ion-icon>
           <span>{{ tiempoEstimado.toFixed(0) }} min</span>
         </div>
+        <!-- Botón para abrir Google Maps -->
+        <ion-button size="small" fill="clear" color="light" (click)="abrirNavegacion()">
+          <ion-icon name="navigate" slot="start"></ion-icon>
+          Navegar
+        </ion-button>
       </div>
     }
   </div>
@@ -53,6 +62,39 @@
         <small>Se optimizará el recorrido según tu ubicación</small>
       </p>
     </div>
+  }
+
+  <!-- ✅ RUTA COMPLETADA - Todos los clientes visitados -->
+  @if (rutaIniciada && todosClientesVisitados) {
+    <ion-card color="success">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="checkmark-circle"></ion-icon>
+          ¡Ruta Completada!
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="resumen-final">
+          <div class="resumen-item">
+            <span class="numero">{{ clientesCompletadosCount }}</span>
+            <span class="label">Ventas</span>
+          </div>
+          <div class="resumen-item">
+            <span class="numero">{{ clientesSaltadosCount }}</span>
+            <span class="label">Saltados</span>
+          </div>
+          <div class="resumen-item">
+            <span class="numero">{{ clientesOrdenados.length }}</span>
+            <span class="label">Total</span>
+          </div>
+        </div>
+        
+        <ion-button expand="block" color="light" (click)="finalizarRuta()">
+          <ion-icon name="flag" slot="start"></ion-icon>
+          Finalizar Ruta
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
   }
 
   <!-- CLIENTE ACTUAL -->
@@ -89,6 +131,12 @@
             <span>${{ clienteActual.precio?.precioPorGarrafon || 'N/A' }} / garrafón</span>
           </div>
         </div>
+
+        <!-- Botón de navegación destacado -->
+        <ion-button expand="block" fill="outline" color="primary" (click)="abrirNavegacion()" class="boton-navegar">
+          <ion-icon name="navigate" slot="start"></ion-icon>
+          Abrir en Google Maps
+        </ion-button>
 
         <div class="acciones">
           <ion-button expand="block" color="success" (click)="agregarVenta()">
@@ -129,6 +177,25 @@
           </ion-item>
         }
       </ion-list>
+    </div>
+  }
+
+  <!-- ✅ BOTÓN PAUSAR/FINALIZAR (footer fijo) -->
+  @if (rutaIniciada) {
+    <div class="footer-acciones">
+      @if (hayClientesPendientes) {
+        <!-- Si hay clientes pendientes, mostrar pausar -->
+        <ion-button expand="block" color="warning" (click)="pausarRuta()">
+          <ion-icon name="pause-circle" slot="start"></ion-icon>
+          Pausar Ruta ({{ clientesPendientesCount }} pendientes)
+        </ion-button>
+      } @else {
+        <!-- Si no hay pendientes, mostrar finalizar -->
+        <ion-button expand="block" color="success" (click)="finalizarRuta()">
+          <ion-icon name="flag" slot="start"></ion-icon>
+          Finalizar Ruta
+        </ion-button>
+      }
     </div>
   }
 

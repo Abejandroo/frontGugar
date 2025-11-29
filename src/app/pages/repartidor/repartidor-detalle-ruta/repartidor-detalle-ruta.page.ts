@@ -1,3 +1,6 @@
+// src/app/pages/repartidor/repartidor-detalle-ruta/repartidor-detalle-ruta.page.ts
+// ✅ MEJORADO - Incluye botones finalizar/pausar y navegación por voz
+
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
@@ -6,6 +9,7 @@ import { RutaService } from 'src/app/service/ruta.service';
 import { GeolocationService } from 'src/app/service/geolocation.service';
 import { RutaOptimizacionService } from 'src/app/service/ruta-optimizacion.service';
 import { VentaService } from 'src/app/service/venta.service';
+import { TtsService } from 'src/app/service/tts.service';
 import { ModalTodosClientesPage } from '../modal-todos-clientes/modal-todos-clientes.page';
 import { ModalAgregarVentaPage } from '../modal-agregar-venta/modal-agregar-venta.page';
 import { ModalEditarClientePage } from '../modal-editar-cliente/modal-editar-cliente.page';
@@ -35,6 +39,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   distanciaAlCliente: number = 0;
   tiempoEstimado: number = 0;
 
+  // ✅ NUEVO: Control de navegación por voz
+  vozHabilitada: boolean = true;
+  private ultimaDistanciaAnunciada: number = 0;
+
   private map: L.Map | null = null;
   private markers: L.Marker[] = [];
   private polyline: L.Polyline | null = null;
@@ -48,12 +56,16 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     private geolocationService: GeolocationService,
     private optimizacionService: RutaOptimizacionService,
     private ventaService: VentaService,
+    private ttsService: TtsService,
     private modalController: ModalController,
     private toastController: ToastController,
     private alertController: AlertController
   ) {}
 
-  // ⭐ CONTADOR BASADO EN VENTAS
+  // ========================================
+  // CONTADORES BASADOS EN VENTAS
+  // ========================================
+
   get clientesVisitadosCount(): number {
     return this.clientesOrdenados.filter(c => 
       c.venta && (c.venta.estado === 'realizado' || c.venta.estado === 'saltado')
@@ -67,6 +79,26 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   get clientesSaltadosCount(): number {
     return this.clientesOrdenados.filter(c => c.venta && c.venta.estado === 'saltado').length;
   }
+
+  get clientesPendientesCount(): number {
+    return this.clientesOrdenados.filter(c => 
+      !c.venta || c.venta.estado === 'pendiente'
+    ).length;
+  }
+
+  // ✅ NUEVO: Verificar si todos los clientes fueron visitados
+  get todosClientesVisitados(): boolean {
+    return this.clientesPendientesCount === 0 && this.clientesOrdenados.length > 0;
+  }
+
+  // ✅ NUEVO: Verificar si hay clientes pendientes (para mostrar pausar vs finalizar)
+  get hayClientesPendientes(): boolean {
+    return this.clientesPendientesCount > 0;
+  }
+
+  // ========================================
+  // CICLO DE VIDA
+  // ========================================
 
   ngOnInit() {
     this.rutaId = Number(this.route.snapshot.paramMap.get('id'));
@@ -87,6 +119,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.map.remove();
     }
   }
+
+  // ========================================
+  // CARGAR DATOS
+  // ========================================
 
   async cargarRuta() {
     this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
@@ -115,13 +151,19 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   }
 
   async cargarVentas() {
-    this.ventaService.obtenerVentasPorDiaRuta(this.diaRuta.id).subscribe({
-      next: (ventas) => {
-        this.clientesOrdenados.forEach(cr => {
-          cr.venta = ventas.find(v => v.clienteRuta.id === cr.id);
-        });
-      },
-      error: (err) => console.error('Error cargando ventas:', err)
+    return new Promise<void>((resolve) => {
+      this.ventaService.obtenerVentasPorDiaRuta(this.diaRuta.id).subscribe({
+        next: (ventas) => {
+          this.clientesOrdenados.forEach(cr => {
+            cr.venta = ventas.find(v => v.clienteRuta?.id === cr.id);
+          });
+          resolve();
+        },
+        error: (err) => {
+          console.error('Error cargando ventas:', err);
+          resolve();
+        }
+      });
     });
   }
 
@@ -136,6 +178,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     return diasRuta.find(dr => dr.diaSemana === diaBuscado) || diasRuta[0];
   }
 
+  // ========================================
+  // MAPA
+  // ========================================
+
   initMap() {
     this.map = L.map('mapRepartidor').setView([17.0732, -96.7266], 14);
 
@@ -144,6 +190,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
   }
+
+  // ========================================
+  // INICIAR / PAUSAR / FINALIZAR RUTA
+  // ========================================
 
   async iniciarRuta() {
     const alert = await this.alertController.create({
@@ -171,12 +221,26 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     await this.optimizarRuta();
 
     this.rutasService.iniciarDiaRuta(this.diaRuta.id).subscribe({
-      next: () => {
+      next: async () => {
         this.rutaIniciada = true;
         this.diaRuta.estado = 'en_curso';
         this.iniciarSeguimiento();
         this.calcularDistanciaYTiempo();
         this.mostrarToast('Ruta iniciada', 'success');
+
+        // ✅ NUEVO: Anunciar inicio de ruta por voz
+        if (this.vozHabilitada) {
+          await this.ttsService.anunciarInicioRuta(this.clientesOrdenados.length);
+          
+          // Anunciar primer cliente
+          if (this.clienteActual) {
+            const dir = this.clienteActual.cliente.direcciones[0];
+            await this.ttsService.anunciarCliente(
+              this.clienteActual.cliente.representante,
+              `${dir.direccion}, ${dir.colonia}`
+            );
+          }
+        }
       },
       error: (err) => {
         console.error('Error al iniciar ruta:', err);
@@ -184,6 +248,96 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       }
     });
   }
+
+  // ✅ NUEVO: Pausar ruta
+  async pausarRuta() {
+    const alert = await this.alertController.create({
+      header: 'Pausar Ruta',
+      message: `¿Deseas pausar la ruta? Quedan ${this.clientesPendientesCount} clientes por visitar.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Pausar', 
+          handler: async () => {
+            this.rutasService.pausarDiaRuta(this.diaRuta.id).subscribe({
+              next: () => {
+                this.diaRuta.estado = 'pausada';
+                this.mostrarToast('Ruta pausada', 'warning');
+                this.detenerSeguimiento();
+                this.router.navigate(['/repartidor/rutas']);
+              },
+              error: (err) => {
+                console.error('Error al pausar ruta:', err);
+                this.mostrarToast('Error al pausar la ruta', 'danger');
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ NUEVO: Finalizar ruta
+  async finalizarRuta() {
+    const visitados = this.clientesVisitadosCount;
+    const total = this.clientesOrdenados.length;
+    const vendidos = this.clientesCompletadosCount;
+    const saltados = this.clientesSaltadosCount;
+
+    const alert = await this.alertController.create({
+      header: 'Finalizar Ruta',
+      message: `
+        <strong>Resumen:</strong><br>
+        • Clientes visitados: ${visitados}/${total}<br>
+        • Ventas realizadas: ${vendidos}<br>
+        • Clientes saltados: ${saltados}<br><br>
+        ¿Confirmas finalizar la ruta?
+      `,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Finalizar', 
+          cssClass: 'alert-button-confirm',
+          handler: async () => {
+            this.rutasService.finalizarDiaRuta(this.diaRuta.id).subscribe({
+              next: async () => {
+                this.diaRuta.estado = 'completada';
+                this.mostrarToast('¡Ruta completada!', 'success');
+                this.detenerSeguimiento();
+
+                // Anunciar fin de ruta
+                if (this.vozHabilitada) {
+                  await this.ttsService.anunciarFinRuta(visitados, total);
+                }
+
+                this.router.navigate(['/repartidor/rutas']);
+              },
+              error: (err) => {
+                console.error('Error al finalizar ruta:', err);
+                this.mostrarToast('Error al finalizar la ruta', 'danger');
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ NUEVO: Detener seguimiento GPS
+  private detenerSeguimiento() {
+    if (this.watchId) {
+      this.geolocationService.stopWatching(this.watchId);
+      this.watchId = null;
+    }
+  }
+
+  // ========================================
+  // OPTIMIZACIÓN DE RUTA
+  // ========================================
 
   async optimizarRuta() {
     if (!this.ubicacionActual) return;
@@ -208,7 +362,13 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
         this.clientesOrdenados = nuevoOrden;
         this.dibujarRutaEnMapa(rutaOptimizada.polyline);
         this.actualizarClienteActual();
-        this.mostrarToast('Ruta optimizada', 'success');
+        
+        // Mostrar info adicional si la ruta fue dividida
+        if (rutaOptimizada.segmentos > 1) {
+          this.mostrarToast(`Ruta optimizada (${rutaOptimizada.segmentos} segmentos)`, 'success');
+        } else {
+          this.mostrarToast('Ruta optimizada', 'success');
+        }
       }
     } catch (error) {
       console.error('Error optimizando ruta:', error);
@@ -216,6 +376,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.dibujarClientesEnMapa();
     }
   }
+
+  // ========================================
+  // DIBUJAR EN MAPA
+  // ========================================
 
   dibujarRutaEnMapa(polyline: any) {
     if (!this.map) return;
@@ -335,6 +499,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  // ========================================
+  // SEGUIMIENTO GPS
+  // ========================================
+
   iniciarSeguimiento() {
     this.watchId = this.geolocationService.watchPosition((position: any) => {
       this.ubicacionActual = position;
@@ -344,6 +512,9 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       }
 
       this.calcularDistanciaYTiempo();
+      
+      // ✅ NUEVO: Anunciar distancia por voz cuando se acerca
+      this.verificarProximidadYAnunciar();
     });
   }
 
@@ -358,21 +529,57 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       dir.longitud
     );
 
+    // Tiempo estimado en minutos (asumiendo 40 km/h promedio)
     this.tiempoEstimado = (this.distanciaAlCliente / 40) * 60;
   }
+
+  // ✅ NUEVO: Verificar proximidad y anunciar por voz
+  private async verificarProximidadYAnunciar() {
+    if (!this.vozHabilitada || !this.clienteActual) return;
+
+    const distanciaMetros = this.distanciaAlCliente * 1000;
+
+    // Anunciar cuando llegue (menos de 50m)
+    if (distanciaMetros < 50 && this.ultimaDistanciaAnunciada >= 50) {
+      await this.ttsService.anunciarLlegada(this.clienteActual.cliente.representante);
+    }
+    // Anunciar cuando esté cerca (menos de 200m)
+    else if (distanciaMetros < 200 && this.ultimaDistanciaAnunciada >= 200) {
+      await this.ttsService.anunciarDistancia(distanciaMetros);
+    }
+    // Anunciar cuando esté a 500m
+    else if (distanciaMetros < 500 && this.ultimaDistanciaAnunciada >= 500) {
+      await this.ttsService.anunciarDistancia(distanciaMetros);
+    }
+
+    this.ultimaDistanciaAnunciada = distanciaMetros;
+  }
+
+  // ========================================
+  // ACTUALIZAR CLIENTE ACTUAL
+  // ========================================
 
   actualizarClienteActual() {
     const noCompletado = this.clientesOrdenados.find(cr => 
       !cr.venta || cr.venta.estado === 'pendiente'
     );
-    this.clienteActual = noCompletado || this.clientesOrdenados[0];
+    this.clienteActual = noCompletado || null;
     this.ventaActual = this.clienteActual?.venta || null;
     
-    const idx = this.clientesOrdenados.indexOf(this.clienteActual);
-    this.proximosClientes = this.clientesOrdenados.slice(idx + 1, idx + 4);
+    if (this.clienteActual) {
+      const idx = this.clientesOrdenados.indexOf(this.clienteActual);
+      this.proximosClientes = this.clientesOrdenados.slice(idx + 1, idx + 4);
+    } else {
+      this.proximosClientes = [];
+    }
 
     this.calcularDistanciaYTiempo();
+    this.ultimaDistanciaAnunciada = this.distanciaAlCliente * 1000;
   }
+
+  // ========================================
+  // ACCIONES DE VENTA
+  // ========================================
 
   async agregarVenta() {
     const modal = await this.modalController.create({
@@ -392,6 +599,19 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.actualizarClienteActual();
       this.dibujarClientesEnMapa();
       this.mostrarToast('Venta registrada', 'success');
+
+      // Anunciar venta y siguiente cliente
+      if (this.vozHabilitada) {
+        await this.ttsService.anunciarVentaRegistrada(data.cantidad || 0);
+        
+        if (this.clienteActual) {
+          const dir = this.clienteActual.cliente.direcciones[0];
+          await this.ttsService.anunciarCliente(
+            this.clienteActual.cliente.representante,
+            `${dir.direccion}, ${dir.colonia}`
+          );
+        }
+      }
     }
   }
 
@@ -413,8 +633,42 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.actualizarClienteActual();
       this.dibujarClientesEnMapa();
       this.mostrarToast('Cliente saltado', 'warning');
+
+      // Anunciar siguiente cliente
+      if (this.vozHabilitada) {
+        await this.ttsService.anunciarClienteSaltado();
+        
+        if (this.clienteActual) {
+          const dir = this.clienteActual.cliente.direcciones[0];
+          await this.ttsService.anunciarCliente(
+            this.clienteActual.cliente.representante,
+            `${dir.direccion}, ${dir.colonia}`
+          );
+        }
+      }
     }
   }
+
+  // ========================================
+  // NAVEGACIÓN A GOOGLE MAPS
+  // ========================================
+
+  // ✅ NUEVO: Abrir navegación en Google Maps
+  abrirNavegacion() {
+    if (!this.clienteActual) return;
+
+    const dir = this.clienteActual.cliente.direcciones[0];
+    const destino = `${dir.latitud},${dir.longitud}`;
+    
+    // URL para abrir Google Maps con navegación
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destino}&travelmode=driving`;
+    
+    window.open(url, '_blank');
+  }
+
+  // ========================================
+  // OTROS MODALES
+  // ========================================
 
   async verTodosClientes() {
     const modal = await this.modalController.create({
@@ -448,6 +702,20 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  // ========================================
+  // HELPERS
+  // ========================================
+
+  // ✅ NUEVO: Toggle voz
+  toggleVoz() {
+    this.vozHabilitada = !this.vozHabilitada;
+    this.ttsService.setHabilitado(this.vozHabilitada);
+    this.mostrarToast(
+      this.vozHabilitada ? 'Indicaciones por voz activadas' : 'Indicaciones por voz desactivadas',
+      'medium'
+    );
+  }
+
   getOrdenCliente(cliente: any): number {
     return this.clientesOrdenados.indexOf(cliente) + 1;
   }
@@ -463,6 +731,10 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   }
 
   volver() {
-    this.router.navigate(['/repartidor/rutas']);
+    if (this.rutaIniciada && this.hayClientesPendientes) {
+      this.pausarRuta();
+    } else {
+      this.router.navigate(['/repartidor/rutas']);
+    }
   }
 }

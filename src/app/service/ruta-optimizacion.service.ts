@@ -1,3 +1,6 @@
+// src/app/service/ruta-optimizacion.service.ts
+// ✅ MEJORADO - Maneja más de 25 waypoints dividiendo en segmentos
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -7,17 +10,17 @@ import { firstValueFrom } from 'rxjs';
 })
 export class RutaOptimizacionService {
 
-  // TODO: Mover a environment
-  private apiKey = 'AIzaSyBIYpgQpv7ihVaUH6leqM-rI3769lNuj6c';
+  private apiKey = 'AIzaSyBIYpgQpv7ihVaUH6leqM-rI3769lNuj6c'; // TODO: Mover a environment
   private routesUrl = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+  
+  // Límite de Google Routes API
+  private readonly MAX_WAYPOINTS = 25;
 
   constructor(private http: HttpClient) {}
 
   /**
    * Optimizar ruta usando Google Routes API
-   * @param origen Coordenadas de origen {lat, lng}
-   * @param destinos Array de coordenadas de destinos [{lat, lng}, ...]
-   * @returns Ruta optimizada con orden y polyline
+   * ✅ MEJORADO: Maneja más de 25 waypoints dividiéndolos en segmentos
    */
   async optimizarRuta(
     origen: { lat: number; lng: number },
@@ -33,12 +36,29 @@ export class RutaOptimizacionService {
       const ruta = await this.calcularRutaSimple(origen, destinos[0]);
       return {
         orden: [0],
-        distanciaTotal: ruta.distanciaTotal,
-        duracionTotal: ruta.duracionTotal,
-        polyline: ruta.polyline
+        distanciaTotal: ruta?.distanciaTotal || 0,
+        duracionTotal: ruta?.duracionTotal || 0,
+        polyline: ruta?.polyline || []
       };
     }
 
+    // Si hay menos de 25 destinos, usar el método normal
+    if (destinos.length <= this.MAX_WAYPOINTS) {
+      return await this.optimizarRutaNormal(origen, destinos);
+    }
+
+    // ✅ NUEVO: Si hay más de 25 destinos, dividir en segmentos
+    console.log(`⚠️ Ruta con ${destinos.length} clientes. Dividiendo en segmentos...`);
+    return await this.optimizarRutaLarga(origen, destinos);
+  }
+
+  /**
+   * Optimización normal para rutas con <= 25 waypoints
+   */
+  private async optimizarRutaNormal(
+    origen: { lat: number; lng: number },
+    destinos: { lat: number; lng: number }[]
+  ): Promise<any> {
     // Calcular matriz de distancias
     const matriz = await this.calcularMatrizDistancias(origen, destinos);
     
@@ -53,10 +73,110 @@ export class RutaOptimizacionService {
 
     return {
       orden: ordenOptimizado,
-      distanciaTotal: rutaCompleta.distanciaTotal,
-      duracionTotal: rutaCompleta.duracionTotal,
-      polyline: rutaCompleta.polyline
+      distanciaTotal: rutaCompleta?.distanciaTotal || 0,
+      duracionTotal: rutaCompleta?.duracionTotal || 0,
+      polyline: rutaCompleta?.polyline || []
     };
+  }
+
+  /**
+   * ✅ NUEVO: Optimización para rutas con > 25 waypoints
+   * Divide la ruta en segmentos y los optimiza individualmente
+   */
+  private async optimizarRutaLarga(
+    origen: { lat: number; lng: number },
+    destinos: { lat: number; lng: number }[]
+  ): Promise<any> {
+    
+    // Paso 1: Ordenar todos los destinos por proximidad usando el algoritmo del vecino más cercano
+    // Esto no usa la API de Google, solo cálculos locales
+    const matrizCompleta = this.calcularMatrizDistanciasLocal(origen, destinos);
+    const ordenGlobal = this.algoritmoVecinoMasCercano(matrizCompleta);
+    
+    // Reordenar destinos según el orden optimizado localmente
+    const destinosOrdenados = ordenGlobal.map(idx => ({
+      original: destinos[idx],
+      indexOriginal: idx
+    }));
+
+    // Paso 2: Dividir en segmentos de máximo 25 waypoints
+    const segmentos: Array<{ lat: number; lng: number }[]> = [];
+    for (let i = 0; i < destinosOrdenados.length; i += this.MAX_WAYPOINTS) {
+      segmentos.push(
+        destinosOrdenados.slice(i, i + this.MAX_WAYPOINTS).map(d => d.original)
+      );
+    }
+
+    console.log(`📦 Dividido en ${segmentos.length} segmentos`);
+
+    // Paso 3: Calcular rutas para cada segmento
+    let polylineCompleta: [number, number][] = [];
+    let distanciaTotal = 0;
+    let duracionTotal = 0;
+    let puntoActual = origen;
+
+    for (let i = 0; i < segmentos.length; i++) {
+      const segmento = segmentos[i];
+      console.log(`🔄 Procesando segmento ${i + 1}/${segmentos.length} (${segmento.length} clientes)`);
+
+      try {
+        const rutaSegmento = await this.calcularRutaCompleta(puntoActual, segmento);
+        
+        if (rutaSegmento) {
+          polylineCompleta = polylineCompleta.concat(rutaSegmento.polyline || []);
+          distanciaTotal += rutaSegmento.distanciaTotal || 0;
+          duracionTotal += parseInt(rutaSegmento.duracionTotal) || 0;
+          
+          // El siguiente segmento empieza donde terminó este
+          puntoActual = segmento[segmento.length - 1];
+        }
+      } catch (error) {
+        console.error(`Error en segmento ${i + 1}:`, error);
+        // Continuar con el siguiente segmento
+      }
+
+      // Pequeño delay entre requests para no saturar la API
+      if (i < segmentos.length - 1) {
+        await this.delay(200);
+      }
+    }
+
+    return {
+      orden: ordenGlobal,
+      distanciaTotal,
+      duracionTotal,
+      polyline: polylineCompleta,
+      segmentos: segmentos.length
+    };
+  }
+
+  /**
+   * Calcular matriz de distancias localmente (sin API)
+   */
+  private calcularMatrizDistanciasLocal(
+    origen: { lat: number; lng: number },
+    destinos: { lat: number; lng: number }[]
+  ): number[][] {
+    const puntos = [origen, ...destinos];
+    const n = puntos.length;
+    const matriz: number[][] = Array(n).fill(0).map(() => Array(n).fill(0));
+
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) {
+          matriz[i][j] = 0;
+        } else {
+          matriz[i][j] = this.calcularDistanciaHaversine(
+            puntos[i].lat,
+            puntos[i].lng,
+            puntos[j].lat,
+            puntos[j].lng
+          );
+        }
+      }
+    }
+
+    return matriz;
   }
 
   /**
@@ -135,13 +255,12 @@ export class RutaOptimizacionService {
     const n = puntos.length;
     const matriz: number[][] = Array(n).fill(0).map(() => Array(n).fill(0));
 
-    // Calcular distancia euclidiana (más rápido para optimización inicial)
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) {
           matriz[i][j] = 0;
         } else {
-          matriz[i][j] = this.calcularDistanciaEuclidiana(
+          matriz[i][j] = this.calcularDistanciaHaversine(
             puntos[i].lat,
             puntos[i].lng,
             puntos[j].lat,
@@ -162,16 +281,13 @@ export class RutaOptimizacionService {
     const visitados = new Set<number>();
     const orden: number[] = [];
     
-    // Empezar desde el origen (índice 0)
     let actual = 0;
     visitados.add(0);
     
-    // Visitar todos los destinos (índices 1 en adelante)
     while (visitados.size < n) {
       let minDistancia = Infinity;
       let siguiente = -1;
       
-      // Buscar el vecino más cercano no visitado
       for (let i = 1; i < n; i++) {
         if (!visitados.has(i) && matriz[actual][i] < minDistancia) {
           minDistancia = matriz[actual][i];
@@ -182,7 +298,7 @@ export class RutaOptimizacionService {
       if (siguiente === -1) break;
       
       visitados.add(siguiente);
-      orden.push(siguiente - 1); // Restar 1 porque el índice 0 era el origen
+      orden.push(siguiente - 1);
       actual = siguiente;
     }
     
@@ -190,7 +306,7 @@ export class RutaOptimizacionService {
   }
 
   /**
-   * Calcular ruta completa con múltiples waypoints
+   * Calcular ruta completa con múltiples waypoints (máximo 25)
    */
   private async calcularRutaCompleta(
     origen: { lat: number; lng: number },
@@ -199,8 +315,15 @@ export class RutaOptimizacionService {
     
     if (destinos.length === 0) return null;
 
-    const ultimoDestino = destinos[destinos.length - 1];
-    const waypoints = destinos.slice(0, -1);
+    // Limitar a 25 waypoints
+    const destinosLimitados = destinos.slice(0, this.MAX_WAYPOINTS);
+    
+    if (destinos.length > this.MAX_WAYPOINTS) {
+      console.warn(`⚠️ Limitando de ${destinos.length} a ${this.MAX_WAYPOINTS} waypoints`);
+    }
+
+    const ultimoDestino = destinosLimitados[destinosLimitados.length - 1];
+    const waypoints = destinosLimitados.slice(0, -1);
 
     const body: any = {
       origin: {
@@ -219,20 +342,24 @@ export class RutaOptimizacionService {
           }
         }
       },
-      intermediates: waypoints.map(wp => ({
+      travelMode: 'DRIVE',
+      routingPreference: 'TRAFFIC_AWARE',
+      optimizeWaypointOrder: false,
+      languageCode: 'es-MX',
+      units: 'METRIC'
+    };
+
+    // Solo agregar intermediates si hay waypoints
+    if (waypoints.length > 0) {
+      body.intermediates = waypoints.map(wp => ({
         location: {
           latLng: {
             latitude: wp.lat,
             longitude: wp.lng
           }
         }
-      })),
-      travelMode: 'DRIVE',
-      routingPreference: 'TRAFFIC_AWARE',
-      optimizeWaypointOrder: false, // Ya optimizamos el orden
-      languageCode: 'es-MX',
-      units: 'METRIC'
-    };
+      }));
+    }
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -265,6 +392,8 @@ export class RutaOptimizacionService {
    * Decodificar polyline de Google
    */
   private decodificarPolyline(encoded: string): [number, number][] {
+    if (!encoded) return [];
+    
     const poly: [number, number][] = [];
     let index = 0;
     let lat = 0;
@@ -303,9 +432,9 @@ export class RutaOptimizacionService {
   }
 
   /**
-   * Calcular distancia euclidiana
+   * Calcular distancia usando fórmula de Haversine
    */
-  private calcularDistanciaEuclidiana(
+  private calcularDistanciaHaversine(
     lat1: number,
     lng1: number,
     lat2: number,
@@ -322,5 +451,12 @@ export class RutaOptimizacionService {
     
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
+  }
+
+  /**
+   * Delay helper
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
