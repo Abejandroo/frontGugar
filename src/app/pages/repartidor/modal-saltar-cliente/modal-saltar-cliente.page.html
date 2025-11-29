@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-title>Saltar Cliente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <!-- INFO DEL CLIENTE -->
+  <ion-card>
+    <ion-card-content>
+      <h2>{{ clienteRuta.cliente.representante }}</h2>
+      <p>{{ clienteRuta.cliente.negocio || 'Sin negocio' }}</p>
+      <p class="direccion-text">
+        <ion-icon name="location-outline"></ion-icon>
+        {{ clienteRuta.cliente.direcciones[0]?.direccion }}
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- FORMULARIO -->
+  <form [formGroup]="formSaltar">
+    
+    <ion-list>
+      <ion-item>
+        <ion-select 
+          label="Motivo del salto"
+          labelPlacement="floating"
+          formControlName="motivo"
+          interface="action-sheet">
+          @for (motivo of motivosSalto; track motivo.valor) {
+            <ion-select-option [value]="motivo.valor">
+              {{ motivo.texto }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-textarea
+          label="Observaciones adicionales (Opcional)"
+          labelPlacement="floating"
+          formControlName="observaciones"
+          rows="3"
+          placeholder="Ej. El cliente pidió que regresemos mañana a las 2pm">
+        </ion-textarea>
+      </ion-item>
+    </ion-list>
+
+    <!-- ADVERTENCIA -->
+    <ion-card color="warning">
+      <ion-card-content>
+        <ion-icon name="warning-outline"></ion-icon>
+        <p>Este cliente será marcado como "saltado" y no se registrará venta.</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- BOTONES -->
+    <ion-button 
+      expand="block" 
+      color="danger"
+      size="large"
+      (click)="saltarCliente()"
+      [disabled]="formSaltar.invalid">
+      <ion-icon name="play-skip-forward" slot="start"></ion-icon>
+      Saltar y Continuar con Siguiente
+    </ion-button>
+
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      (click)="cerrar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

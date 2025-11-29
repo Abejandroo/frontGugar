@@ -1,0 +1,17 @@
+.direccion-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-medium);
+  
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+ion-card {
+  ion-icon {
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+}
