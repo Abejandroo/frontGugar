@@ -1,64 +1,98 @@
-<div class="ruta-container">
-  <div class="header">
-    <button class="back-button">←</button>
-    <div class="title">
-      <p class="ruta">Ruta 1 · <span>SAN FELIPE DEL AGUA</span></p>
-      <p class="repartidor">Repartidor asignado:<br><strong>JUAN RODOLFO MORALES PEREZ</strong></p>
+<ion-content [fullscreen]="true">
+  
+  @if (cargando) {
+    <div class="loading-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando ruta...</p>
     </div>
-    <button class="edit-button">Editar</button>
-  </div>
+  } @else {
 
-  <div class="search-section">
-    <input type="text" placeholder="BUSCAR CLIENTE O DIRECCIÓN" />
-    <button class="search-button">🔍</button>
-  </div>
+    <div class="map-header">
+      <google-map 
+        height="35vh" 
+        width="100%" 
+        [center]="center" 
+        [zoom]="zoom" 
+        [options]="mapOptions">
+        
+        @for (marker of marcadoresClientes; track marker.title) {
+          <map-marker [position]="marker.position" [title]="marker.title" [options]="{icon: marker.icon}"></map-marker>
+        }
 
-  <div class="filter">
-    <label for="dia">Día de visita:</label>
-    <select id="dia">
-      <option>Todos</option>
-      <option>Lunes</option>
-      <option>Martes</option>
-      <option>Miércoles</option>
-    </select>
-  </div>
+        @if (marcadorRepartidor) {
+          <map-marker 
+            [position]="marcadorRepartidor.position" 
+            [title]="marcadorRepartidor.title"
+            [options]="{icon: marcadorRepartidor.icon, animation: 1}"> </map-marker>
+        }
+      </google-map>
+      
+      <button class="back-button-map" (click)="regresar()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </div>
 
-  <p class="clientes-count">450 clientes</p>
-
-  <div class="clientes-list">
-    <div class="cliente-card">
-      <div class="cliente-info">
-        <h3>BERTHA PEREZ</h3>
-        <p>3 PRIV DE ROCIO 104 MZ, LT.</p>
+    <div class="ruta-container">
+      
+      <div class="info-header">
+        <div class="title">
+          <p class="ruta">Ruta #{{ rutaData.id }} · <span>{{ rutaData.nombre }}</span></p>
+          <div class="repartidor-info">
+            <ion-icon name="bicycle-outline"></ion-icon>
+            <div>
+              <small>Repartidor asignado:</small>
+              <strong>{{ rutaData.repartidor?.name || 'Sin Asignar' }}</strong>
+            </div>
+          </div>
+        </div>
+        <button class="edit-button">
+          <ion-icon name="create-outline"></ion-icon> Editar
+        </button>
       </div>
-      <span class="dia">Lunes / Jueves</span>
-    </div>
 
-    <div class="cliente-card selected">
-      <div class="cliente-info">
-        <h3>BERTHA PEREZ</h3>
-        <p>3 PRIV DE ROCIO 104 MZ, LT.</p>
+      <div class="search-section">
+        <div class="input-wrapper">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" placeholder="Buscar cliente o dirección..." />
+        </div>
       </div>
-      <span class="dia">Lunes / Jueves</span>
-    </div>
 
-    <div class="cliente-card">
-      <div class="cliente-info">
-        <h3>BERTHA PEREZ</h3>
-        <p>3 PRIV DE ROCIO 104 MZ, LT.</p>
+      <div class="filter-row">
+        <div class="filter">
+          <label for="dia">Día:</label>
+          <select id="dia">
+            <option>Todos</option>
+            <option>Lunes</option>
+            <option>Martes</option>
+            <option>Miércoles</option>
+            </select>
+        </div>
+        <p class="clientes-count">{{ clientesLista.length }} clientes</p>
       </div>
-      <span class="dia">Lunes / Jueves</span>
-    </div>
 
-    <div class="cliente-card">
-      <div class="cliente-info">
-        <h3>BERTHA PEREZ</h3>
-        <p>3 PRIV DE ROCIO 104 MZ, LT.</p>
+      <div class="clientes-list">
+        
+        @for (cliente of clientesLista; track cliente.id) {
+          <div class="cliente-card">
+            <div class="cliente-info">
+              <h3>{{ cliente.nombre }}</h3>
+              <p>
+                <ion-icon name="location-outline"></ion-icon>
+                {{ cliente.calle }} {{ cliente.colonia }}
+              </p>
+            </div>
+            <span class="dia-badge">{{ cliente.diaVisita }}</span>
+          </div>
+        } @empty {
+          <div class="empty-msg">No hay clientes asignados a esta ruta.</div>
+        }
+
       </div>
-      <span class="dia">Lunes / Jueves</span>
     </div>
-  </div>
-</div>
+  }
+
+</ion-content>
+
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
   <app-supervisor-navbar paginaActual="rutas"></app-supervisor-navbar>
 </ion-footer>
