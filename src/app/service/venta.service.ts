@@ -20,10 +20,18 @@ export class VentaService {
   }
 
   actualizarVenta(ventaId: number, datos: any): Observable<any> {
-    return this.http.put(`${this.url}/ventas/${ventaId}`, datos);
+    return this.http.patch(`${this.url}/ventas/${ventaId}`, datos);
   }
 
   eliminarVenta(ventaId: number): Observable<any> {
     return this.http.delete(`${this.url}/ventas/${ventaId}`);
+  }
+
+  obtenerVentasPorFecha(fecha: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/ventas/fecha/${fecha}`);
+  }
+
+  calcularTotalDelDia(fecha: string): Observable<any> {
+    return this.http.get(`${this.url}/ventas/total/dia?fecha=${fecha}`);
   }
 }

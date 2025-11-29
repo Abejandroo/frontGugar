@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 import { GeolocationService } from 'src/app/service/geolocation.service';
 import { RutaOptimizacionService } from 'src/app/service/ruta-optimizacion.service';
 import { VentaService } from 'src/app/service/venta.service';
@@ -44,7 +44,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private rutasService: RutaServiceTs,
+    private rutasService: RutaService,
     private geolocationService: GeolocationService,
     private optimizacionService: RutaOptimizacionService,
     private ventaService: VentaService,

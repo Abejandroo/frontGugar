@@ -37,6 +37,11 @@ import {
   saveOutline,
   add,
   remove,
+  car,
+  star,
+  eyeOutline,
+  warningOutline,
+  waterOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -80,7 +85,12 @@ export class AppComponent {
   'close':close,
   'save-outline':saveOutline,
   'add':add,
-  'remove':remove
+  'remove':remove,
+  'car':car,
+  'eye-outline': eyeOutline,
+  'warning-outline': warningOutline,
+  'water-outline': waterOutline,
+  
 });
  }
   isAdmin() {

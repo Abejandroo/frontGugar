@@ -12,7 +12,7 @@ export class ClienteService {
   constructor(private http: HttpClient) {}
 
   obtenerClientes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}/clientes`);
+    return this.http.get<any[]>(`${this.url}/clientes/all`);
   }
 
   obtenerClientePorId(id: number): Observable<any> {
@@ -23,11 +23,19 @@ export class ClienteService {
     return this.http.patch(`${this.url}/clientes/${cliente.id}`, cliente);
   }
 
+  actualizarClientePorId(id: number, datos: any): Observable<any> {
+    return this.http.patch(`${this.url}/clientes/${id}`, datos);
+  }
+
   crearCliente(cliente: any): Observable<any> {
     return this.http.post(`${this.url}/clientes`, cliente);
   }
 
   eliminarCliente(id: number): Observable<any> {
     return this.http.delete(`${this.url}/clientes/${id}`);
+  }
+
+  verPedidosCliente(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/clientes/${id}/pedidos`);
   }
 }

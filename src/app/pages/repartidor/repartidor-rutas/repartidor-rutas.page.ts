@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 
 @Component({
   selector: 'app-repartidor-rutas',
@@ -19,7 +19,7 @@ export class RepartidorRutasPage implements OnInit {
 
   constructor(
     private router: Router,
-    private rutasService: RutaServiceTs,
+    private rutasService: RutaService,
     private loadingController: LoadingController,
     private toastController: ToastController
   ) {}

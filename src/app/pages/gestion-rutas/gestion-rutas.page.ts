@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, ActionSheetController, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
 import { DetalleRutaPage } from 'src/app/pages/detalle-ruta/detalle-ruta.page';
@@ -46,7 +46,7 @@ export class GestionRutasPage implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private alertController: AlertController,
-    private rutasService: RutaServiceTs,
+    private rutasService: RutaService,
     private router: Router
   ) {
     addIcons({
