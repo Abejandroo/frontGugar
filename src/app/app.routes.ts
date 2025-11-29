@@ -9,21 +9,17 @@ export const routes: Routes = [
   // ========================================
   {
     path: '',
-    redirectTo: 'home1',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   {
-    path: 'login',
-    loadComponent: () => import('./supervisor/login/login.component').then((m) => m.LoginComponent),
+    path: 'home',
+    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
     path: 'auth/login',
     loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage),
     providers: [Auth, provideHttpClient()]
-  },
-  {
-    path: 'home1',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
 
   // ========================================
@@ -86,7 +82,7 @@ export const routes: Routes = [
   },
 
   // ========================================
-  // RUTAS SUPERVISOR
+  // RUTAS SUPERVISOR (de tu colaborador)
   // ========================================
   {
     path: 'usuario/supervisor',
@@ -96,8 +92,26 @@ export const routes: Routes = [
     providers: [Auth, provideHttpClient()]
   },
   {
-    path: 'home',
+    path: 'supervisores/home',
     loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
+    canActivate: [authGuard],
+    data: { role: 'supervisor' }
+  },
+  {
+    path: 'supervisores/clientes',
+    loadComponent: () => import('./supervisor/clientes/clientes.component').then((m) => m.ClientesComponent),
+    canActivate: [authGuard],
+    data: { role: 'supervisor' }
+  },
+  {
+    path: 'supervisores/rutas',
+    loadComponent: () => import('./supervisor/rutas/rutas.component').then((m) => m.RutasComponent),
+    canActivate: [authGuard],
+    data: { role: 'supervisor' }
+  },
+  {
+    path: 'supervisores/precios',
+    loadComponent: () => import('./supervisor/precios/precios.page').then(m => m.PreciosPage),
     canActivate: [authGuard],
     data: { role: 'supervisor' }
   },
@@ -107,15 +121,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { role: 'supervisor' }
   },
-  {
-    path: 'rutas',
-    loadComponent: () => import('./supervisor/repartidores/repartidores.component').then((m) => m.RepartidoresComponent),
-    canActivate: [authGuard],
-    data: { role: 'supervisor' }
-  },
 
   // ========================================
-  // RUTAS REPARTIDOR
+  // RUTAS REPARTIDOR (las tuyas)
   // ========================================
   {
     path: 'usuario/repartidor',
@@ -139,8 +147,6 @@ export const routes: Routes = [
       }
     ]
   },
-  
-  // RUTAS INDIVIDUALES DEL REPARTIDOR (por si se usan sin children)
   {
     path: 'repartidor-rutas',
     loadComponent: () => import('./pages/repartidor/repartidor-rutas/repartidor-rutas.page').then(m => m.RepartidorRutasPage),
@@ -155,7 +161,27 @@ export const routes: Routes = [
   },
 
   // ========================================
-  // MODALES (no necesitan guard, se abren desde páginas protegidas)
+  // MODALES COMPARTIDOS
+  // ========================================
+  {
+    path: 'agregar-cliente',
+    loadComponent: () => import('./modal/agregar-cliente/agregar-cliente.page').then(m => m.AgregarClientePage)
+  },
+  {
+    path: 'editar-cliente',
+    loadComponent: () => import('./modal/editar-cliente/editar-cliente.page').then(m => m.EditarClientePage)
+  },
+  {
+    path: 'agregarprecio',
+    loadComponent: () => import('./modal/agregarprecio/agregarprecio.page').then(m => m.AgregarprecioPage)
+  },
+  {
+    path: 'editarprecio',
+    loadComponent: () => import('./modal/editarprecio/editarprecio.page').then(m => m.EditarprecioPage)
+  },
+
+  // ========================================
+  // MODALES REPARTIDOR (los tuyos)
   // ========================================
   {
     path: 'modal-todos-clientes',
@@ -168,13 +194,13 @@ export const routes: Routes = [
   {
     path: 'modal-editar-cliente',
     loadComponent: () => import('./pages/repartidor/modal-editar-cliente/modal-editar-cliente.page').then(m => m.ModalEditarClientePage)
-  },  {
+  },
+  {
     path: 'modal-editar-venta',
-    loadComponent: () => import('./pages/repartidor/modal-editar-venta/modal-editar-venta.page').then( m => m.ModalEditarVentaPage)
+    loadComponent: () => import('./pages/repartidor/modal-editar-venta/modal-editar-venta.page').then(m => m.ModalEditarVentaPage)
   },
   {
     path: 'modal-saltar-cliente',
-    loadComponent: () => import('./pages/repartidor/modal-saltar-cliente/modal-saltar-cliente.page').then( m => m.ModalSaltarClientePage)
+    loadComponent: () => import('./pages/repartidor/modal-saltar-cliente/modal-saltar-cliente.page').then(m => m.ModalSaltarClientePage)
   }
-
 ];

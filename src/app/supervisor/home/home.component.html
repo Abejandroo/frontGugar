@@ -1,74 +1,140 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bienvenido Supervisor</title>
-  <link rel="stylesheet" href="home.component.scss" />
-</head>
-<body>
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
+    <ion-grid fixed>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+        <ion-col size="auto">
+          <img src="./assets/logo.png" alt="Logo" class="logo" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
 
-  <div class="header">
-    <h1>BIENVENIDO</h1>
-    <h2>Esteban Pardo</h2>
-    <small>Lunes 10 de Octubre 2025</small>
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <div class="welcome-message">
+    <h2>👋 Hola, {{ userName }}</h2>
+    <p class="fecha">{{ fechaHoy }}</p>
+    <p>Panel de Supervisión</p>
   </div>
 
-  <div class="indicadores">
-    <div class="card">
-      <h3>18</h3>
-      <p>Rutas asignadas</p>
-    </div>
-    <div class="card">
-      <h3>5</h3>
-      <p>Rutas completadas</p>
-    </div>
-    <div class="card">
-      <h3>0</h3>
-      <p>Incidencias</p>
-    </div>
-    <div class="card">
-      <h3>3</h3>
-      <p>Notificaciones</p>
-    </div>
-     <div class="card" (click)="goToRepartidores()">
-      <h3>3</h3>
-      <p>Repartidores</p>
-    </div>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center" style="row-gap: 15px;">
+      
+      <ion-col size="6" size-md="3">
+        <ion-card class="kpi-card">
+          <ion-card-content>
+            <h1>{{ rutasAsignadasCount }}</h1>
+            <p>Asignadas</p>
+            <ion-icon name="map-outline" class="bg-icon"></ion-icon>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6" size-md="3">
+        <ion-card class="kpi-card success">
+          <ion-card-content>
+            <h1>{{ rutasCompletadasCount }}</h1>
+            <p>Completadas</p>
+            <ion-icon name="checkmark-done-circle-outline" class="bg-icon"></ion-icon>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6" size-md="3">
+        <ion-card class="kpi-card danger">
+          <ion-card-content>
+            <h1>{{ incidenciasCount }}</h1>
+            <p>Incidencias</p>
+            <ion-icon name="alert-circle-outline" class="bg-icon"></ion-icon>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6" size-md="3">
+        <ion-card class="kpi-card tertiary" (click)="goToRepartidores()" button> 
+          <ion-card-content>
+            <h1>{{ repartidoresCount }}</h1>
+            <p>Repartidores</p>
+            <ion-icon name="bicycle-outline" class="bg-icon"></ion-icon>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <div class="tabs-container ion-margin-top">
+    
+    <ion-segment [value]="segmentoActual" (ionChange)="cambiarSegmento($event)" mode="ios">
+      <ion-segment-button value="activas">
+        <ion-label>Activas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pendientes">
+        <ion-label>Pendientes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completadas">
+        <ion-label>Fin</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-list class="ruta-list">
+      
+      @for (ruta of rutasFiltradas; track ruta.id) {
+        <ion-card class="ruta-card">
+          
+          <div class="status-bar" 
+               [ngClass]="{
+                 'success': ruta.status === 'en_curso',
+                 'warning': ruta.status === 'pendiente',
+                 'danger': ruta.status === 'incidencia',
+                 'medium': ruta.status === 'completada'
+               }">
+          </div> 
+          
+          <ion-card-header>
+            <div class="header-top">
+              <ion-badge [color]="getColorEstado(ruta.status)">
+                {{ ruta.status | uppercase }}
+              </ion-badge>
+              <small>ID: #{{ ruta.id }}</small>
+            </div>
+            
+            <ion-card-title>{{ ruta.nombre }}</ion-card-title>
+            
+            <ion-card-subtitle>
+              <ion-icon name="person-circle-outline"></ion-icon> 
+              {{ ruta.driver_name || 'Sin Asignar' }} 
+            </ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="progreso-info">
+              <span>Progreso Estimado:</span>
+              <span>{{ ruta.progreso || 0 }}%</span>
+            </div>
+            <ion-progress-bar [value]="(ruta.progreso || 0) / 100" [color]="getColorEstado(ruta.status)"></ion-progress-bar>
+            
+            <div class="ion-text-end ion-margin-top">
+              <ion-button size="small" fill="outline" shape="round" color="light" (click)="verDetalleRuta(ruta)">
+                Ver Detalles <ion-icon name="arrow-forward" slot="end"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      } @empty {
+        <div class="empty-state">
+          <ion-icon name="leaf-outline" size="large"></ion-icon>
+          <p>No hay rutas en esta sección</p>
+        </div>
+      }
+
+    </ion-list>
   </div>
 
-  <div class="tabs">
-    <div class="active">Activas</div>
-    <div>Pendientes</div>
-    <div>Completadas</div>
-  </div>
+  <div style="height: 80px;"></div>
+</ion-content>
 
-  <div class="ruta">
-    <div class="status"></div>
-    <h4>SAN FELIPE DEL AGUA</h4>
-    <small>Ruta 2</small>
-    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
-    <p>40 / 350 clientes por visitar</p>
-    <button class="btn" >→</button>
-  </div>
-
-  <div class="ruta">
-    <div class="status"></div>
-    <h4>SAN FELIPE DEL AGUA</h4>
-    <small>Ruta 2</small>
-    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
-    <p>40 / 350 clientes por visitar</p>
-    <button class="btn" >→</button>
-  </div>
-
-  <div class="ruta">
-    <div class="status"></div>
-    <h4>SAN FELIPE DEL AGUA</h4>
-    <small>Ruta 2</small>
-    <p>Chofer: JUAN RODOLFO MORALES PEREZ</p>
-    <p>40 / 350 clientes por visitar</p>
-    <button class="btn" >→</button>
-  </div>
-
-</body>
-</html>
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-supervisor-navbar paginaActual="inicio"></app-supervisor-navbar> 
+</ion-footer>

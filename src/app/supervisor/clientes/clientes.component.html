@@ -1,0 +1,107 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
+    <ion-grid fixed>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+        <ion-col size="auto">
+          <img src="./assets/logo.png" alt="Logo" class="logo" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>CLIENTES</h1>
+        <small>Gestiona tu cartera de clientes</small>
+      </div>
+      <div class="badge-count">
+        {{ clientes.length }}
+      </div>
+    </div>
+
+    <div class="search-container">
+      <ion-searchbar 
+        placeholder="Buscar cliente..." 
+        [debounce]="500" 
+        (ionInput)="buscarCliente($event)"
+        mode="ios">
+      </ion-searchbar>
+    </div>
+  </div>
+
+  <div class="lista-container">
+    
+    @if (cargando) {
+      <div class="grid-clientes">
+        @for (item of [1,2,3,4,5,6]; track item) {
+          <div class="cliente-card skeleton">
+            <ion-skeleton-text animated style="width: 50px; height: 50px; border-radius: 50%; margin-bottom: 10px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 20px; margin-bottom: 5px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 60%; height: 15px;"></ion-skeleton-text>
+          </div>
+        }
+      </div>
+    } @else {
+      
+      <div class="grid-clientes">
+        @for (cliente of clientesFiltrados; track cliente.id) {
+          <div class="cliente-card">
+            
+            <div class="icon-header">
+              {{ obtenerIniciales(cliente.nombre) }}
+            </div>
+
+            <div class="info">
+              <h3>{{ cliente.nombre }}</h3>
+              
+              <p class="dato">
+                <ion-icon name="call-outline"></ion-icon> {{ cliente.telefono }}
+              </p>
+              
+              <div class="precio-badge">
+                @if (cliente.tipoPrecio) {
+                  {{ cliente.tipoPrecio.tipoCompra }}
+                } @else {
+                  Sin Tarifa
+                }
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn-icon edit" (click)="abrirModalEditar(cliente)">
+                <ion-icon name="create-outline"></ion-icon>
+              </button>
+              <button class="btn-icon delete" (click)="confirmarEliminar(cliente)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <ion-icon name="people-outline"></ion-icon>
+            <p>No se encontraron clientes</p>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <div style="height: 100px;"></div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" style="margin-bottom: 60px; margin-right: 10px;">
+    <ion-fab-button (click)="abrirModalCrear()" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-supervisor-navbar paginaActual="clientes"></app-supervisor-navbar>
+</ion-footer>

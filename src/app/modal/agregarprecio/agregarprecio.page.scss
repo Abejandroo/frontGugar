@@ -1,0 +1,38 @@
+// Estilo "Burbuja" para los inputs
+ion-item {
+  --background: #ffffff;
+  --border-radius: 16px;
+  --padding-start: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  
+  // --- CORRECCIÓN DE COLORES ---
+  --color: #333333; // Color de la etiqueta (Label)
+  
+  ion-input {
+    --color: #333333; // Color de lo que escribes
+    --placeholder-color: #888888; // Color del texto de ejemplo
+    --placeholder-opacity: 0.7;
+    color: #333333 !important; // Refuerzo para asegurar que sea negro
+    font-weight: 500;
+  }
+  // -----------------------------
+
+  // Borde de color lateral
+  border-left: 5px solid var(--ion-color-primary);
+
+  ion-icon {
+    margin-right: 8px;
+    opacity: 0.8;
+  }
+
+  &.item-has-focus {
+    border-left: 5px solid var(--ion-color-tertiary);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+
+    ion-icon {
+      color: var(--ion-color-tertiary) !important;
+    }
+  }
+}
