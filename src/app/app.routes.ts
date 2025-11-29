@@ -82,15 +82,15 @@ export const routes: Routes = [
   },
 
   // ========================================
-  // RUTAS SUPERVISOR (de tu colaborador)
+  // RUTAS SUPERVISOR
   // ========================================
-  {
-    path: 'usuario/supervisor',
-    loadComponent: () => import('./usuario/supervisor/supervisor.page').then(m => m.SupervisorPage),
-    canActivate: [authGuard],
-    data: { role: 'supervisor' },
-    providers: [Auth, provideHttpClient()]
-  },
+  // {
+  //   path: 'usuario/supervisor',
+  //   loadComponent: () => import('./usuario/supervisor/supervisor.page').then(m => m.SupervisorPage),
+  //   canActivate: [authGuard],
+  //   data: { role: 'supervisor' },
+  //   providers: [Auth, provideHttpClient()]
+  // },
   {
     path: 'supervisores/home',
     loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
@@ -123,7 +123,7 @@ export const routes: Routes = [
   },
 
   // ========================================
-  // RUTAS REPARTIDOR (las tuyas)
+  // RUTAS REPARTIDOR 
   // ========================================
   {
     path: 'usuario/repartidor',
@@ -181,7 +181,7 @@ export const routes: Routes = [
   },
 
   // ========================================
-  // MODALES REPARTIDOR (los tuyos)
+  // MODALES REPARTIDOR REPARTIDOR
   // ========================================
   {
     path: 'modal-todos-clientes',
