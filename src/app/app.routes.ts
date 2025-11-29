@@ -55,8 +55,14 @@ export const routes: Routes = [
   {
     path: 'gestion-rutas',
     loadComponent: () => import('./pages/gestion-rutas/gestion-rutas.page').then( m => m.GestionRutasPage),
-    canActivate: [authGuard],  
-    data: { role: 'admin' },       
+    // canActivate: [authGuard],  
+    // data: { role: 'admin' },       
+  },
+  {
+    path: 'detalle-ruta/:id',
+    loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage),
+    // canActivate: [authGuard],  
+    // data: { role: 'admin' },       
   },
   {
     path: 'conductores',
@@ -89,7 +95,7 @@ export const routes: Routes = [
   
   {
     path: 'detalle-ruta',
-    loadComponent: () => import('./modal/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage),
+    loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage),
     canActivate: [authGuard], data: { role: 'admin' }
 
   },
