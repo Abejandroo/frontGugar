@@ -1,12 +1,5 @@
 /*
  * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
 /* Core CSS required for Ionic components to work properly */
@@ -25,28 +18,221 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+// ========================================
+// ESTILOS GENERALES
+// ========================================
+
 ion-item ion-icon {
   color: rgb(68, 68, 68) !important;
 }
+
 ion-toolbar {
   --background: transparent !important;
 }
+
 ion-menu[menuId="admin-menu"] {
   z-index: 9999 !important;
 }
 
+// ========================================
+// LEAFLET
+// ========================================
+
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.leaflet-popup-content {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.leaflet-control-zoom {
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.leaflet-control-zoom a {
+  background-color: white;
+  color: #333;
+  
+  &:hover {
+    background-color: #f4f4f4;
+  }
+}
+
+// ========================================
+// FIX CRÍTICO: Z-INDEX Y BACKDROP
+// ========================================
+
+// IMPORTANTE: El backdrop NUNCA debe bloquear los controles
 ion-backdrop {
-  z-index: 9998 !important;
+  pointer-events: none !important; // ✅ Permite clicks a través del backdrop
+}
+
+// Los overlays SÍ deben capturar eventos
+ion-alert,
+ion-action-sheet,
+ion-modal,
+ion-loading,
+ion-toast {
+  pointer-events: auto !important;
+  z-index: 20001 !important;
+  
+  // El contenido interno SÍ debe ser clickeable
+  .alert-wrapper,
+  .action-sheet-wrapper,
+  .modal-wrapper {
+    pointer-events: auto !important;
+    z-index: 20002 !important;
+  }
+}
+
+// ========================================
+// ACTION SHEETS (SELECTS)
+// ========================================
+
+.custom-action-sheet {
+  .action-sheet-wrapper {
+    .action-sheet-button {
+      font-size: 16px;
+    }
+  }
+}
+
+// ========================================
+// MODALS
+// ========================================
+
+.modal-detalle-cliente {
+  --height: auto;
+  --max-height: 90%;
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  
+  ion-toolbar {
+    --background: white;
+    --color: #1c1c1e;
+    --border-width: 0 0 1px 0;
+    --border-color: #e5e5ea;
+    
+    ion-title {
+      font-weight: 600;
+      font-size: 17px;
+    }
+    
+    ion-button {
+      --color: #007aff;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    --width: 500px;
+    --height: 80%;
+    --border-radius: 16px;
+  }
+}
+
+.modal-dividir-ruta {
+  --height: auto;
+  --border-radius: 16px 16px 0 0;
+  
+  @media (min-width: 768px) {
+    --width: 450px;
+    --height: auto;
+    --border-radius: 16px;
+  }
+}
+
+// ========================================
+// ALERTS
+// ========================================
+
+// Alert general limpio
+ion-alert {
+  .alert-wrapper {
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  
+  .alert-head {
+    padding-top: 20px;
+  }
+  
+  .alert-title {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  
+  .alert-sub-title {
+    font-size: 13px;
+    color: #8e8e93;
+    margin-top: 8px;
+  }
+  
+  .alert-message {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  
+  .alert-button-group {
+    border-top: 1px solid #e5e5ea;
+    
+    .alert-button {
+      font-size: 17px;
+      
+      &[role="destructive"] {
+        color: #ff3b30;
+        font-weight: 600;
+      }
+      
+      &[role="cancel"] {
+        color: #007aff;
+      }
+    }
+  }
+}
+
+// Alert específico para eliminar ruta
+.alert-eliminar-ruta {
+  .alert-wrapper {
+    max-width: 400px;
+  }
+  
+  .alert-message {
+    text-align: left;
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+      
+      li {
+        padding: 8px 12px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Alert para eliminar cliente
+.alert-eliminar-cliente {
+  .alert-wrapper {
+    max-width: 320px;
+  }
 }
 .custom-alert {
   --backdrop-opacity: 0.6;

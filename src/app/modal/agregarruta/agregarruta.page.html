@@ -1,6 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Planificar Ruta</ion-title> <ion-buttons slot="end">
+    <ion-title>Planificar Ruta</ion-title>
+    <ion-buttons slot="end">
       <ion-button (click)="cerrarModal()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
@@ -11,88 +12,195 @@
 <ion-content class="ion-padding">
   
   <form [formGroup]="formRuta">
-    <ion-list>
-      <ion-item>
-        <ion-input label="NOMBRE DE LA RUTA" labelPlacement="floating" placeholder="Ej. RUTA CENTRO" formControlName="nombre"></ion-input>
-      </ion-item>
+    
+    <!-- MODO: Nueva ruta o Agregar a existente -->
+    <ion-segment [(ngModel)]="modoCreacion" (ionChange)="onModoChange()" [ngModelOptions]="{standalone: true}">
+      <ion-segment-button value="nueva">
+        <ion-label>Nueva Ruta</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="agregar" [disabled]="rutasConDiasFaltantes.length === 0">
+        <ion-label>Agregar Día</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
+    <ion-list>
+      
+      <!-- OPCIÓN A: Crear nueva ruta -->
+      @if (modoCreacion === 'nueva') {
+        <ion-item>
+          <ion-input 
+            label="NOMBRE DE LA RUTA" 
+            labelPlacement="floating" 
+            placeholder="Ej. RUTA CENTRO" 
+            formControlName="nombreRuta">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-select 
+            label="SUPERVISOR (Opcional)" 
+            labelPlacement="floating" 
+            formControlName="supervisorId" 
+            placeholder="Selecciona supervisor" 
+            interface="popover">
+            <ion-select-option [value]="null">Sin supervisor</ion-select-option>
+            @for (sup of supervisores; track sup.id) {
+              <ion-select-option [value]="sup.id">{{ sup.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-select 
+            label="REPARTIDOR (Opcional)" 
+            labelPlacement="floating" 
+            formControlName="repartidorId" 
+            placeholder="Selecciona repartidor" 
+            interface="popover">
+            <ion-select-option [value]="null">Sin repartidor</ion-select-option>
+            @for (rep of repartidores; track rep.id) {
+              <ion-select-option [value]="rep.id">{{ rep.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      }
+
+      <!-- OPCIÓN B: Agregar día a ruta existente -->
+      @if (modoCreacion === 'agregar') {
+        <ion-item>
+          <ion-select 
+            label="SELECCIONA RUTA" 
+            labelPlacement="floating" 
+            formControlName="rutaExistenteId" 
+            placeholder="Elige una ruta" 
+            interface="action-sheet"
+            (ionChange)="onRutaExistenteChange($event)">
+            @for (ruta of rutasConDiasFaltantes; track ruta.id) {
+              <ion-select-option [value]="ruta.id">
+                {{ ruta.nombre }} (Le faltan: {{ ruta.diasFaltantes.join(', ') }})
+              </ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        @if (formRuta.get('rutaExistenteId')?.value) {
+          <ion-note class="ion-padding-start" color="primary">
+            <small>
+              💡 Días disponibles: {{ getDiasFaltantes(formRuta.get('rutaExistenteId')?.value).join(', ') }}
+            </small>
+          </ion-note>
+        }
+      }
+
+      <!-- DÍA DE VISITA (Obligatorio) -->
       <ion-item>
-        <ion-select label="REPARTIDOR" labelPlacement="floating" formControlName="rutaId" placeholder="Selecciona un conductor" interface="popover"> 
-          @for (rep of repartidores; track rep.id) {
-            <ion-select-option [value]="rep.id">{{ rep.name }}</ion-select-option>
+        <ion-select 
+          label="DÍA DE VISITA" 
+          labelPlacement="floating" 
+          formControlName="diaSemana" 
+          placeholder="Selecciona días" 
+          interface="popover">
+          @for (dia of diasSemana; track dia.value) {
+            <ion-select-option [value]="dia.value">
+              {{ dia.label }}
+            </ion-select-option>
           }
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-input label="DESCRIPCIÓN / ZONA" labelPlacement="floating" formControlName="lugarEntrega"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-input label="CANTIDAD PAQUETES" type="number" labelPlacement="floating" formControlName="cantidad" min="0"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-input label="ACCIONES ESPECIALES" labelPlacement="floating" formControlName="acciones"></ion-input>
-      </ion-item>
     </ion-list>
 
-    <div class="ion-text-center ion-margin-top">
-      <p class="ion-text-muted">
-        <ion-icon name="finger-print"></ion-icon> Toca el mapa para agregar paradas (A, B, C...)
-      </p>
-      <ion-badge color="secondary" *ngIf="puntosRuta.length > 0">
-        {{ puntosRuta.length }} Paradas marcadas
-      </ion-badge>
-    </div>
+    <!-- SECCIÓN: CLIENTES DISPONIBLES -->
+    <div class="ion-margin-top">
+      <div class="section-header">
+        <h3>Clientes Disponibles</h3>
+        <ion-badge color="secondary">{{ clientesDisponibles.length }}</ion-badge>
+      </div>
 
-    <div class="map-container ion-margin-top">
-      <google-map 
-        height="350px" 
-        width="100%" 
-        [center]="center" 
-        [zoom]="zoom"
-        (mapClick)="agregarPuntoAlMapa($event)">
-        
-        <map-polyline [path]="puntosRuta" [options]="polylineOptions"></map-polyline>
-        
-        @for (punto of puntosRuta; track punto; let i = $index) {
-          <map-marker 
-            [position]="punto"
-            [label]="obtenerLetraMarcador(i)"
-            [title]="'Parada ' + (i + 1)">
-          </map-marker>
+      <!-- Buscador -->
+      <ion-searchbar 
+        [(ngModel)]="busquedaCliente" 
+        [ngModelOptions]="{standalone: true}"
+        placeholder="Buscar cliente..." 
+        animated>
+      </ion-searchbar>
+
+      <!-- Lista de clientes -->
+      <ion-list class="clientes-list">
+        @for (cliente of clientesFiltrados; track cliente.id) {
+          <ion-item button (click)="seleccionarCliente(cliente)">
+            <ion-label>
+              <h3>{{ cliente.representante }}</h3>
+              <p>{{ cliente.direcciones[0]?.direccion }}, {{ cliente.direcciones[0]?.colonia }}</p>
+            </ion-label>
+            <ion-badge slot="end" color="primary">
+              ${{ cliente.tipoPrecio?.precioPorGarrafon || 'N/A' }}
+            </ion-badge>
+          </ion-item>
         }
-
-      </google-map>
+        @empty {
+          <ion-item>
+            <ion-label class="ion-text-center">
+              <p>No hay clientes disponibles</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
     </div>
 
-    @if (puntosRuta.length > 0) {
-      <ion-grid>
-        <ion-row>
-          <ion-col size="4">
-            <ion-button fill="outline" color="medium" expand="block" size="small" (click)="deshacerUltimo()">
-              <ion-icon name="arrow-undo" slot="icon-only"></ion-icon>
-            </ion-button>
-          </ion-col>
-          <ion-col size="4">
-            <ion-button fill="outline" color="danger" expand="block" size="small" (click)="limpiarRuta()">
-              <ion-icon name="trash" slot="icon-only"></ion-icon>
-            </ion-button>
-          </ion-col>
-          <ion-col size="4">
-            <ion-button fill="solid" color="tertiary" expand="block" size="small" (click)="cerrarCircuito()" [disabled]="puntosRuta.length < 2">
-              <ion-icon name="repeat" slot="icon-only"></ion-icon>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+    <!-- SECCIÓN: ORDEN DE VISITA -->
+    @if (clientesSeleccionados.length > 0) {
+      <div class="ion-margin-top">
+        <div class="section-header">
+          <h3>Orden de Visita</h3>
+          <ion-badge color="success">{{ clientesSeleccionados.length }} clientes</ion-badge>
+        </div>
+
+        <ion-list>
+          @for (cliente of clientesSeleccionados; track cliente.id; let i = $index) {
+            <ion-item>
+              <ion-badge slot="start" color="tertiary">{{ obtenerLetraMarcador(i) }}</ion-badge>
+              <ion-label>
+                <h3>{{ cliente.representante }}</h3>
+                <p>{{ cliente.direcciones[0]?.colonia }}</p>
+              </ion-label>
+              <ion-button slot="end" fill="clear" (click)="quitarCliente(i)">
+                <ion-icon name="close" color="danger"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="danger" 
+          (click)="limpiarTodo()">
+          <ion-icon name="trash" slot="start"></ion-icon>
+          Limpiar Todo
+        </ion-button>
+      </div>
     }
 
+    <!-- MAPA DE LEAFLET -->
+    <div class="ion-margin-top">
+      <h3>Vista de Ruta</h3>
+      <div id="mapLeaflet" style="height: 300px; width: 100%; border-radius: 8px;"></div>
+    </div>
+
+    <!-- BOTÓN GUARDAR -->
     <div class="ion-padding-top">
-      <ion-button expand="block" (click)="agregarGrupo()" shape="round">
+      <ion-button 
+        expand="block" 
+        (click)="agregarGrupo()" 
+        shape="round"
+        [disabled]="formRuta.invalid || clientesSeleccionados.length === 0">
         <ion-icon name="save-outline" slot="start"></ion-icon>
-        Guardar Ruta Completa
+        @if (modoCreacion === 'nueva') {
+          Crear Ruta con {{ clientesSeleccionados.length }} clientes
+        } @else {
+          Agregar Día con {{ clientesSeleccionados.length }} clientes
+        }
       </ion-button>
     </div>
 
