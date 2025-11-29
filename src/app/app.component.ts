@@ -46,6 +46,14 @@ import {
   flag,
   volumeMute,
   pauseCircle,
+  downloadOutline,
+  document,
+  folderOpen,
+  documentText,
+  clipboardOutline,
+  closeCircle,
+  listOutline,
+  chevronDown,
 } from 'ionicons/icons';
 
 @Component({
@@ -98,6 +106,14 @@ export class AppComponent {
   'flag':flag,
   'volume-mute':volumeMute,
   'pause-circle': pauseCircle,
+  'download-outline': downloadOutline,
+  'document': document,
+  'folder-open': folderOpen,
+  'document-text': documentText,
+  'clipboard-outline': clipboardOutline,
+  'close-circle': closeCircle,
+  'list-outline': listOutline,
+  'chevron-down': chevronDown,
 });
  }
   isAdmin() {
