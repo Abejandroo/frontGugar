@@ -1,0 +1,48 @@
+<div class="navbar-container">
+    <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'inicio'"
+    (click)="navegar('inicio')"> 
+    <ion-icon name="home"></ion-icon>
+    
+    @if (paginaActual === 'inicio') {
+      <span>Inicio</span>
+    }
+  </div>
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'rutas'"
+    (click)="navegar('rutas')"> 
+    <ion-icon name="compass"></ion-icon>
+    
+    @if (paginaActual === 'rutas') {
+      <span>Rutas</span>
+    }
+  </div>
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'clientes'"
+    (click)="navegar('clientes')">
+    <ion-icon name="people"></ion-icon>
+    
+    @if (paginaActual === 'clientes') {
+      <span>Clientes</span>
+    }
+  </div>
+  <div 
+    class="nav-item" 
+    [class.active]="paginaActual === 'precios'"
+    (click)="navegar('precios')">
+    <ion-icon name="pricetag"></ion-icon>
+    
+    @if (paginaActual === 'precios') {
+      <span>Precios</span>
+    }
+  </div>
+  <div 
+    class="nav-item" 
+    (click)="abrirMenu($event)">
+    <ion-icon name="settings"></ion-icon>
+  </div>
+
+</div>

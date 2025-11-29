@@ -1,0 +1,73 @@
+<ion-content [fullscreen]="true">
+  
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>LISTA DE PRECIOS</h1>
+        <small>Gestiona los costos por garrafón</small>
+      </div>
+      <div class="badge-count">
+        {{ precios.length }}
+      </div>
+    </div>
+  </div>
+
+  <div class="lista-container">
+    
+    @if (cargando) {
+      @for (item of [1,2,3]; track item) {
+        <div class="precio-card skeleton">
+          <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 40px;"></ion-skeleton-text>
+        </div>
+      }
+    } @else {
+      
+      <div class="grid-precios">
+        @for (precio of precios; track precio.id) {
+          <div class="precio-card">
+            
+            <div class="icon-header">
+              <ion-icon name="pricetag"></ion-icon>
+            </div>
+
+            <div class="info">
+              <h3>{{ precio.tipoCompra }}</h3>
+              <h1 class="valor">${{ precio.precioPorGarrafon | number:'1.2-2' }}</h1>
+            </div>
+
+        <div class="actions">
+          <ion-button fill="clear" class="btn-icon edit" (click)="abrirModalEditar(precio); $event.stopPropagation()">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" class="btn-icon delete" (click)="confirmarEliminar(precio); $event.stopPropagation()">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <p>No hay precios registrados</p>
+          </div>
+        }
+      </div>
+
+    }
+
+  </div>
+
+  <div style="height: 100px;"></div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" style="margin-bottom: 60px; margin-right: 10px;">
+    <ion-fab-button (click)="abrirModalCrear()" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-supervisor-navbar paginaActual="precios"></app-supervisor-navbar>
+</ion-footer>

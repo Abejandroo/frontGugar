@@ -1,0 +1,106 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Editar Cliente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="form-container">
+    <p class="intro-text">Modifica los datos y la ubicación del cliente.</p>
+
+    <form [formGroup]="formCliente">
+      
+      <h3 class="section-title">Datos Personales</h3>
+
+      <ion-item lines="none">
+        <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Nombre" labelPlacement="floating" formControlName="nombre"></ion-input>
+      </ion-item>
+      @if (formCliente.get('nombre')?.invalid && formCliente.get('nombre')?.touched) {
+        <div class="error-msg">Nombre requerido.</div>
+      }
+
+      <ion-item lines="none">
+        <ion-icon name="call-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Teléfono" labelPlacement="floating" formControlName="telefono" type="tel" maxlength="15"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Correo" labelPlacement="floating" formControlName="correo" type="email"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-icon name="pricetag-outline" slot="start" color="primary"></ion-icon>
+        <ion-select 
+          label="Tipo de Precio" 
+          labelPlacement="floating" 
+          formControlName="tipoPrecioId"
+          interface="popover"
+          placeholder="Seleccionar tarifa">
+          @for (precio of listaPrecios; track precio.id) {
+            <ion-select-option [value]="precio.id">
+              {{ precio.tipoCompra }} - ${{ precio.precioPorGarrafon }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <h3 class="section-title ion-margin-top">Ubicación</h3>
+
+      <ion-item lines="none">
+        <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Calle y Número" labelPlacement="floating" formControlName="calle"></ion-input>
+      </ion-item>
+      
+      <ion-item lines="none">
+        <ion-icon name="home-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Colonia" labelPlacement="floating" formControlName="colonia"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
+        <ion-textarea label="Referencia" labelPlacement="floating" formControlName="referencia" rows="2"></ion-textarea>
+      </ion-item>
+
+      <div class="map-section ion-margin-top">
+        <p class="map-instruction">
+          <ion-icon name="finger-print"></ion-icon> Toca para actualizar la ubicación
+        </p>
+        
+        <div class="map-wrapper">
+          <google-map 
+            height="300px" 
+            width="100%" 
+            [center]="center" 
+            [zoom]="zoom" 
+            [options]="mapOptions" 
+            (mapClick)="agregarMarcador($event)">
+            
+            @if (markerPosition) {
+              <map-marker [position]="markerPosition" [options]="pinOptions"></map-marker>
+            }
+          </google-map>
+        </div>
+      </div>
+
+      <div class="ion-padding-top ion-margin-top">
+        <ion-button expand="block" shape="round" (click)="actualizarCliente()" [disabled]="cargando">
+          @if (cargando) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            Actualizar Cambios
+          }
+        </ion-button>
+      </div>
+
+    </form>
+  </div>
+</ion-content>

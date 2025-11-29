@@ -25,8 +25,8 @@ export const authGuard: CanActivateFn = async (route, state) => {
       icon: 'lock-closed'
     });
     await toast.present();
-    if (usuario.role === 'repartidor') router.navigate(['/usuario/repartidor']);
-    else if (usuario.role === 'supervisor') router.navigate(['/usuario/supervisor']);
+    if (usuario.role === 'repartidor') router.navigate(['/repartidor/home']);
+    else if (usuario.role === 'supervisor') router.navigate(['/supervisores/home']);
     else router.navigate(['/auth/login']);
     
     return false;

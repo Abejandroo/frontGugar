@@ -46,7 +46,7 @@ export class LoginPage {
           if (this.rolSeleccionado === 'admin') {
             this.router.navigate(['/usuario/admin']);
           } else if (this.rolSeleccionado === 'supervisor') {
-            this.router.navigate(['/usuario/supervisor']);
+            this.router.navigate(['/supervisores/home']);
           } else if (this.rolSeleccionado === 'repartidor') {
             this.router.navigate(['/usuario/repartidor']);
           }

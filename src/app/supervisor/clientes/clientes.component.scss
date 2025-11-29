@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+ion-content {
+  --background: #f6f8fb;
+  font-family: 'Poppins', sans-serif;
+}
+
+// --- ENCABEZADO AZUL ---
+.header {
+  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
+  padding: 30px 20px 40px 20px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 0 4px 20px rgba(0, 82, 212, 0.25);
+  position: relative;
+  
+  // ✨ AJUSTE CLAVE: Para que el azul suba detrás del logo y la barra de estado
+  padding-top: calc(var(--ion-safe-area-top) + 50px); 
+  margin-top: -60px; 
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    margin-top: 10px;
+
+    h1 { color: #fff; font-weight: 700; font-size: 1.8rem; margin: 0; }
+    small { color: rgba(255,255,255,0.9); font-size: 0.9rem; }
+    
+    .badge-count {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+  }
+}
+
+// --- LOGO (ESTE ERA EL CULPABLE) ---
+.logo {
+  height: 40px; // Tamaño controlado
+  width: auto;
+  object-fit: contain;
+  margin-top: 10px; // Un poco de espacio arriba
+  position: relative;
+  z-index: 10; // Para asegurar que quede encima del fondo
+}
+
+// --- BUSCADOR ---
+.search-container {
+  ion-searchbar {
+    --background: #ffffff;
+    --border-radius: 14px;
+    --placeholder-color: #888;
+    --icon-color: #0052d4;
+    --box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 0;
+  }
+}
+
+// --- CONTENEDOR PRINCIPAL ---
+.lista-container {
+  padding: 20px;
+  margin-top: -20px; // Sube un poco sobre el header azul
+}
+
+// --- GRID SYSTEM (CUADRÍCULA VERTICAL) ---
+.grid-clientes {
+  display: grid;
+  // Tarjetas adaptables (mínimo 160px de ancho)
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+  gap: 15px;
+}
+
+// --- TARJETA DE CLIENTE ---
+.cliente-card {
+  background: #fff;
+  border-radius: 24px; 
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s;
+  
+  // Altura mínima para que se vean uniformes y "grandes"
+  min-height: 240px; 
+
+  &:active { transform: scale(0.98); }
+
+  // Icono Circular con Iniciales
+  .icon-header {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px auto;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+
+  .info {
+    h3 {
+      font-size: 1.1rem;
+      color: #333;
+      margin: 0 0 5px 0;
+      font-weight: 700;
+      white-space: nowrap; 
+      overflow: hidden;
+      text-overflow: ellipsis; 
+    }
+
+    .dato {
+      font-size: 0.8rem;
+      color: #666;
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      
+      ion-icon { font-size: 1rem; color: #999; }
+    }
+
+    .precio-badge {
+      margin-top: 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  // Botones de Acción (Abajo)
+  .actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    border-top: 1px solid #f4f4f4;
+    padding-top: 10px;
+
+    .btn-icon {
+      background: #f9f9f9;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      color: #666;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &.edit { color: #ffb300; } // Amarillo
+      &.delete { color: #e53935; } // Rojo
+      
+      &:active { background: #eee; }
+    }
+  }
+}
+
+// Estado Vacío
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  ion-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+}
+
+// Skeleton Loading
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
