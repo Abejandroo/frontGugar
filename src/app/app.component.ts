@@ -54,6 +54,9 @@ import {
   closeCircle,
   listOutline,
   chevronDown,
+  pricetag,
+  lockClosed,
+  
 } from 'ionicons/icons';
 
 @Component({
@@ -114,6 +117,8 @@ export class AppComponent {
   'close-circle': closeCircle,
   'list-outline': listOutline,
   'chevron-down': chevronDown,
+  'pricetag': pricetag,
+  'lock-closed': lockClosed 
 });
  }
   isAdmin() {
