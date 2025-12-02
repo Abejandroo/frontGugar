@@ -82,13 +82,11 @@ crearRutaConDia(data: {
 
 
 
-obtenerClientesDisponibles(diaRutaId?: number): Observable<any[]> {
-  const url = diaRutaId 
-    ? `${this.url}/rutas/clientes-disponibles/${diaRutaId}`
-    : `${this.url}/rutas/clientes-disponibles`;
-  
-  return this.http.get<any[]>(url);
-}
+// Cambiamos la URL para apuntar al controlador de Clientes
+  obtenerClientesDisponibles(): Observable<any[]> {
+    // Usamos el endpoint que ya probamos ayer
+    return this.http.get<any[]>(`${this.url}/clientes/all`);
+  }
 
 
 

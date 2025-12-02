@@ -31,15 +31,17 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
   clientesSeleccionados: any[] = [];
   busquedaCliente: string = '';
   
+ // 2. CORREGIR EL BUSCADOR (Getter)
   get clientesFiltrados() {
     if (!this.busquedaCliente.trim()) {
       return this.clientesDisponibles;
     }
     const busqueda = this.busquedaCliente.toLowerCase();
     return this.clientesDisponibles.filter(c => 
-      c.representante.toLowerCase().includes(busqueda) ||
-      c.negocio?.toLowerCase().includes(busqueda) ||
-      c.direcciones[0]?.direccion.toLowerCase().includes(busqueda)
+      // Buscamos por nombre (representante es un nombre viejo, mejor usa 'nombre')
+      (c.nombre || c.representante || '').toLowerCase().includes(busqueda) ||
+      // Buscamos por calle directa
+      (c.calle || '').toLowerCase().includes(busqueda)
     );
   }
 
@@ -110,26 +112,24 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
   // NUEVO: GESTIÓN DE CLIENTES
   // ========================================
 
+ // 1. CORREGIR EL FILTRO DE CARGA
   cargarClientesDisponibles() {
     this.rutasService.obtenerClientesDisponibles().subscribe({
       next: (clientes) => {
-        // Filtrar solo clientes con dirección válida
+        // AHORA VERIFICAMOS LOS CAMPOS DIRECTOS
         this.clientesDisponibles = clientes.filter(c => 
-          c.direcciones && 
-          c.direcciones.length > 0 && 
-          c.direcciones[0].latitud && 
-          c.direcciones[0].longitud
+          c.latitud && c.longitud // Verificamos que tenga coordenadas directas
         );
-        console.log('Clientes disponibles:', this.clientesDisponibles.length);
+        console.log('Clientes cargados:', this.clientesDisponibles);
       },
       error: (err) => {
         console.error('Error cargando clientes:', err);
-        this.mostrarToast('Error al cargar clientes disponibles', 'danger');
+        this.mostrarToast('Error al cargar clientes', 'danger');
       }
     });
   }
 
-  seleccionarCliente(cliente: any) {
+ seleccionarCliente(cliente: any) {
     // Verificar que no esté ya seleccionado
     if (this.clientesSeleccionados.find(c => c.id === cliente.id)) {
       this.mostrarToast('Cliente ya está en la ruta', 'warning');
@@ -142,14 +142,26 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     // Agregar marcador al mapa
     this.agregarMarcadorCliente(cliente);
 
-    this.mostrarToast(`${cliente.representante} agregado`, 'success');
+    // CORRECCIÓN AQUÍ: Usamos 'nombre' en lugar de 'representante'
+    this.mostrarToast(`${cliente.nombre} agregado`, 'success');
   }
 
-  agregarMarcadorCliente(cliente: any) {
+// 3. CORREGIR EL MAPA (LEAFLET)
+agregarMarcadorCliente(cliente: any) {
     if (!this.map) return;
 
-    const direccion = cliente.direcciones[0];
-    const latlng = L.latLng(direccion.latitud, direccion.longitud);
+    // CORRECCIÓN: Usamos coordenadas directas del cliente
+    // (Asegúrate de que latitud/longitud sean números)
+    const lat = Number(cliente.latitud);
+    const lng = Number(cliente.longitud);
+    
+    // Si no tiene coordenadas válidas, no hacemos nada o mostramos error
+    if (!lat || !lng) {
+      this.mostrarToast(`El cliente ${cliente.nombre} no tiene ubicación en el mapa`, 'warning');
+      return;
+    }
+
+    const latlng = L.latLng(lat, lng);
 
     // Obtener letra según orden
     const letra = this.obtenerLetraMarcador(this.clientesSeleccionados.length - 1);
@@ -159,11 +171,11 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
       icon: this.crearIconoLetra(letra)
     }).addTo(this.map);
 
-    // Popup con info del cliente
+    // CORRECCIÓN DEL POPUP: Usamos 'nombre', 'calle', 'colonia'
     marker.bindPopup(`
       <div style="text-align: center;">
-        <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
-        <small>${direccion.direccion}<br>${direccion.colonia}</small><br>
+        <strong style="font-size: 14px;">${letra}. ${cliente.nombre}</strong><br>
+        <small>${cliente.calle}<br>${cliente.colonia}</small><br>
         <strong style="color: #3880ff;">$${cliente.tipoPrecio?.precioPorGarrafon || 'N/A'}</strong>
       </div>
     `);
@@ -191,14 +203,20 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
       this.agregarMarcadorClienteSinMensaje(cliente);
     });
 
-    this.mostrarToast(`${clienteQuitado.representante} quitado`, 'warning');
+    // CORRECCIÓN AQUÍ: Usamos 'nombre'
+    this.mostrarToast(`${clienteQuitado.nombre} quitado`, 'warning');
   }
 
-  private agregarMarcadorClienteSinMensaje(cliente: any) {
+ private agregarMarcadorClienteSinMensaje(cliente: any) {
     if (!this.map) return;
 
-    const direccion = cliente.direcciones[0];
-    const latlng = L.latLng(direccion.latitud, direccion.longitud);
+    // CORRECCIÓN IGUAL QUE ARRIBA
+    const lat = Number(cliente.latitud);
+    const lng = Number(cliente.longitud);
+    
+    if (!lat || !lng) return;
+
+    const latlng = L.latLng(lat, lng);
     const letra = this.obtenerLetraMarcador(
       this.clientesSeleccionados.indexOf(cliente)
     );
@@ -207,10 +225,11 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
       icon: this.crearIconoLetra(letra)
     }).addTo(this.map);
 
+    // CORRECCIÓN DEL POPUP
     marker.bindPopup(`
       <div style="text-align: center;">
-        <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
-        <small>${direccion.direccion}<br>${direccion.colonia}</small><br>
+        <strong style="font-size: 14px;">${letra}. ${cliente.nombre}</strong><br>
+        <small>${cliente.calle}<br>${cliente.colonia}</small><br>
         <strong style="color: #3880ff;">$${cliente.tipoPrecio?.precioPorGarrafon || 'N/A'}</strong>
       </div>
     `);
@@ -266,19 +285,18 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  actualizarPolyline() {
+ // 4. CORREGIR LA LÍNEA DEL MAPA (POLYLINE)
+ actualizarPolyline() {
     if (!this.map) return;
 
-    // Eliminar polyline anterior
     if (this.polyline) {
       this.map.removeLayer(this.polyline);
     }
 
-    // Crear nueva polyline si hay clientes
     if (this.clientesSeleccionados.length > 1) {
       const latlngs = this.clientesSeleccionados.map(cliente => {
-        const dir = cliente.direcciones[0];
-        return L.latLng(dir.latitud, dir.longitud);
+        // CORRECCIÓN: Usar datos directos
+        return L.latLng(Number(cliente.latitud), Number(cliente.longitud));
       });
 
       this.polyline = L.polyline(latlngs, {
@@ -390,45 +408,6 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private async agregarDiaARutaExistente(formValues: any, clientesIds: number[]) {
-    const diaRutaData = {
-      rutaId: formValues.rutaExistenteId,
-      diaSemana: formValues.diaSemana,
-      clientesIds: clientesIds
-    };
-
-    this.rutasService.agregarDiaARuta(diaRutaData).subscribe({
-      next: () => {
-        this.mostrarToast('Día de ruta agregado correctamente', 'success');
-        this.modalController.dismiss(true);
-      },
-      error: (err) => {
-        console.error(err);
-        this.mostrarToast('Error al agregar día de ruta', 'danger');
-      }
-    });
-  }
-
-  private async crearNuevaRuta(formValues: any, clientesIds: number[]) {
-    const rutaData = {
-      nombre: formValues.nombreRuta.toUpperCase(),
-      supervisorId: formValues.supervisorId || null,
-      repartidorId: formValues.repartidorId || null,
-      diaSemana: formValues.diaSemana,
-      clientesIds: clientesIds
-    };
-
-    this.rutasService.crearRutaConDia(rutaData).subscribe({
-      next: () => {
-        this.mostrarToast('Ruta creada correctamente', 'success');
-        this.modalController.dismiss(true);
-      },
-      error: (err) => {
-        console.error(err);
-        this.mostrarToast('Error al crear la ruta', 'danger');
-      }
-    });
-  }
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({
@@ -448,5 +427,48 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+  }
+  // En agregarruta.page.ts
+
+  private async agregarDiaARutaExistente(formValues: any, clientesIds: number[]) {
+    const diaRutaData = {
+      rutaId: formValues.rutaExistenteId,
+      diaSemana: formValues.diaSemana,
+      clientesIds: clientesIds
+    };
+
+    this.rutasService.agregarDiaARuta(diaRutaData).subscribe({
+      next: () => {
+        // QUITAMOS EL TOAST DE AQUÍ ❌
+        // Solo cerramos y enviamos 'true' (éxito)
+        this.modalController.dismiss(true); 
+      },
+      error: (err) => {
+        console.error(err);
+        this.mostrarToast('Error al agregar día de ruta', 'danger'); // El de error sí lo dejamos
+      }
+    });
+  }
+
+  private async crearNuevaRuta(formValues: any, clientesIds: number[]) {
+    const rutaData = {
+      nombre: formValues.nombreRuta.toUpperCase(),
+      supervisorId: formValues.supervisorId || null,
+      repartidorId: formValues.repartidorId || null,
+      diaSemana: formValues.diaSemana,
+      clientesIds: clientesIds
+    };
+
+    this.rutasService.crearRutaConDia(rutaData).subscribe({
+      next: () => {
+        // QUITAMOS EL TOAST DE AQUÍ ❌
+        // Solo cerramos y enviamos 'true' (éxito)
+        this.modalController.dismiss(true);
+      },
+      error: (err) => {
+        console.error(err);
+        this.mostrarToast('Error al crear la ruta', 'danger');
+      }
+    });
   }
 }

@@ -28,16 +28,20 @@
   <div class="asignaciones-section">
     <div class="asignacion-col">
       <div class="asignacion-label">SUPERVISOR</div>
-      <ion-select [(ngModel)]="ruta.supervisor_id" (ionChange)="marcarCambio()" interface="action-sheet"
-        [interfaceOptions]="{
-        cssClass: 'custom-action-sheet',
-        backdropDismiss: false
-      }" placeholder="Sin asignar" class="select-personal">
-        <ion-select-option [value]="null">Sin asignar</ion-select-option>
-        <ion-select-option *ngFor="let sup of supervisores" [value]="sup.id">
-          {{ sup.name }}
-        </ion-select-option>
-      </ion-select>
+     <ion-select 
+  [(ngModel)]="ruta.supervisorId"  (ionChange)="marcarCambio()" 
+  interface="action-sheet"
+  placeholder="Sin asignar" 
+  class="select-personal">
+  
+  <ion-select-option [value]="null">Sin asignar</ion-select-option>
+  
+  @for (sup of supervisores; track sup.id) {
+    <ion-select-option [value]="sup.id">
+      {{ sup.name }}
+    </ion-select-option>
+  }
+</ion-select>
     </div>
 
     <div class="asignacion-col">
@@ -133,12 +137,11 @@
   </div>
 
   <!-- LISTA DE CLIENTES -->
-  <div class="clientes-section">
+ <div class="clientes-section">
     <div class="clientes-header">
       <h3>{{ clientesFiltrados.length }} clientes</h3>
     </div>
 
-    <!-- CLIENTE SELECCIONADO (APARECE ARRIBA) -->
     @if (clienteSeleccionado) {
     <ion-card class="cliente-card destacado" (click)="deseleccionarCliente()">
       <ion-card-header>
@@ -154,28 +157,18 @@
           <div class="orden-numero">{{ clienteSeleccionado.ordenVisita }}</div>
 
           <div class="cliente-datos">
-            <h4>{{ clienteSeleccionado.cliente.representante }}</h4>
-
-            @if (clienteSeleccionado.cliente.negocio) {
-            <p class="negocio">
-              <ion-icon name="business-outline"></ion-icon>
-              {{ clienteSeleccionado.cliente.negocio }}
-            </p>
-            }
+            <h4>{{ clienteSeleccionado.cliente.nombre }}</h4>
 
             <p class="direccion">
               <ion-icon name="location-outline"></ion-icon>
-              {{ clienteSeleccionado.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}
+              {{ clienteSeleccionado.cliente.calle }}, {{ clienteSeleccionado.cliente.colonia }}
             </p>
+            @if (clienteSeleccionado.cliente.referencia) {
+              <p class="referencia"><small>{{ clienteSeleccionado.cliente.referencia }}</small></p>
+            }
 
             <div class="badges">
-              <ion-badge color="primary">${{ clienteSeleccionado.precio?.precioPorGarrafon || 0 }}</ion-badge>
-              @if (clienteSeleccionado.es_credito) {
-              <ion-badge color="warning">Crédito</ion-badge>
-              }
-              @if (clienteSeleccionado.requiere_factura) {
-              <ion-badge color="tertiary">Factura</ion-badge>
-              }
+              <ion-badge color="primary">${{ clienteSeleccionado.cliente.tipoPrecio?.precioPorGarrafon || 0 }}</ion-badge>
             </div>
           </div>
 
@@ -194,7 +187,6 @@
     </ion-card>
     }
 
-    <!-- LISTA COMPLETA -->
     <ion-list lines="none">
       <ion-item-sliding *ngFor="let clienteRuta of clientesFiltrados; let i = index">
 
@@ -205,29 +197,17 @@
           <div class="orden-circulo" slot="start">{{ clienteRuta.ordenVisita || i + 1 }}</div>
 
           <ion-label>
-            <h3>{{ clienteRuta.cliente.representante }}</h3>
-
-            @if (clienteRuta.cliente.negocio) {
-            <p class="negocio-texto">
-              <ion-icon name="business-outline"></ion-icon>
-              {{ clienteRuta.cliente.negocio }}
-            </p>
-            }
+            <h3>{{ clienteRuta.cliente.nombre }}</h3>
 
             <p class="direccion-texto">
               <ion-icon name="location-outline"></ion-icon>
-              {{ clienteRuta.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}
+              {{ clienteRuta.cliente.calle }}, {{ clienteRuta.cliente.colonia }}
             </p>
 
             <div class="badges-row">
-              <ion-badge color="primary">${{ clienteRuta.precio?.precioPorGarrafon || 0 }}</ion-badge>
-              @if (clienteRuta.es_credito) {
-              <ion-badge color="warning">Crédito</ion-badge>
-              }
-              @if (clienteRuta.requiere_factura) {
-              <ion-badge color="tertiary">Factura</ion-badge>
-              }
-              @if (!clienteRuta.cliente.direcciones?.[0]?.latitud) {
+              <ion-badge color="primary">${{ clienteRuta.cliente.tipoPrecio?.precioPorGarrafon || 0 }}</ion-badge>
+              
+              @if (!clienteRuta.cliente.latitud) {
               <ion-badge color="danger">
                 <ion-icon name="warning-outline"></ion-icon>
                 Sin ubicación
@@ -241,7 +221,6 @@
           }
         </ion-item>
 
-        <!-- OPCIONES DESLIZABLES -->
         <ion-item-options side="end">
           <ion-item-option color="secondary" (click)="editarUbicacionCliente(clienteRuta)">
             <ion-icon name="create" slot="icon-only"></ion-icon>
