@@ -130,6 +130,14 @@ export const routes: Routes = [
     path: 'editarprecio',
     loadComponent: () => import('./modal/editarprecio/editarprecio.page').then( m => m.EditarprecioPage)
   },
+  {
+  path: 'supervisor/detalle-ruta/:id', // <--- El :id es clave
+  loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage)
+},  {
+    path: 'monitoreo-ruta',
+    loadComponent: () => import('./modal/monitoreo-ruta/monitoreo-ruta.page').then( m => m.MonitoreoRutaPage)
+  },
+
   
 
   
