@@ -133,7 +133,8 @@ export const routes: Routes = [
   {
   path: 'supervisor/detalle-ruta/:id', // <--- El :id es clave
   loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then( m => m.DetalleRutaPage)
-},  {
+},
+  {
     path: 'monitoreo-ruta',
     loadComponent: () => import('./modal/monitoreo-ruta/monitoreo-ruta.page').then( m => m.MonitoreoRutaPage)
   },
@@ -141,6 +142,7 @@ export const routes: Routes = [
   
 
   
+
 
 
 
