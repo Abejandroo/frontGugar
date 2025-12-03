@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Todos los Clientes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segmento" scrollable>
+      <ion-segment-button value="todos">
+        <ion-label>Todos ({{ clientes.length }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pendientes">
+        <ion-label>Pendientes ({{ clientesPendientesCount }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completados">
+        <ion-label>Completados ({{ clientesCompletadosCount }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="saltados">
+        <ion-label>Saltados ({{ clientesSaltadosCount }})</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (cliente of clientesFiltrados; track cliente.id) {
+      <ion-item [class.cliente-actual]="esClienteActual(cliente)">
+        
+        <ion-badge 
+          slot="start" 
+          [color]="getColorEstado(cliente)">
+          {{ getOrdenCliente(cliente) }}
+        </ion-badge>
+
+        <ion-label>
+          <h2>{{ cliente.cliente.representante }}</h2>
+          <p>{{ cliente.cliente.negocio || 'Sin negocio' }}</p>
+          <p class="direccion-text">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ cliente.cliente.direcciones[0]?.direccion }}, {{ cliente.cliente.direcciones[0]?.colonia }}
+          </p>
+          
+          @if (tieneVenta(cliente)) {
+            <p class="venta-info">
+              <ion-icon name="water-outline" color="success"></ion-icon>
+              {{ cliente.venta.cantidadVendida }} garrafones - ${{ cliente.venta.total }}
+            </p>
+          }
+
+          @if (fueSaltado(cliente)) {
+            <p class="salto-info">
+              <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+              {{ cliente.venta.motivoSalto || 'Cliente saltado' }}
+            </p>
+          }
+        </ion-label>
+
+        <div slot="end">
+          <ion-badge [color]="getColorEstado(cliente)">
+            {{ getEstadoTexto(cliente) }}
+          </ion-badge>
+        </div>
+      </ion-item>
+    } @empty {
+      <div class="empty-state">
+        <ion-icon name="people-outline" size="large"></ion-icon>
+        <p>No hay clientes en esta categoría</p>
+      </div>
+    }
+  </ion-list>
+</ion-content>

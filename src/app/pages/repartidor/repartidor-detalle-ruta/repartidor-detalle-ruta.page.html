@@ -1,0 +1,202 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ diaRuta?.nombre || 'Ruta' }}</ion-title>
+    <ion-buttons slot="end">
+      <!-- Toggle Voz -->
+      <ion-button (click)="toggleVoz()" [color]="vozHabilitada ? 'light' : 'medium'">
+        <ion-icon [name]="vozHabilitada ? 'volume-high' : 'volume-mute'"></ion-icon>
+      </ion-button>
+      <ion-badge color="light">
+        {{ clientesVisitadosCount }}/{{ clientesOrdenados.length }}
+      </ion-badge>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <!-- MAPA -->
+  <div class="map-container">
+    <div id="mapRepartidor" style="height: 300px; width: 100%;"></div>
+    
+    @if (ubicacionActual) {
+      <div class="ubicacion-badge">
+        <ion-icon name="navigate"></ion-icon>
+        <span>GPS Activo</span>
+      </div>
+    }
+
+    <!-- INFORMACIÓN DE NAVEGACIÓN -->
+    @if (rutaIniciada && clienteActual && distanciaAlCliente > 0) {
+      <div class="navegacion-info">
+        <div class="info-item">
+          <ion-icon name="navigate-circle"></ion-icon>
+          <span>{{ (distanciaAlCliente * 1000).toFixed(0) }} m</span>
+        </div>
+        <div class="info-item">
+          <ion-icon name="time"></ion-icon>
+          <span>{{ tiempoEstimado.toFixed(0) }} min</span>
+        </div>
+        <!-- Botón para abrir Google Maps -->
+        <ion-button size="small" fill="clear" color="light" (click)="abrirNavegacion()">
+          <ion-icon name="navigate" slot="start"></ion-icon>
+          Navegar
+        </ion-button>
+      </div>
+    }
+  </div>
+
+  <!-- BOTÓN INICIAR RUTA -->
+  @if (!rutaIniciada) {
+    <div class="ion-padding">
+      <ion-button expand="block" size="large" (click)="iniciarRuta()">
+        <ion-icon name="play-circle" slot="start"></ion-icon>
+        Iniciar Ruta
+      </ion-button>
+      <p class="ion-text-center">
+        <small>Se optimizará el recorrido según tu ubicación</small>
+      </p>
+    </div>
+  }
+
+  <!-- ✅ RUTA COMPLETADA - Todos los clientes visitados -->
+  @if (rutaIniciada && todosClientesVisitados) {
+    <ion-card color="success">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="checkmark-circle"></ion-icon>
+          ¡Ruta Completada!
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="resumen-final">
+          <div class="resumen-item">
+            <span class="numero">{{ clientesCompletadosCount }}</span>
+            <span class="label">Ventas</span>
+          </div>
+          <div class="resumen-item">
+            <span class="numero">{{ clientesSaltadosCount }}</span>
+            <span class="label">Saltados</span>
+          </div>
+          <div class="resumen-item">
+            <span class="numero">{{ clientesOrdenados.length }}</span>
+            <span class="label">Total</span>
+          </div>
+        </div>
+        
+        <ion-button expand="block" color="light" (click)="finalizarRuta()">
+          <ion-icon name="flag" slot="start"></ion-icon>
+          Finalizar Ruta
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  <!-- CLIENTE ACTUAL -->
+  @if (rutaIniciada && clienteActual) {
+    <ion-card class="cliente-actual-card">
+      <ion-card-header>
+        <div class="cliente-header">
+          <div>
+            <ion-badge color="warning">Cliente Actual</ion-badge>
+            <ion-card-title>{{ clienteActual.cliente.representante }}</ion-card-title>
+          </div>
+          <ion-button fill="clear" (click)="editarCliente()">
+            <ion-icon name="create-outline" color="primary"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="cliente-info">
+          <div class="info-item">
+            <ion-icon name="storefront-outline"></ion-icon>
+            <span>{{ clienteActual.cliente.negocio || 'Sin negocio' }}</span>
+          </div>
+          <div class="info-item">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ clienteActual.cliente.direcciones[0]?.direccion }}, {{ clienteActual.cliente.direcciones[0]?.colonia }}</span>
+          </div>
+          <div class="info-item">
+            <ion-icon name="call-outline"></ion-icon>
+            <span>{{ clienteActual.cliente.telefono || 'Sin teléfono' }}</span>
+          </div>
+          <div class="info-item">
+            <ion-icon name="cash-outline"></ion-icon>
+            <span>${{ clienteActual.precio?.precioPorGarrafon || 'N/A' }} / garrafón</span>
+          </div>
+        </div>
+
+        <!-- Botón de navegación destacado -->
+        <ion-button expand="block" fill="outline" color="primary" (click)="abrirNavegacion()" class="boton-navegar">
+          <ion-icon name="navigate" slot="start"></ion-icon>
+          Abrir en Google Maps
+        </ion-button>
+
+        <div class="acciones">
+          <ion-button expand="block" color="success" (click)="agregarVenta()">
+            <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+            Registrar Venta
+          </ion-button>
+          
+          <ion-button expand="block" fill="outline" color="danger" (click)="saltarCliente()">
+            <ion-icon name="play-skip-forward" slot="start"></ion-icon>
+            Saltar Cliente
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  <!-- PRÓXIMOS CLIENTES -->
+  @if (rutaIniciada && proximosClientes.length > 0) {
+    <div class="proximos-section">
+      <div class="section-header">
+        <h3>Próximos Clientes</h3>
+        <ion-button fill="clear" size="small" (click)="verTodosClientes()">
+          Ver todos ({{ clientesOrdenados.length }})
+          <ion-icon name="chevron-forward" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+
+      <ion-list>
+        @for (cliente of proximosClientes; track cliente.id) {
+          <ion-item>
+            <ion-badge slot="start" color="medium">
+              {{ getOrdenCliente(cliente) }}
+            </ion-badge>
+            <ion-label>
+              <h3>{{ cliente.cliente.representante }}</h3>
+              <p>{{ cliente.cliente.direcciones[0]?.colonia }}</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  }
+
+  <!-- ✅ BOTÓN PAUSAR/FINALIZAR (footer fijo) -->
+  @if (rutaIniciada) {
+    <div class="footer-acciones">
+      @if (hayClientesPendientes) {
+        <!-- Si hay clientes pendientes, mostrar pausar -->
+        <ion-button expand="block" color="warning" (click)="pausarRuta()">
+          <ion-icon name="pause-circle" slot="start"></ion-icon>
+          Pausar Ruta ({{ clientesPendientesCount }} pendientes)
+        </ion-button>
+      } @else {
+        <!-- Si no hay pendientes, mostrar finalizar -->
+        <ion-button expand="block" color="success" (click)="finalizarRuta()">
+          <ion-icon name="flag" slot="start"></ion-icon>
+          Finalizar Ruta
+        </ion-button>
+      }
+    </div>
+  }
+
+</ion-content>

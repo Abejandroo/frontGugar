@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } fr
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, AlertController, ToastController, ModalController } from '@ionic/angular';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { DirectionsService } from 'src/app/service/directions.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -82,7 +82,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private rutasService: RutaServiceTs,
+    private rutasService: RutaService,
     private authService: Auth,
     private directionsService: DirectionsService,
     private alertController: AlertController,

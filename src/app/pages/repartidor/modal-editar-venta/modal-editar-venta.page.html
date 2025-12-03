@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Editar Venta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <!-- INFO DEL CLIENTE -->
+  <ion-card>
+    <ion-card-content>
+      <h2>{{ clienteRuta.cliente.representante }}</h2>
+      <p>{{ clienteRuta.cliente.negocio || 'Sin negocio' }}</p>
+      <p class="fecha-info">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Venta realizada: {{ venta.fecha | date:'short' }}
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- FORMULARIO -->
+  <form [formGroup]="formVenta">
+    
+    <!-- GARRAFONES -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Cantidad de Garrafones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="cantidad-control">
+          <ion-button fill="solid" color="danger" (click)="decrementar()" size="large">
+            <ion-icon name="remove" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <div class="cantidad-display">
+            <h1>{{ formVenta.get('cantidadVendida')?.value }}</h1>
+            <p>garrafones</p>
+          </div>
+          
+          <ion-button fill="solid" color="success" (click)="incrementar()" size="large">
+            <ion-icon name="add" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- TOTAL -->
+    <ion-card color="primary">
+      <ion-card-content>
+        <div class="total-venta">
+          <span>Total:</span>
+          <h1>${{ totalVenta.toFixed(2) }}</h1>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- BOTONES -->
+    <ion-button 
+      expand="block" 
+      size="large"
+      color="primary"
+      (click)="guardarCambios()"
+      [disabled]="formVenta.invalid || guardando">
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      @if (guardando) {
+        Guardando...
+      } @else {
+        Guardar Cambios
+      }
+    </ion-button>
+
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      (click)="cerrar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

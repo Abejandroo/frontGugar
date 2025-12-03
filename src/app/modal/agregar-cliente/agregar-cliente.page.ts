@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline, mapOutline, homeOutline, locationOutline } from 'ionicons/icons';
-import { Cliente } from 'src/app/service/cliente'; 
+import { ClienteService } from 'src/app/service/cliente.service'; 
 import { PrecioService } from 'src/app/service/precio';
 import { GoogleMapsModule } from '@angular/google-maps'; 
 
@@ -38,7 +38,7 @@ export class AgregarClientePage {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private clienteService: Cliente,
+    private clienteService: ClienteService,
     private precioService: PrecioService,
     private toastCtrl: ToastController
   ) {

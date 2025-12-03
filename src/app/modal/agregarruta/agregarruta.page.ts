@@ -5,7 +5,7 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { close, trash, arrowUndo, saveOutline, searchOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Auth } from 'src/app/service/auth'; 
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 import * as L from 'leaflet';
 
 @Component({
@@ -61,7 +61,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     private readonly toastController: ToastController,
     private fb: FormBuilder,
     private authService: Auth,
-    private rutasService: RutaServiceTs
+    private rutasService: RutaService
   ) {
     addIcons({ 
       close, 'close-outline': close, 

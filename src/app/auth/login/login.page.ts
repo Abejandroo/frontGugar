@@ -48,7 +48,7 @@ export class LoginPage {
           } else if (this.rolSeleccionado === 'supervisor') {
             this.router.navigate(['/supervisores/home']);
           } else if (this.rolSeleccionado === 'repartidor') {
-            this.router.navigate(['/usuario/repartidor']);
+            this.router.navigate(['/repartidor/rutas']);
           }
 
         } else {

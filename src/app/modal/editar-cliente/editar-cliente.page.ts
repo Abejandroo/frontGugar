@@ -5,7 +5,7 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { GoogleMapsModule } from '@angular/google-maps'; 
 import { addIcons } from 'ionicons';
 import { close, personOutline, callOutline, mailOutline, pricetagOutline, saveOutline, mapOutline, homeOutline, locationOutline, fingerPrint, checkmarkCircle } from 'ionicons/icons';
-import { Cliente } from 'src/app/service/cliente'; 
+import { ClienteService } from 'src/app/service/cliente.service'; 
 import { PrecioService } from 'src/app/service/precio';
 
 @Component({
@@ -32,7 +32,7 @@ export class EditarClientePage{
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private clienteService: Cliente,
+    private clienteService: ClienteService,
     private precioService: PrecioService,
     private toastCtrl: ToastController
   ) {
@@ -103,7 +103,7 @@ export class EditarClientePage{
     this.cargando = true;
     const datos = this.formCliente.value;
 
-    this.clienteService.actualizarCliente(this.cliente.id, datos).subscribe({
+    this.clienteService.actualizarClientePorId(this.cliente.id, datos).subscribe({
       next: async () => {
         this.cargando = false;
         await this.mostrarToast('Cliente actualizado correctamente', 'success');

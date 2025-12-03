@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar color="success">
+    <ion-title>Registrar Venta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <!-- INFO DEL CLIENTE -->
+  <ion-card>
+    <ion-card-content>
+      <h2>{{ clienteRuta.cliente.representante }}</h2>
+      <p>{{ clienteRuta.cliente.negocio || 'Sin negocio' }}</p>
+      <p class="precio-info">
+        <ion-icon name="cash-outline"></ion-icon>
+        ${{ clienteRuta.precio?.precioPorGarrafon || 0 }} / garrafón
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- FORMULARIO -->
+  <form [formGroup]="formVenta">
+    
+    <!-- GARRAFONES -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Cantidad de Garrafones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="cantidad-control">
+          <ion-button fill="solid" color="danger" (click)="decrementar()" size="large">
+            <ion-icon name="remove" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <div class="cantidad-display">
+            <h1>{{ formVenta.get('cantidadVendida')?.value }}</h1>
+            <p>garrafones</p>
+          </div>
+          
+          <ion-button fill="solid" color="success" (click)="incrementar()" size="large">
+            <ion-icon name="add" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- TOTAL -->
+    <ion-card color="success">
+      <ion-card-content>
+        <div class="total-venta">
+          <span>Total a cobrar:</span>
+          <h1>${{ totalVenta.toFixed(2) }}</h1>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- BOTONES -->
+    <ion-button 
+      expand="block" 
+      size="large"
+      color="success"
+      (click)="guardarVenta()"
+      [disabled]="formVenta.invalid || guardando">
+      <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+      @if (guardando) {
+        Guardando...
+      } @else {
+        Registrar Venta
+      }
+    </ion-button>
+
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      (click)="cerrar()">
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

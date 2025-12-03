@@ -12,10 +12,7 @@
   <!-- BARRA DE BÚSQUEDA CON BOTÓN DE FILTRO -->
   <ion-toolbar>
     <div class="search-container">
-      <ion-searchbar 
-        [(ngModel)]="textoBusqueda"
-        (ionInput)="onBuscar($event)"
-        placeholder="Buscar ruta o repartidor"
+      <ion-searchbar [(ngModel)]="textoBusqueda" (ionInput)="onBuscar($event)" placeholder="Buscar ruta o repartidor"
         animated>
       </ion-searchbar>
       <ion-button fill="clear" (click)="toggleFiltros()" class="btn-filtro">
@@ -49,7 +46,7 @@
 <ion-content [fullscreen]="true" class="ion-padding">
 
   <ion-grid fixed>
-    
+
     <!-- BOTONES DE ACCIÓN -->
     <ion-row>
       <ion-col size="12" size-md="6">
@@ -64,64 +61,68 @@
           Importar desde Excel
         </ion-button>
       </ion-col>
+      <ion-col>
+        <ion-button expand="block" color="secondary" (click)="generarReporteSemanal()">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          Descargar Reporte Semanal
+        </ion-button>
+      </ion-col>
     </ion-row>
 
     <!-- LISTA DE RUTAS PADRE -->
     <ion-row>
       @for (ruta of rutasFiltradas; track ruta.id) {
-        <ion-col size="12">
-          <ion-card class="ruta-card-compact" button (click)="abrirOpcionesRuta(ruta)">
-            <ion-card-content>
-              <div class="card-wrapper">
-                
-                <!-- BADGE DE ESTADO (basado en el día actual) -->
-                <div class="estado-badge">
-                  <div class="punto-estado" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
-                </div>
+      <ion-col size="12">
+        <ion-card class="ruta-card-compact" button (click)="abrirOpcionesRuta(ruta)">
+          <ion-card-content>
+            <div class="card-wrapper">
 
-                <!-- INFO PRINCIPAL -->
-                <div class="ruta-info">
-                  <!-- NOMBRE -->
-                  <div class="ruta-nombre">{{ ruta.nombre }}</div>
-                  
-                  <!-- META INFO: Ruta 1 · Lun - Jue · EN CURSO -->
-                  <div class="ruta-meta">
-                    Ruta {{ ruta.id }} · {{ getDiaVisitaActual(ruta) }} · {{ getEstadoDiaActual(ruta) }}
-                  </div>
-
-                  <!-- PERSONAL -->
-                  <div class="ruta-personal">
-                    <span>Supervisor: {{ ruta.supervisor?.name || 'SIN ASIGNAR' }}</span>
-                    <span>Repartidor: {{ ruta.repartidor?.name || 'SIN ASIGNAR' }}</span>
-                  </div>
-
-                  <!-- BARRA DE PROGRESO -->
-                  <div class="progreso-wrapper">
-                    <div class="progreso-texto">
-                      {{ getClientesVisitados(ruta) }} / {{ getClientesTotalesDia(ruta) }} clientes por visitar hoy
-                    </div>
-                    <ion-progress-bar 
-                      [value]="getProgresoRuta(ruta)"
-                      [color]="getColorProgreso(ruta)">
-                    </ion-progress-bar>
-                  </div>
-                </div>
-
-                <!-- ÍCONO FLECHA -->
-                <ion-icon name="chevron-forward-outline" class="icono-flecha"></ion-icon>
-
+              <!-- BADGE DE ESTADO (basado en el día actual) -->
+              <div class="estado-badge">
+                <div class="punto-estado" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
               </div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
+
+              <!-- INFO PRINCIPAL -->
+              <div class="ruta-info">
+                <!-- NOMBRE -->
+                <div class="ruta-nombre">{{ ruta.nombre }}</div>
+
+                <!-- META INFO: Ruta 1 · Lun - Jue · EN CURSO -->
+                <div class="ruta-meta">
+                  Ruta {{ ruta.id }} · {{ getDiaVisitaActual(ruta) }} · {{ getEstadoDiaActual(ruta) }}
+                </div>
+
+                <!-- PERSONAL -->
+                <div class="ruta-personal">
+                  <span>Supervisor: {{ ruta.supervisor?.name || 'SIN ASIGNAR' }}</span>
+                  <span>Repartidor: {{ ruta.repartidor?.name || 'SIN ASIGNAR' }}</span>
+                </div>
+
+                <!-- BARRA DE PROGRESO -->
+                <div class="progreso-wrapper">
+                  <div class="progreso-texto">
+                    {{ getClientesVisitados(ruta) }} / {{ getClientesTotalesDia(ruta) }} clientes por visitar hoy
+                  </div>
+                  <ion-progress-bar [value]="getProgresoRuta(ruta)" [color]="getColorProgreso(ruta)">
+                  </ion-progress-bar>
+                </div>
+              </div>
+
+              <!-- ÍCONO FLECHA -->
+              <ion-icon name="chevron-forward-outline" class="icono-flecha"></ion-icon>
+
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
       }
       @empty {
-        <ion-col size="12">
-          <div class="empty-state">
-            <ion-icon name="map-outline" size="large"></ion-icon>
-            <p>No hay rutas {{ filtroEstado !== 'todos' ? 'con ese estado' : 'registradas' }}</p>
-          </div>
-        </ion-col>
+      <ion-col size="12">
+        <div class="empty-state">
+          <ion-icon name="map-outline" size="large"></ion-icon>
+          <p>No hay rutas {{ filtroEstado !== 'todos' ? 'con ese estado' : 'registradas' }}</p>
+        </div>
+      </ion-col>
       }
     </ion-row>
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, ActionSheetController, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
+import { RutaService } from 'src/app/service/ruta.service';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
 import { DetalleRutaPage } from 'src/app/pages/detalle-ruta/detalle-ruta.page';
@@ -19,6 +19,7 @@ import {
 } from 'ionicons/icons';
 import { OpcionesRutaModalComponent } from 'src/app/modal/opciones-ruta-modal/opciones-ruta-modal.component';
 import { Router } from '@angular/router';
+import { ReporteVentasService } from 'src/app/service/reporte-ventas.service';
 
 @Component({
   selector: 'app-gestion-rutas',
@@ -46,8 +47,9 @@ export class GestionRutasPage implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private alertController: AlertController,
-    private rutasService: RutaServiceTs,
-    private router: Router
+    private rutasService: RutaService,
+    private router: Router,
+    private reporteService: ReporteVentasService
   ) {
     addIcons({
       addCircleOutline,
@@ -323,6 +325,21 @@ export class GestionRutasPage implements OnInit {
     });
     toast.present();
   }
+
+  async generarReporteSemanal() {
+  // Obtener ventas de la semana
+  this.reporteService.obtenerVentasSemana().subscribe({
+    next: async (ventas) => {
+      // Generar Excel
+      await this.reporteService.generarExcelSemanal(ventas);
+      this.mostrarToast('Reporte generado correctamente', 'success');
+    },
+    error: (err) => {
+      console.error('Error generando reporte:', err);
+      this.mostrarToast('Error al generar reporte', 'danger');
+    }
+  });
+}
   // En gestion-rutas.page.ts
 
   async abrirModalAgregarGrupo() {

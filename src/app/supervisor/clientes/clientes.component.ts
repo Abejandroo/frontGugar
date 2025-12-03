@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ActionSheetController, ToastController } from '@ionic/angular';
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
-import { Cliente } from 'src/app/service/cliente';
+import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
 import { add, searchOutline, peopleOutline, callOutline, mailOutline, ellipsisVertical, trashOutline, createOutline, close, trash, create } from 'ionicons/icons';
 import { AgregarClientePage } from 'src/app/modal/agregar-cliente/agregar-cliente.page';
@@ -22,7 +22,7 @@ export class ClientesComponent {
   cargando: boolean = true;
 
   constructor(
-    private clienteService: Cliente,
+    private clienteService: ClienteService,
     private modalCtrl: ModalController,
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController 
