@@ -43,7 +43,7 @@ export class RutaService {
   // ========================================
 
   crearRutaConDia(data: {
-    nombre: string;
+    representante: string;
     supervisorId: number | null;
     repartidorId: number | null;
     diaSemana: string;

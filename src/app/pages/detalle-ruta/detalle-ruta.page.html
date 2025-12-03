@@ -157,7 +157,7 @@
           <div class="orden-numero">{{ clienteSeleccionado.ordenVisita }}</div>
 
           <div class="cliente-datos">
-            <h4>{{ clienteSeleccionado.cliente.nombre }}</h4>
+            <h4>{{ clienteSeleccionado.cliente.representante }}</h4>
 
             <p class="direccion">
               <ion-icon name="location-outline"></ion-icon>
@@ -197,7 +197,7 @@
           <div class="orden-circulo" slot="start">{{ clienteRuta.ordenVisita || i + 1 }}</div>
 
           <ion-label>
-            <h3>{{ clienteRuta.cliente.nombre }}</h3>
+            <h3>{{ clienteRuta.cliente.representante }}</h3>
 
             <p class="direccion-texto">
               <ion-icon name="location-outline"></ion-icon>

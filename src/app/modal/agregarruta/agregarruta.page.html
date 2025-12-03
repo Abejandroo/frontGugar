@@ -130,12 +130,11 @@
         @for (cliente of clientesFiltrados; track cliente.id) {
     <ion-item button (click)="seleccionarCliente(cliente)">
       <ion-label>
-        <h3>{{ cliente.nombre }}</h3>
+        <h3>{{ cliente.representante }}</h3>
         <p>{{ cliente.calle }}, {{ cliente.colonia }}</p>
       </ion-label>
       <ion-badge slot="end" color="primary">
-        ${{ cliente.tipoPrecio?.precioPorGarrafon || 'N/A' }}
-      </ion-badge>
+${{ cliente.tipoPrecio?.precioPorGarrafon || cliente.precio?.precioPorGarrafon || 'N/A' }}      </ion-badge>
     </ion-item>
   }
         @empty {

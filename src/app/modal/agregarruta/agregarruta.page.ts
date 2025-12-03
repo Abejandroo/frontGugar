@@ -38,8 +38,8 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
     const busqueda = this.busquedaCliente.toLowerCase();
     return this.clientesDisponibles.filter(c => 
-      // Buscamos por nombre (representante es un nombre viejo, mejor usa 'nombre')
-      (c.nombre || c.representante || '').toLowerCase().includes(busqueda) ||
+      // Buscamos por representante (representante es un representante viejo, mejor usa 'representante')
+      (c.representante || c.representante || '').toLowerCase().includes(busqueda) ||
       // Buscamos por calle directa
       (c.calle || '').toLowerCase().includes(busqueda)
     );
@@ -73,7 +73,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     
     this.formRuta = this.fb.group({
       rutaExistenteId: [null],
-      nombreRuta: [''],
+      representanteRuta: [''],
       supervisorId: [null],
       repartidorId: [null],
       diaSemana: ['', Validators.required],
@@ -142,8 +142,8 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     // Agregar marcador al mapa
     this.agregarMarcadorCliente(cliente);
 
-    // CORRECCIÓN AQUÍ: Usamos 'nombre' en lugar de 'representante'
-    this.mostrarToast(`${cliente.nombre} agregado`, 'success');
+    // CORRECCIÓN AQUÍ: Usamos 'representante' en lugar de 'representante'
+    this.mostrarToast(`${cliente.representante} agregado`, 'success');
   }
 
 // 3. CORREGIR EL MAPA (LEAFLET)
@@ -157,7 +157,7 @@ agregarMarcadorCliente(cliente: any) {
     
     // Si no tiene coordenadas válidas, no hacemos nada o mostramos error
     if (!lat || !lng) {
-      this.mostrarToast(`El cliente ${cliente.nombre} no tiene ubicación en el mapa`, 'warning');
+      this.mostrarToast(`El cliente ${cliente.representante} no tiene ubicación en el mapa`, 'warning');
       return;
     }
 
@@ -171,10 +171,10 @@ agregarMarcadorCliente(cliente: any) {
       icon: this.crearIconoLetra(letra)
     }).addTo(this.map);
 
-    // CORRECCIÓN DEL POPUP: Usamos 'nombre', 'calle', 'colonia'
+    // CORRECCIÓN DEL POPUP: Usamos 'representante', 'calle', 'colonia'
     marker.bindPopup(`
       <div style="text-align: center;">
-        <strong style="font-size: 14px;">${letra}. ${cliente.nombre}</strong><br>
+        <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
         <small>${cliente.calle}<br>${cliente.colonia}</small><br>
         <strong style="color: #3880ff;">$${cliente.tipoPrecio?.precioPorGarrafon || 'N/A'}</strong>
       </div>
@@ -203,8 +203,8 @@ agregarMarcadorCliente(cliente: any) {
       this.agregarMarcadorClienteSinMensaje(cliente);
     });
 
-    // CORRECCIÓN AQUÍ: Usamos 'nombre'
-    this.mostrarToast(`${clienteQuitado.nombre} quitado`, 'warning');
+    // CORRECCIÓN AQUÍ: Usamos 'representante'
+    this.mostrarToast(`${clienteQuitado.representante} quitado`, 'warning');
   }
 
  private agregarMarcadorClienteSinMensaje(cliente: any) {
@@ -228,7 +228,7 @@ agregarMarcadorCliente(cliente: any) {
     // CORRECCIÓN DEL POPUP
     marker.bindPopup(`
       <div style="text-align: center;">
-        <strong style="font-size: 14px;">${letra}. ${cliente.nombre}</strong><br>
+        <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
         <small>${cliente.calle}<br>${cliente.colonia}</small><br>
         <strong style="color: #3880ff;">$${cliente.tipoPrecio?.precioPorGarrafon || 'N/A'}</strong>
       </div>
@@ -351,13 +351,13 @@ agregarMarcadorCliente(cliente: any) {
   onModoChange() {
     if (this.modoCreacion === 'nueva') {
       this.formRuta.get('rutaExistenteId')?.clearValidators();
-      this.formRuta.get('nombreRuta')?.setValidators([Validators.required]);
+      this.formRuta.get('representanteRuta')?.setValidators([Validators.required]);
     } else {
-      this.formRuta.get('nombreRuta')?.clearValidators();
+      this.formRuta.get('representanteRuta')?.clearValidators();
       this.formRuta.get('rutaExistenteId')?.setValidators([Validators.required]);
     }
     this.formRuta.get('rutaExistenteId')?.updateValueAndValidity();
-    this.formRuta.get('nombreRuta')?.updateValueAndValidity();
+    this.formRuta.get('representanteRuta')?.updateValueAndValidity();
   }
 
   onRutaExistenteChange(event: any) {
@@ -452,7 +452,7 @@ agregarMarcadorCliente(cliente: any) {
 
   private async crearNuevaRuta(formValues: any, clientesIds: number[]) {
     const rutaData = {
-      nombre: formValues.nombreRuta.toUpperCase(),
+      representante: formValues.representanteRuta.toUpperCase(),
       supervisorId: formValues.supervisorId || null,
       repartidorId: formValues.repartidorId || null,
       diaSemana: formValues.diaSemana,

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router'; // Importante para navegar
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts'; // Asegura la ruta correcta
 import { addIcons } from 'ionicons';
 import { ModalController } from '@ionic/angular';
 
@@ -13,6 +12,7 @@ import {
   pricetag
 } from 'ionicons/icons';
 import { MonitoreoRutaPage } from 'src/app/modal/monitoreo-ruta/monitoreo-ruta.page';
+import { RutaService } from 'src/app/service/ruta.service';
 
 @Component({
   selector: 'app-rutas',
@@ -27,7 +27,7 @@ export class RutasComponent implements OnInit {
   cargando: boolean = true;
 
   constructor(
-    private rutaService: RutaServiceTs,
+    private rutaService: RutaService,
     private router: Router,
     private modalCtrl: ModalController
   ) { 

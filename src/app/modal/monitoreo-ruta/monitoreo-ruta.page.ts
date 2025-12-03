@@ -1,11 +1,11 @@
 import { Component, Input, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import { RutaServiceTs } from 'src/app/service/ruta.service.ts';
 import { Geolocation } from '@capacitor/geolocation';
 import * as L from 'leaflet';
 import { addIcons } from 'ionicons';
 import { close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle } from 'ionicons/icons';
+import { RutaService } from 'src/app/service/ruta.service';
 
 @Component({
   selector: 'app-monitoreo-ruta',
@@ -17,7 +17,7 @@ import { close, map, location, timeOutline, car, businessOutline, checkmarkCircl
 export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaMonitoreo', { static: false }) mapaElement!: ElementRef;
 
-  @Input() rutaId!: number; // Recibimos solo el ID
+  @Input() rutaId!: number;
   
   ruta: any = null;
   cargando: boolean = true;
@@ -36,7 +36,7 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private modalCtrl: ModalController,
-    private rutasService: RutaServiceTs,
+    private rutasService: RutaService,
     private toastCtrl: ToastController
   ) {
     addIcons({ close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle });
@@ -47,7 +47,6 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Esperamos un poco para que el modal termine de abrirse antes de cargar el mapa
     setTimeout(() => {
       this.initMap();
     }, 500);
@@ -67,38 +66,53 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         console.error(err);
         this.cargando = false;
+        this.mostrarToast('Error al cargar la ruta', 'danger');
       }
     });
   }
 
-  procesarDatosDiaActual() {
+procesarDatosDiaActual() {
     if (!this.ruta.diasRuta || this.ruta.diasRuta.length === 0) return;
 
-    // Lógica simple para tomar el primer día disponible (o mejorar con fecha actual)
     const dia = this.ruta.diasRuta[0]; 
     this.diaSeleccionado = dia.diaSemana;
 
-    // Aplanamos clientes
-    this.clientesDia = (dia.clientes || []).map((c: any, i: number) => ({
-      ...c,
-      ordenVisita: i + 1
-    }));
+    let listaCruda: any[] = [];
+
+    // --- CORRECCIÓN: Forzamos el índice (i + 1) si no hay ordenVisita ---
+    
+    if (dia.clientesRuta && dia.clientesRuta.length > 0) {
+       // Caso A: Tabla Intermedia
+       listaCruda = dia.clientesRuta.map((cr: any, i: number) => ({
+           ...cr.cliente,
+           ordenVisita: cr.ordenVisita || (i + 1), // <--- AQUÍ ESTÁ EL TRUCO
+           visitado: cr.visitado
+       }));
+    } else if (dia.clientes && dia.clientes.length > 0) {
+       // Caso B: Directo
+       listaCruda = dia.clientes.map((c: any, i: number) => ({
+           ...c,
+           ordenVisita: i + 1, // <--- Usamos el contador
+           visitado: false
+       }));
+    }
+
+    this.clientesDia = listaCruda;
 
     if (this.map) this.dibujarPines();
   }
-
   // --- MAPA LEAFLET ---
   initMap() {
     const element = this.mapaElement?.nativeElement;
     if (!element) return;
 
-    // Centrar en Oaxaca por defecto
     this.map = L.map(element).setView([17.0732, -96.7266], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
+    // Dibujamos pines si ya hay datos
     if (this.clientesDia.length > 0) {
       this.dibujarPines();
     }
@@ -114,6 +128,7 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
     const bounds: L.LatLngBoundsExpression = [];
 
     this.clientesDia.forEach(c => {
+      // Aseguramos que sean números
       const lat = Number(c.latitud);
       const lng = Number(c.longitud);
 
@@ -121,16 +136,17 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
         const latlng: L.LatLngExpression = [lat, lng];
         bounds.push(latlng);
 
-        // Icono circular con número
         const icon = L.divIcon({
-          html: `<div style="background:#3880ff; color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-weight:bold; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);">${c.ordenVisita}</div>`,
+          html: `<div style="background:#3880ff; color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-weight:bold; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);">${c.ordenVisita || '?'}</div>`,
           className: 'custom-pin',
           iconSize: [30, 30],
           iconAnchor: [15, 15]
         });
 
+        // Usamos 'representante' o 'nombre'
+        const nombreMostrar = c.representante || c.nombre || 'Cliente';
         const marker = L.marker(latlng, { icon })
-          .bindPopup(`<b>${c.nombre}</b><br>${c.calle}`)
+          .bindPopup(`<b>${nombreMostrar}</b><br>${c.calle}`)
           .addTo(this.map!);
         
         this.markers.push(marker);
@@ -142,46 +158,65 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // --- RASTREO EN VIVO (Simulado o Real) ---
-  async iniciarMonitoreo() {
+  // --- RASTREO EN VIVO MEJORADO ---
+async iniciarMonitoreo() {
     try {
-      const permiso = await Geolocation.checkPermissions();
-      if(permiso.location !== 'granted') await Geolocation.requestPermissions();
+      this.mostrarToast('Buscando señal GPS...', 'warning');
 
-      this.watchId = await Geolocation.watchPosition({ enableHighAccuracy: true }, (pos, err) => {
-        if (pos) {
-          this.actualizarRepartidor(pos.coords.latitude, pos.coords.longitude);
-        }
+      // Intento directo de obtener posición (saltamos el check estricto que a veces falla en web)
+      // enableHighAccuracy: true es bueno, pero si falla puedes probar false
+      const position = await Geolocation.getCurrentPosition({ 
+        enableHighAccuracy: true,
+        timeout: 10000 // Esperar hasta 10 segundos
       });
-      this.mostrarToast('Rastreando repartidor...', 'success');
+
+      if (position) {
+        const { latitude, longitude } = position.coords;
+        this.actualizarRepartidor(latitude, longitude);
+        this.mostrarToast('¡Te encontré! 🚚', 'success');
+        
+        // Volamos a tu ubicación real
+        this.map?.flyTo([latitude, longitude], 16);
+      }
+
+      // Iniciar seguimiento
+      this.watchId = await Geolocation.watchPosition({ enableHighAccuracy: true }, (pos) => {
+        if (pos) this.actualizarRepartidor(pos.coords.latitude, pos.coords.longitude);
+      });
+
     } catch (e) {
-      this.mostrarToast('No se pudo acceder al GPS', 'danger');
+      console.error(e);
+      // Si falla en PC, es posible que el sistema operativo tenga la ubicación desactivada,
+      // aunque el navegador tenga permiso.
+      this.mostrarToast('Error GPS. Verifica la ubicación de tu PC/Celular.', 'danger');
     }
   }
-
   detenerMonitoreo() {
     if (this.watchId) Geolocation.clearWatch({ id: this.watchId });
   }
 
-  actualizarRepartidor(lat: number, lng: number) {
+ actualizarRepartidor(lat: number, lng: number) {
     if (!this.map) return;
+    
+    // Filtro coordenadas inválidas (0,0 es en el océano cerca de África)
+    if (Math.abs(lat) < 0.1 && Math.abs(lng) < 0.1) return;
+
     if (this.markerRepartidor) this.markerRepartidor.remove();
 
     const icon = L.divIcon({
-      html: `<div style="font-size:24px;">🚚</div>`, // Icono simple de camión
+      html: `<div style="font-size:30px; filter: drop-shadow(2px 4px 6px black);">🚚</div>`,
       className: 'truck-icon',
-      iconSize: [40, 40]
+      iconSize: [40, 40],
+      iconAnchor: [20, 20]
     });
 
-    this.markerRepartidor = L.marker([lat, lng], { icon }).addTo(this.map);
+    this.markerRepartidor = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(this.map);
   }
-
-  cerrar() {
+ cerrar() {
     this.modalCtrl.dismiss();
   }
-
-  async mostrarToast(msg: string, color: string) {
-    const t = await this.toastCtrl.create({ message: msg, duration: 2000, color });
+async mostrarToast(msg: string, color: string) {
+    const t = await this.toastCtrl.create({ message: msg, duration: 2500, color });
     t.present();
   }
 }

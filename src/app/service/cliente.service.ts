@@ -18,9 +18,8 @@ export class ClienteService {
   obtenerClientePorId(id: number): Observable<any> {
     return this.http.get(`${this.url}/clientes/${id}`);
   }
-
-  actualizarCliente(cliente: any): Observable<any> {
-    return this.http.patch(`${this.url}/clientes/${cliente.id}`, cliente);
+actualizarCliente(id: number, data: any): Observable<any> {
+    return this.http.patch(`${this.url}/clientes/${id}`, data);
   }
 
   actualizarClientePorId(id: number, datos: any): Observable<any> {

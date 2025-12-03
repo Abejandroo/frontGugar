@@ -40,7 +40,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaLeaflet', { static: false }) mapaElement!: ElementRef;
 
   ruta: any = {
-    nombre: '',
+    representante: '',
     supervisor_id: null,
     idRepartidor: null,
     diasRuta: []
@@ -136,10 +136,15 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  cargarRuta() {
+cargarRuta() {
     this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
       next: (data) => {
-        this.ruta = data;
+        // PARCHE 1: Mapear IDs para que los selects funcionen
+        this.ruta = {
+          ...data,
+          supervisor_id: data.supervisor?.id || data.supervisorId,
+          idRepartidor: data.repartidor?.id || data.idRepartidor
+        };
         this.cargarDiasDisponibles();
       },
       error: (err) => {
@@ -149,21 +154,17 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
-  cargarDiasDisponibles() {
+ cargarDiasDisponibles() {
     if (this.ruta.diasRuta && this.ruta.diasRuta.length > 0) {
       this.diasDisponibles = this.ruta.diasRuta;
-
+      
+      // Seleccionar día actual o el primero por defecto
       const hoy = new Date().getDay();
       let diaDefault = this.diasDisponibles[0];
-
-      if (hoy === 1 || hoy === 4) {
-        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Lunes - Jueves') || diaDefault;
-      } else if (hoy === 2 || hoy === 5) {
-        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Martes - Viernes') || diaDefault;
-      } else if (hoy === 3 || hoy === 6) {
-        diaDefault = this.diasDisponibles.find(d => d.diaSemana === 'Miércoles - Sábado') || diaDefault;
-      }
+      // Lógica simple de mapeo de días (puedes ajustarla)
+      if ([1,4].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Lunes')) || diaDefault;
+      if ([2,5].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Martes')) || diaDefault;
+      if ([3,6].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Miércoles')) || diaDefault;
 
       this.diaSeleccionado = diaDefault.diaSemana;
       this.cambiarDia();
@@ -172,27 +173,37 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 
 // En detalle-ruta.page.ts
 
-  cambiarDia() {
-    // Buscamos el día seleccionado en la data que llegó del backend
+ cambiarDia() {
     const dia = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
 
     if (dia) {
-      // --- AQUÍ ESTÁ LA MAGIA DE ADAPTACIÓN ✨ ---
-      // El backend nos manda 'dia.clientes' (array de clientes directos).
-      // Pero tu HTML espera 'clienteRuta.cliente' y 'clienteRuta.ordenVisita'.
-      // Así que los envolvemos para que el HTML no se rompa.
+      // --- PARCHE 2: ADAPTADOR DE DATOS ---
+      // Si viene de tabla intermedia (compañero), usa clientesRuta.
+      // Si viene directo (nuestro), usa clientes.
+      // Lo normalizamos a una estructura única: { cliente: {...}, precio: ..., ordenVisita: ... }
       
-      this.clientesDia = (dia.clientes || []).map((clienteReal: any, index: number) => ({
-        id: clienteReal.id,           // ID del cliente
-        cliente: clienteReal,         // Metemos al cliente aquí para que {{ clienteRuta.cliente.nombre }} funcione
-        ordenVisita: index + 1,       // Simulamos el orden
-        visitado: false,              // Por defecto false (aún no guardamos esto en BD)
-        precio: clienteReal.tipoPrecio // Pasamos el precio
-      }));
-      // --------------------------------------------
+      let listaCruda: any[] = [];
+      
+      if (dia.clientesRuta && dia.clientesRuta.length > 0) {
+         // Caso A: Tabla Intermedia
+         listaCruda = dia.clientesRuta;
+      } else if (dia.clientes && dia.clientes.length > 0) {
+         // Caso B: Directo (Lo adaptamos para que parezca Caso A)
+         listaCruda = dia.clientes.map((c: any, i: number) => ({
+             id: c.id, 
+             cliente: c,
+             precio: c.tipoPrecio,
+             ordenVisita: i + 1,
+             visitado: false,
+             es_credito: false,
+             requiere_factura: false
+         }));
+      }
 
+      this.clientesDia = listaCruda.sort((a, b) => (a.ordenVisita || 0) - (b.ordenVisita || 0));
       this.clientesFiltrados = [...this.clientesDia];
       this.clienteSeleccionado = null;
+      
       this.calcularEstadisticas();
       this.actualizarMapa();
     } else {
@@ -201,7 +212,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  calcularEstadisticas() {
+ calcularEstadisticas() {
     this.totalClientes = this.clientesDia.length;
     this.visitados = this.clientesDia.filter(c => c.visitado).length;
     this.pendientes = this.totalClientes - this.visitados;
@@ -211,112 +222,74 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // MAPA LEAFLET
   // ========================================
 
-  inicializarMapa() {
-    if (this.mapa) {
-      this.mapa.remove();
-    }
-
+ inicializarMapa() {
+    if (this.mapa) this.mapa.remove();
     const mapElement = this.mapaElement?.nativeElement;
     if (!mapElement) return;
 
     this.mapa = L.map(mapElement).setView([17.0732, -96.7266], 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(this.mapa);
-
-    if (this.clientesDia.length > 0) {
-      this.actualizarMapa();
-    }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.mapa);
+    
+    if (this.clientesDia.length > 0) this.actualizarMapa();
   }
 
- actualizarMapa() {
+actualizarMapa() {
     if (!this.mapa) return;
-
-    this.markers.forEach(marker => marker.remove());
+    this.markers.forEach(m => m.remove());
     this.markers.clear();
 
     const bounds: L.LatLngBoundsExpression = [];
 
     this.clientesDia.forEach((clienteRuta, index) => {
-      const cliente = clienteRuta.cliente;
-      
-      // --- CORRECCIÓN AQUÍ: Usamos coordenadas directas ---
-      const lat = Number(cliente.latitud);
-      const lng = Number(cliente.longitud);
+      const c = clienteRuta.cliente;
+      // Usamos campos directos
+      const lat = Number(c.latitud);
+      const lng = Number(c.longitud);
 
       if (lat && lng) {
         const latlng: L.LatLngExpression = [lat, lng];
         bounds.push(latlng);
 
-        const iconHtml = `
-          <div class="marker-custom">
-            <div class="marker-numero">${clienteRuta.ordenVisita || index + 1}</div>
-          </div>
-        `;
+        const iconHtml = `<div class="marker-custom"><div class="marker-numero">${clienteRuta.ordenVisita || index + 1}</div></div>`;
+        const customIcon = L.divIcon({ html: iconHtml, className: 'custom-marker-icon', iconSize: [32, 32], iconAnchor: [16, 32] });
 
-        const customIcon = L.divIcon({
-          html: iconHtml,
-          className: 'custom-marker-icon',
-          iconSize: [32, 32],
-          iconAnchor: [16, 32]
-        });
-
-        // --- CORRECCIÓN POPUP: Usamos 'nombre' y 'calle' ---
         const marker = L.marker(latlng, { icon: customIcon })
-          .bindPopup(`
-            <strong>${cliente.nombre}</strong><br>
-            ${cliente.calle}
-          `)
-          .on('click', () => {
-            this.seleccionarCliente(clienteRuta);
-          })
+          .bindPopup(`<strong>${c.representante}</strong><br>${c.calle}`)
+          .on('click', () => { this.seleccionarCliente(clienteRuta); })
           .addTo(this.mapa!);
 
         this.markers.set(clienteRuta.id, marker);
       }
     });
 
-    if (bounds.length > 0) {
-      this.mapa.fitBounds(bounds, { padding: [50, 50] });
-    }
+    if (bounds.length > 0) this.mapa.fitBounds(bounds, { padding: [50, 50] });
   }
 
-  seleccionarCliente(clienteRuta: any) {
+seleccionarCliente(clienteRuta: any) {
     this.clienteSeleccionado = clienteRuta;
-
-    // Scroll suave hacia arriba
     setTimeout(() => {
       const content = document.querySelector('ion-content');
       content?.scrollToPoint(0, 700, 500);
     }, 100);
   }
 
-  deseleccionarCliente() {
-    this.clienteSeleccionado = null;
-  }
-
-  seleccionarClienteEnMapa(clienteRuta: any) {
+  deseleccionarCliente() { this.clienteSeleccionado = null; }
+ seleccionarClienteEnMapa(clienteRuta: any) {
     const lat = Number(clienteRuta.cliente.latitud);
     const lng = Number(clienteRuta.cliente.longitud);
 
     if (lat && lng) {
       this.clienteSeleccionado = clienteRuta;
-
-      if (this.mapa) {
-        this.mapa.setView([lat, lng], 16);
-      }
-
+      if (this.mapa) this.mapa.setView([lat, lng], 16);
       const marker = this.markers.get(clienteRuta.id);
-      if (marker) {
-        marker.openPopup();
-      }
-
-      // Scroll al mapa
+      if (marker) marker.openPopup();
+      
       setTimeout(() => {
         const mapaElement = document.getElementById('mapa-leaflet');
         mapaElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
+    } else {
+      this.mostrarToast('Este cliente no tiene ubicación GPS', 'warning');
     }
   }
 
@@ -561,29 +534,21 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // EDICIÓN
   // ========================================
 
-  marcarCambio() {
-    this.hayaCambios = true;
-  }
+  marcarCambio() { this.hayaCambios = true; }
 
-  async guardarCambios() {
+ async guardarCambios() {
     if (!this.hayaCambios) return;
-
-    const datosActualizados = {
+    const datos = {
       nombre: this.ruta.nombre,
       idSupervisor: this.ruta.supervisor_id,
       idRepartidor: this.ruta.idRepartidor
     };
-
-    this.rutasService.actualizarRuta(this.rutaId, datosActualizados).subscribe({
+    this.rutasService.actualizarRuta(this.rutaId, datos).subscribe({
       next: () => {
         this.hayaCambios = false;
-        this.mostrarToast('Cambios guardados correctamente', 'success');
-        this.cargarRuta();
+        this.mostrarToast('Cambios guardados', 'success');
       },
-      error: (err) => {
-        console.error('Error:', err);
-        this.mostrarToast('Error al guardar cambios', 'danger');
-      }
+      error: () => this.mostrarToast('Error al guardar', 'danger')
     });
   }
 
@@ -597,18 +562,15 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 
 buscarCliente(event: any) {
     const busqueda = event.target.value.toLowerCase();
-    
     if (!busqueda) {
       this.clientesFiltrados = [...this.clientesDia];
       return;
     }
-
     this.clientesFiltrados = this.clientesDia.filter(cr => {
-      const cliente = cr.cliente;
-      // --- CORRECCIÓN AQUÍ: Usamos 'nombre', 'calle', 'colonia' ---
-      return (cliente.nombre || '').toLowerCase().includes(busqueda) ||
-             (cliente.calle || '').toLowerCase().includes(busqueda) ||
-             (cliente.colonia || '').toLowerCase().includes(busqueda);
+      const c = cr.cliente;
+      // Buscamos por nombre y calle
+      return (c.representante || '').toLowerCase().includes(busqueda) ||
+             (c.calle || '').toLowerCase().includes(busqueda);
     });
   }
 
@@ -690,14 +652,9 @@ private eliminarClienteDeRutaDirecto(clienteRuta: any) {
     return dias[new Date().getDay()];
   }
 
-  async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2000,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+ async mostrarToast(msg: string, color: string) {
+    const t = await this.toastController.create({ message: msg, duration: 2000, color, position: 'top' });
+    t.present();
   }
 
   volver() {

@@ -106,13 +106,11 @@ export class ModalEditarClientePage implements OnInit {
       }]
     };
 
-    this.clienteService.actualizarCliente(clienteActualizado).subscribe({
-      next: () => {
-        this.mostrarToast('Cliente actualizado', 'success');
-        this.modalController.dismiss({
-          actualizado: true,
-          cliente: clienteActualizado
-        });
+   this.clienteService.actualizarCliente(this.cliente.id, clienteActualizado).subscribe({
+      next: async () => {
+        this.guardando = false;
+        await this.mostrarToast('Cliente actualizado correctamente', 'success');
+        this.modalController.dismiss({ actualizado: true });
       },
       error: (err) => {
         console.error('Error actualizando cliente:', err);
