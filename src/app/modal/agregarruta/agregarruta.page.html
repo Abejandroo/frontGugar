@@ -128,16 +128,16 @@
       <!-- Lista de clientes -->
       <ion-list class="clientes-list">
         @for (cliente of clientesFiltrados; track cliente.id) {
-          <ion-item button (click)="seleccionarCliente(cliente)">
-            <ion-label>
-              <h3>{{ cliente.representante }}</h3>
-              <p>{{ cliente.direcciones[0]?.direccion }}, {{ cliente.direcciones[0]?.colonia }}</p>
-            </ion-label>
-            <ion-badge slot="end" color="primary">
-              ${{ cliente.tipoPrecio?.precioPorGarrafon || 'N/A' }}
-            </ion-badge>
-          </ion-item>
-        }
+    <ion-item button (click)="seleccionarCliente(cliente)">
+      <ion-label>
+        <h3>{{ cliente.nombre }}</h3>
+        <p>{{ cliente.calle }}, {{ cliente.colonia }}</p>
+      </ion-label>
+      <ion-badge slot="end" color="primary">
+        ${{ cliente.tipoPrecio?.precioPorGarrafon || 'N/A' }}
+      </ion-badge>
+    </ion-item>
+  }
         @empty {
           <ion-item>
             <ion-label class="ion-text-center">
@@ -150,37 +150,37 @@
 
     <!-- SECCIÓN: ORDEN DE VISITA -->
     @if (clientesSeleccionados.length > 0) {
-      <div class="ion-margin-top">
-        <div class="section-header">
-          <h3>Orden de Visita</h3>
-          <ion-badge color="success">{{ clientesSeleccionados.length }} clientes</ion-badge>
-        </div>
+  <div class="ion-margin-top">
+    <div class="section-header">
+      <h3>Orden de Visita</h3>
+      <ion-badge color="success">{{ clientesSeleccionados.length }} clientes</ion-badge>
+    </div>
 
-        <ion-list>
-          @for (cliente of clientesSeleccionados; track cliente.id; let i = $index) {
-            <ion-item>
-              <ion-badge slot="start" color="tertiary">{{ obtenerLetraMarcador(i) }}</ion-badge>
-              <ion-label>
-                <h3>{{ cliente.representante }}</h3>
-                <p>{{ cliente.direcciones[0]?.colonia }}</p>
-              </ion-label>
-              <ion-button slot="end" fill="clear" (click)="quitarCliente(i)">
-                <ion-icon name="close" color="danger"></ion-icon>
-              </ion-button>
-            </ion-item>
-          }
-        </ion-list>
+    <ion-list>
+      @for (cliente of clientesSeleccionados; track cliente.id; let i = $index) {
+        <ion-item>
+          <ion-badge slot="start" color="tertiary">{{ obtenerLetraMarcador(i) }}</ion-badge>
+          
+          <ion-label>
+            <h3>{{ cliente.nombre }}</h3> <p>{{ cliente.calle }}, {{ cliente.colonia }}</p> </ion-label>
+          
+          <ion-button slot="end" fill="clear" (click)="quitarCliente(i)">
+            <ion-icon name="close" color="danger"></ion-icon>
+          </ion-button>
+        </ion-item>
+      }
+    </ion-list>
 
-        <ion-button 
-          expand="block" 
-          fill="outline" 
-          color="danger" 
-          (click)="limpiarTodo()">
-          <ion-icon name="trash" slot="start"></ion-icon>
-          Limpiar Todo
-        </ion-button>
-      </div>
-    }
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      color="danger" 
+      (click)="limpiarTodo()">
+      <ion-icon name="trash" slot="start"></ion-icon>
+      Limpiar Todo
+    </ion-button>
+  </div>
+}
 
     <!-- MAPA DE LEAFLET -->
     <div class="ion-margin-top">

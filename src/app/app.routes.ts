@@ -84,13 +84,6 @@ export const routes: Routes = [
   // ========================================
   // RUTAS SUPERVISOR
   // ========================================
-  // {
-  //   path: 'usuario/supervisor',
-  //   loadComponent: () => import('./usuario/supervisor/supervisor.page').then(m => m.SupervisorPage),
-  //   canActivate: [authGuard],
-  //   data: { role: 'supervisor' },
-  //   providers: [Auth, provideHttpClient()]
-  // },
   {
     path: 'supervisores/home',
     loadComponent: () => import('./supervisor/home/home.component').then((m) => m.HomeComponent),
@@ -112,6 +105,12 @@ export const routes: Routes = [
   {
     path: 'supervisores/precios',
     loadComponent: () => import('./supervisor/precios/precios.page').then(m => m.PreciosPage),
+    canActivate: [authGuard],
+    data: { role: 'supervisor' }
+  },
+  {
+    path: 'supervisor/detalle-ruta/:id',
+    loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then(m => m.DetalleRutaPage),
     canActivate: [authGuard],
     data: { role: 'supervisor' }
   },
@@ -179,9 +178,13 @@ export const routes: Routes = [
     path: 'editarprecio',
     loadComponent: () => import('./modal/editarprecio/editarprecio.page').then(m => m.EditarprecioPage)
   },
+  {
+    path: 'monitoreo-ruta',
+    loadComponent: () => import('./modal/monitoreo-ruta/monitoreo-ruta.page').then(m => m.MonitoreoRutaPage)
+  },
 
   // ========================================
-  // MODALES REPARTIDOR REPARTIDOR
+  // MODALES REPARTIDOR
   // ========================================
   {
     path: 'modal-todos-clientes',
