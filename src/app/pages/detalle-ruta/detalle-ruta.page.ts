@@ -170,18 +170,34 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+// En detalle-ruta.page.ts
+
   cambiarDia() {
+    // Buscamos el día seleccionado en la data que llegó del backend
     const dia = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
 
-    if (dia && dia.clientesRuta) {
-      this.clientesDia = dia.clientesRuta.sort((a: any, b: any) =>
-        (a.ordenVisita || 0) - (b.ordenVisita || 0)
-      );
+    if (dia) {
+      // --- AQUÍ ESTÁ LA MAGIA DE ADAPTACIÓN ✨ ---
+      // El backend nos manda 'dia.clientes' (array de clientes directos).
+      // Pero tu HTML espera 'clienteRuta.cliente' y 'clienteRuta.ordenVisita'.
+      // Así que los envolvemos para que el HTML no se rompa.
+      
+      this.clientesDia = (dia.clientes || []).map((clienteReal: any, index: number) => ({
+        id: clienteReal.id,           // ID del cliente
+        cliente: clienteReal,         // Metemos al cliente aquí para que {{ clienteRuta.cliente.nombre }} funcione
+        ordenVisita: index + 1,       // Simulamos el orden
+        visitado: false,              // Por defecto false (aún no guardamos esto en BD)
+        precio: clienteReal.tipoPrecio // Pasamos el precio
+      }));
+      // --------------------------------------------
 
       this.clientesFiltrados = [...this.clientesDia];
       this.clienteSeleccionado = null;
       this.calcularEstadisticas();
       this.actualizarMapa();
+    } else {
+      this.clientesDia = [];
+      this.clientesFiltrados = [];
     }
   }
 
@@ -214,22 +230,23 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  actualizarMapa() {
+ actualizarMapa() {
     if (!this.mapa) return;
 
-    // Limpiar markers anteriores
     this.markers.forEach(marker => marker.remove());
     this.markers.clear();
 
     const bounds: L.LatLngBoundsExpression = [];
 
-    // SÍ, los puntos vienen de la BD (latitud y longitud)
     this.clientesDia.forEach((clienteRuta, index) => {
       const cliente = clienteRuta.cliente;
-      const direccion = cliente.direcciones?.[0];
+      
+      // --- CORRECCIÓN AQUÍ: Usamos coordenadas directas ---
+      const lat = Number(cliente.latitud);
+      const lng = Number(cliente.longitud);
 
-      if (direccion && direccion.latitud && direccion.longitud) {
-        const latlng: L.LatLngExpression = [direccion.latitud, direccion.longitud];
+      if (lat && lng) {
+        const latlng: L.LatLngExpression = [lat, lng];
         bounds.push(latlng);
 
         const iconHtml = `
@@ -245,10 +262,11 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
           iconAnchor: [16, 32]
         });
 
+        // --- CORRECCIÓN POPUP: Usamos 'nombre' y 'calle' ---
         const marker = L.marker(latlng, { icon: customIcon })
           .bindPopup(`
-            <strong>${cliente.representante}</strong><br>
-            ${direccion.direccion}
+            <strong>${cliente.nombre}</strong><br>
+            ${cliente.calle}
           `)
           .on('click', () => {
             this.seleccionarCliente(clienteRuta);
@@ -279,12 +297,14 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   seleccionarClienteEnMapa(clienteRuta: any) {
-    const direccion = clienteRuta.cliente.direcciones?.[0];
-    if (direccion && direccion.latitud && direccion.longitud) {
+    const lat = Number(clienteRuta.cliente.latitud);
+    const lng = Number(clienteRuta.cliente.longitud);
+
+    if (lat && lng) {
       this.clienteSeleccionado = clienteRuta;
 
       if (this.mapa) {
-        this.mapa.setView([direccion.latitud, direccion.longitud], 16);
+        this.mapa.setView([lat, lng], 16);
       }
 
       const marker = this.markers.get(clienteRuta.id);
@@ -576,20 +596,21 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 // ========================================
 
 buscarCliente(event: any) {
-  const busqueda = event.target.value.toLowerCase();
-  
-  if (!busqueda) {
-    this.clientesFiltrados = [...this.clientesDia];
-    return;
-  }
+    const busqueda = event.target.value.toLowerCase();
+    
+    if (!busqueda) {
+      this.clientesFiltrados = [...this.clientesDia];
+      return;
+    }
 
-  this.clientesFiltrados = this.clientesDia.filter(cr => {
-    const cliente = cr.cliente;
-    return cliente.representante.toLowerCase().includes(busqueda) ||
-           cliente.negocio?.toLowerCase().includes(busqueda) ||
-           cliente.direcciones?.[0]?.direccion.toLowerCase().includes(busqueda);
-  });
-}
+    this.clientesFiltrados = this.clientesDia.filter(cr => {
+      const cliente = cr.cliente;
+      // --- CORRECCIÓN AQUÍ: Usamos 'nombre', 'calle', 'colonia' ---
+      return (cliente.nombre || '').toLowerCase().includes(busqueda) ||
+             (cliente.calle || '').toLowerCase().includes(busqueda) ||
+             (cliente.colonia || '').toLowerCase().includes(busqueda);
+    });
+  }
 
 async editarUbicacionCliente(clienteRuta: any) {
   const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);

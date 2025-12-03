@@ -302,17 +302,6 @@ export class GestionRutasPage implements OnInit {
     });
   }
 
-  async abrirModalAgregarGrupo() {
-    const modal = await this.modalController.create({
-      component: AgregarrutaPage
-    });
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-    if (data) {
-      this.cargarRutas();
-    }
-  }
 
   async abrirImportador() {
     const modal = await this.modalController.create({
@@ -351,4 +340,20 @@ export class GestionRutasPage implements OnInit {
     }
   });
 }
+  // En gestion-rutas.page.ts
+
+  async abrirModalAgregarGrupo() {
+    const modal = await this.modalController.create({
+      component: AgregarrutaPage
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    // Verificamos que sea true explícitamente
+    if (data === true) { 
+      this.mostrarToast('Ruta guardada exitosamente', 'success');
+      this.cargarRutas();
+    }
+  }
 }

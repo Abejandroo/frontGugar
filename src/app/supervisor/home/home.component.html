@@ -63,8 +63,7 @@
 
     </ion-row>
   </ion-grid>
-
-  <div class="tabs-container ion-margin-top">
+<div class="tabs-container ion-margin-top">
     
     <ion-segment [value]="segmentoActual" (ionChange)="cambiarSegmento($event)" mode="ios">
       <ion-segment-button value="activas">
@@ -85,35 +84,35 @@
           
           <div class="status-bar" 
                [ngClass]="{
-                 'success': ruta.status === 'en_curso',
-                 'warning': ruta.status === 'pendiente',
-                 'danger': ruta.status === 'incidencia',
-                 'medium': ruta.status === 'completada'
+                 'success': getEstadoDiaActual(ruta) === 'en_curso' || getEstadoDiaActual(ruta) === 'activa',
+                 'warning': getEstadoDiaActual(ruta) === 'pendiente',
+                 'danger': getEstadoDiaActual(ruta) === 'incidencia',
+                 'medium': getEstadoDiaActual(ruta) === 'completada'
                }">
           </div> 
           
           <ion-card-header>
             <div class="header-top">
-              <ion-badge [color]="getColorEstado(ruta.status)">
-                {{ ruta.status | uppercase }}
+              <ion-badge [color]="getColorEstado(getEstadoDiaActual(ruta))">
+                {{ getEstadoDiaActual(ruta) | uppercase }}
               </ion-badge>
-              <small>ID: #{{ ruta.id }}</small>
+              <small>Ruta #{{ ruta.id }}</small>
             </div>
             
             <ion-card-title>{{ ruta.nombre }}</ion-card-title>
             
             <ion-card-subtitle>
               <ion-icon name="person-circle-outline"></ion-icon> 
-              {{ ruta.driver_name || 'Sin Asignar' }} 
+              {{ ruta.repartidor?.name || 'Sin Asignar' }} 
             </ion-card-subtitle>
           </ion-card-header>
 
           <ion-card-content>
             <div class="progreso-info">
-              <span>Progreso Estimado:</span>
-              <span>{{ ruta.progreso || 0 }}%</span>
+              <span>Progreso:</span>
+              <span>0%</span>
             </div>
-            <ion-progress-bar [value]="(ruta.progreso || 0) / 100" [color]="getColorEstado(ruta.status)"></ion-progress-bar>
+            <ion-progress-bar [value]="0" [color]="getColorEstado(getEstadoDiaActual(ruta))"></ion-progress-bar>
             
             <div class="ion-text-end ion-margin-top">
               <ion-button size="small" fill="outline" shape="round" color="light" (click)="verDetalleRuta(ruta)">
@@ -136,5 +135,5 @@
 </ion-content>
 
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
-  <app-supervisor-navbar paginaActual="inicio"></app-supervisor-navbar> 
+  <app-supervisor-navbar paginaActual="inicio"></app-supervisor-navbar>
 </ion-footer>
