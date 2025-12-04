@@ -7,9 +7,13 @@
       </div>
 
       <div class="text-container">
-        <h2>MIS RUTAS</h2>
-        <p>Supervisa el avance de tus zonas</p>
-        <h1 class="big-number">{{ rutasFiltradas.length }}</h1>
+        <h2>👋 HOLA, {{ userName }}</h2>
+        <p class="fecha">{{ fechaHoy }}</p>
+        
+        <div class="big-counter-box">
+          <h1 class="big-number">{{ rutasFiltradas.length }}</h1>
+          <span class="counter-label">Rutas Asignadas</span>
+        </div>
       </div>
     </div>
   </div>
@@ -45,6 +49,7 @@
           <div class="card-info">
             <div class="card-header-row">
               <h3 class="ruta-title">{{ ruta.nombre }}</h3>
+              
               <ion-badge mode="ios" [color]="getColorEstado(getEstadoDiaActual(ruta))" class="mini-badge">
                 {{ getEstadoDiaActual(ruta) | uppercase }}
               </ion-badge>
