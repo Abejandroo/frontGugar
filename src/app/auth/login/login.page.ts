@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonToolbar, IonGrid, IonRow, IonCol, IonButtons, IonBackButton, IonItem, IonLabel, IonButton, IonIcon, IonInput, ToastController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { personOutline, lockOpenOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { personOutline, lockOpenOutline, eyeOutline, eyeOffOutline, lockClosedOutline, arrowForwardOutline } from 'ionicons/icons';
 import { Auth } from 'src/app/service/auth';
 
 @Component({
@@ -29,7 +29,7 @@ export class LoginPage {
     this.route.queryParams.subscribe(params => {
       this.rolSeleccionado = params['rol'];
     });
-    addIcons({ personOutline, 'lock-open-outline': lockOpenOutline, eyeOutline, 'eye-off-outline': eyeOffOutline });
+    addIcons({personOutline,lockClosedOutline,arrowForwardOutline,'lockOpenOutline':lockOpenOutline,eyeOutline,'eyeOffOutline':eyeOffOutline});
   }
 
   async onSubmit() {

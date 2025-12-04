@@ -1,137 +1,82 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-light">
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  
-  <div class="welcome-message">
-    <h2>👋 Hola, {{ userName }}</h2>
-    <p class="fecha">{{ fechaHoy }}</p>
-    <p>Panel de Supervisión</p>
+  <div class="main-header">
+    <div class="header-content">
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
+      </div>
+
+      <div class="text-container">
+        <h2>MIS RUTAS</h2>
+        <p>Supervisa el avance de tus zonas</p>
+        <h1 class="big-number">{{ rutasFiltradas.length }}</h1>
+      </div>
+    </div>
   </div>
 
-  <ion-grid>
-    <ion-row class="ion-justify-content-center" style="row-gap: 15px;">
-      
-      <ion-col size="6" size-md="3">
-        <ion-card class="kpi-card">
-          <ion-card-content>
-            <h1>{{ rutasAsignadasCount }}</h1>
-            <p>Asignadas</p>
-            <ion-icon name="map-outline" class="bg-icon"></ion-icon>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="kpi-card success">
-          <ion-card-content>
-            <h1>{{ rutasCompletadasCount }}</h1>
-            <p>Completadas</p>
-            <ion-icon name="checkmark-done-circle-outline" class="bg-icon"></ion-icon>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="kpi-card danger">
-          <ion-card-content>
-            <h1>{{ incidenciasCount }}</h1>
-            <p>Incidencias</p>
-            <ion-icon name="alert-circle-outline" class="bg-icon"></ion-icon>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="kpi-card tertiary" (click)="goToRepartidores()" button> 
-          <ion-card-content>
-            <h1>{{ repartidoresCount }}</h1>
-            <p>Repartidores</p>
-            <ion-icon name="bicycle-outline" class="bg-icon"></ion-icon>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
-<div class="tabs-container ion-margin-top">
+  <div class="white-container">
     
-    <ion-segment [value]="segmentoActual" (ionChange)="cambiarSegmento($event)" mode="ios">
-      <ion-segment-button value="activas">
-        <ion-label>Activas</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="pendientes">
-        <ion-label>Pendientes</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="completadas">
-        <ion-label>Fin</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    <div class="tabs-container">
+      <ion-segment [value]="segmentoActual" (ionChange)="cambiarSegmento($event)" mode="ios" class="custom-segment">
+        <ion-segment-button value="activas">
+          <ion-label>Activas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pendientes">
+          <ion-label>Pendientes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completadas">
+          <ion-label>Fin</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
 
-    <ion-list class="ruta-list">
+    <div class="rutas-list-container ion-margin-top">
       
       @for (ruta of rutasFiltradas; track ruta.id) {
-        <ion-card class="ruta-card">
+        
+        <div class="clean-card" (click)="verDetalleRuta(ruta)">
           
-          <div class="status-bar" 
-               [ngClass]="{
-                 'success': getEstadoDiaActual(ruta) === 'en_curso' || getEstadoDiaActual(ruta) === 'activa',
-                 'warning': getEstadoDiaActual(ruta) === 'pendiente',
-                 'danger': getEstadoDiaActual(ruta) === 'incidencia',
-                 'medium': getEstadoDiaActual(ruta) === 'completada'
-               }">
-          </div> 
-          
-          <ion-card-header>
-            <div class="header-top">
-              <ion-badge [color]="getColorEstado(getEstadoDiaActual(ruta))">
+          <div class="status-strip" [ngClass]="getColorEstado(getEstadoDiaActual(ruta))"></div>
+
+          <div class="card-icon-box">
+            <ion-icon name="map-outline"></ion-icon>
+          </div>
+
+          <div class="card-info">
+            <div class="card-header-row">
+              <h3 class="ruta-title">{{ ruta.nombre }}</h3>
+              <ion-badge mode="ios" [color]="getColorEstado(getEstadoDiaActual(ruta))" class="mini-badge">
                 {{ getEstadoDiaActual(ruta) | uppercase }}
               </ion-badge>
-              <small>Ruta #{{ ruta.id }}</small>
             </div>
             
-            <ion-card-title>{{ ruta.nombre }}</ion-card-title>
-            
-            <ion-card-subtitle>
-              <ion-icon name="person-circle-outline"></ion-icon> 
-              {{ ruta.repartidor?.name || 'Sin Asignar' }} 
-            </ion-card-subtitle>
-          </ion-card-header>
+            <span class="ruta-subtitle">Ruta #{{ ruta.id }}</span>
 
-          <ion-card-content>
-            <div class="progreso-info">
-              <span>Progreso:</span>
-              <span>0%</span>
+            <div class="repartidor-chip">
+              <ion-icon name="bicycle-outline"></ion-icon>
+              <span>{{ ruta.repartidor?.name || 'SIN ASIGNAR' | uppercase }}</span>
             </div>
-            <ion-progress-bar [value]="0" [color]="getColorEstado(getEstadoDiaActual(ruta))"></ion-progress-bar>
             
-            <div class="ion-text-end ion-margin-top">
-              <ion-button size="small" fill="outline" shape="round" color="light" (click)="verDetalleRuta(ruta)">
-                Ver Detalles <ion-icon name="arrow-forward" slot="end"></ion-icon>
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
+            <div class="divider"></div>
+          </div>
+
+          <div class="arrow-container">
+             <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+
+        </div>
       } @empty {
         <div class="empty-state">
           <ion-icon name="leaf-outline" size="large"></ion-icon>
-          <p>No hay rutas en esta sección</p>
+          <p>No hay rutas en la sección {{ segmentoActual }}</p>
         </div>
       }
 
-    </ion-list>
+    </div>
+
+    <div style="height: 100px;"></div>
   </div>
 
-  <div style="height: 80px;"></div>
 </ion-content>
 
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">

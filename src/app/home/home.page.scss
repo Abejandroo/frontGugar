@@ -1,266 +1,115 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+// FUENTE GENERAL
+* {
+  font-family: 'Poppins', sans-serif;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.bg-light {
+  --background: #f4f6fa;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-}
-
-.img {
-  height: auto;
-  max-width: 100%;
-}
-.img-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.logo {
-  height: 40px;
-  width: auto;
-}
-.title {
-  margin-bottom: 20px;
-}
-
-.custom-toast {
-  .toast-message {
-    white-space: pre-line;
-  }
-}
-
-.custom-button {
+// --- HEADER AZUL ---
+.main-header {
+  // Gradiente azul (Mismo que las otras pantallas)
+  background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
+  padding: 40px 20px 80px 20px; // Más alto porque es el Login/Home
+  color: white;
   position: relative;
-  padding: 12px 35px;
-  background: transparent; /* Cambiado de #fec195 a transparente */
-  font-size: 17px;
-  font-weight: 500;
-  color: #181818;
-  border: 3px solid transparent;
-  border-radius: 8px;
-  box-shadow: 0 0 0 gray;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-}
-
-.custom-button .star-1,
-.custom-button .star-2,
-.custom-button .star-3,
-.custom-button .star-4,
-.custom-button .star-5,
-.custom-button .star-6 {
-  position: absolute;
-  width: 25px;
-  height: auto;
-  filter: drop-shadow(0 0 0 #fffdef);
-  z-index: -5;
-  transition: all 1s cubic-bezier(0.05, 0.83, 0.43, 0.96);
-}
-
-.custom-button .star-2 {
-  top: 45%;
-  left: 45%;
-  width: 15px;
-  transition: all 1s cubic-bezier(0, 0.4, 0, 1.01);
-}
-
-.custom-button .star-3 {
-  top: 40%;
-  left: 40%;
-  width: 5px;
-  transition: all 1s cubic-bezier(0, 0.4, 0, 1.01);
-}
-
-.custom-button .star-4 {
-  top: 20%;
-  left: 40%;
-  width: 8px;
-  transition: all 0.8s cubic-bezier(0, 0.4, 0, 1.01);
-}
-
-.custom-button .star-5 {
-  top: 25%;
-  left: 45%;
-  width: 15px;
-  transition: all 0.6s cubic-bezier(0, 0.4, 0, 1.01);
-}
-
-.custom-button .star-6 {
-  top: 5%;
-  left: 50%;
-  width: 5px;
-  transition: all 0.8s ease;
-}
-
-.custom-button:hover {
-  background: transparent;
-  color: rgba(47, 217, 255, 0.745);
-  box-shadow: 0 0 25px 745px rgba(47, 217, 255, 0.745);
-}
-
-.custom-button:hover .star-1 {
-  top: -80%;
-  left: -30%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.custom-button:hover .star-2 {
-  top: -25%;
-  left: 10%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.custom-button:hover .star-3 {
-  top: 55%;
-  left: 25%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.custom-button:hover .star-4 {
-  top: 30%;
-  left: 80%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.custom-button:hover .star-5 {
-  top: 25%;
-  left: 115%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.custom-button:hover .star-6 {
-  top: 5%;
-  left: 60%;
-  filter: drop-shadow(0 0 10px #fffdef);
-  z-index: 2;
-}
-
-.fil0 {
-  fill: #fffdef;
-}
-
-.button2 {
-  display: inline-block;
-  transition: all 0.2s ease-in;
-  position: relative;
-  overflow: hidden;
   z-index: 1;
-  color: #090909; 
-  padding: 0.7em 1.7em;
-  cursor: pointer;
-  font-size: 18px;
-  border-radius: 0.5em;
-  background: transparent;
-  border: 1px solid transparent;
-  width: 100%;
-  box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
-}
+  text-align: center;
 
-.button2:active {
-  color: transparent;
-  box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
-}
+  .top-bar {
+    margin-bottom: 20px;
+    .main-logo {
+      height: 60px; // Logo más grande para impacto inicial
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+  }
 
-.button2:before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%) scaleY(1) scaleX(1.25);
-  top: 100%;
-  width: 140%;
-  height: 180%;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
-  display: block;
-  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-  z-index: -1;
-}
-
-.button2:after {
-  content: "";
-  position: absolute;
-  left: 55%;
-  transform: translateX(-50%) scaleY(1) scaleX(1.45);
-  top: 180%;
-  width: 160%;
-  height: 190%;
-  background-color: #084c34;
-  border-radius: 50%;
-  display: block;
-  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-  z-index: -1;
-}
-
-.button2:hover {
-  color: #ffffff;
-  border: 1px solid rgba(47, 217, 255, 0.745);
-}
-
-.button2:hover:before {
-  top: -35%;
-  background-color: rgba(47, 89, 255, 0.3);
-  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-}
-
-.button2:hover:after {
-  top: -45%;
-  background-color: rgba(47, 89, 255, 0.3);
-  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-}
-
-@media (prefers-color-scheme: dark) {
-  .button2 {
-    color: #ffffff;
+  .text-container {
+    h2 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
+    p { margin: 5px 0 0 0; font-size: 1rem; opacity: 0.9; font-weight: 300; }
   }
 }
-.button2:disabled {
-  background-color: #cccccc;
-  color: #666666;
-  cursor: not-allowed;
-  box-shadow: none;
+
+// --- CONTENEDOR BLANCO ---
+.white-container {
+  background: #f4f6fa;
+  margin-top: -50px; // Overlap pronunciado
+  border-top-left-radius: 35px;
+  border-top-right-radius: 35px;
+  min-height: 80vh; // Cubre el resto
+  position: relative;
+  z-index: 2;
+  padding: 30px 20px;
 }
-.button2:disabled:before,
-.button2:disabled:after {
-  content: none;
+
+// --- LISTA DE ROLES ---
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.icono-ojo {
-  font-size: 22px;
-  color: var(--ion-color-medium);
+
+// --- TARJETA DE ROL (ROLE CARD) ---
+.role-card {
+  background: white;
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  border: 1px solid transparent;
+
+  // Efecto Hover/Active
+  &:active {
+    transform: scale(0.97);
+    background: #fdfdfd;
+  }
+
+  // CAJA DE IMAGEN (Izquierda)
+  .role-icon-box {
+    width: 70px; height: 70px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px;
+    
+    // Variantes de color de fondo sutil según el rol
+    &.blue { background: #e3f2fd; }   // Repartidor
+    &.purple { background: #f3e5f5; } // Supervisor
+    &.dark { background: #eceff1; }   // Admin
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  // INFO (Centro)
+  .role-info {
+    flex: 1;
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #333;
+    }
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #888;
+    }
+  }
+
+  // FLECHA (Derecha)
+  .arrow-box {
+    color: #ccc;
+    font-size: 1.4rem;
+    display: flex; align-items: center;
+  }
 }
 
-/* Pega esto en tu archivo login.page.scss */
-
-ion-content {
-  // Esta es la forma correcta y más segura de poner una imagen de fondo
-  --background: url('/assets/bg.png') no-repeat center center / cover;
-}
-
-ion-toolbar {
-  // Esto fuerza a la barra de navegación a ser transparente, siempre
-  --background: transparent;
-}
+// ---

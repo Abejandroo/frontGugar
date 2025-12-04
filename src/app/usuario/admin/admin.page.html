@@ -1,115 +1,106 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-light">
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  
-  <div class="welcome-message">
-    <h2>👋 Bienvenido, {{ userName }}</h2>
-    <p class="fecha">{{ fechaHoy }}</p>
-    <p>Resumen de operaciones:</p>
+  <div class="main-header">
+    <div class="header-content">
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
+      </div>
+
+      <div class="text-container">
+        <h2>HOLA, {{ userName }}</h2>
+        <p class="fecha">{{ fechaHoy }}</p>
+        <p class="subtitle">Panel de Administración</p>
+      </div>
+    </div>
   </div>
 
-  <ion-grid>
-    <p style="text-align: center; font-weight: 600; color: #fff;">Indicadores de hoy:</p>
+  <div class="white-container">
+
+    <h3 class="section-title">Resumen del Día</h3>
     
-    <ion-row class="ion-justify-content-center" style="row-gap: 20px;">
+    <ion-grid class="ion-no-padding">
+      <ion-row style="margin: 0 -5px;"> <ion-col size="6">
+          <div class="stat-card">
+            <div class="icon-box blue">
+              <img src="assets/ruta.png" alt="Ruta">
+            </div>
+            <div class="stat-info">
+              <h1>{{ rutasTotales }}</h1>
+              <p>Rutas</p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="stat-card">
+            <div class="icon-box green">
+              <img src="assets/repartidor.png" alt="Repartidor" onerror="this.src='assets/logo.png'">
+            </div>
+            <div class="stat-info">
+              <h1>{{ repartidoresTotales }}</h1>
+              <p>Repartidores</p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="stat-card">
+            <div class="icon-box purple">
+              <img src="assets/supervisor.png" alt="Supervisor" onerror="this.src='assets/campana.png'">
+            </div>
+            <div class="stat-info">
+              <h1>{{ supervisoresTotales }}</h1>
+              <p>Supervisores</p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="stat-card">
+            <div class="icon-box orange">
+              <img src="assets/asignado.png" alt="Asignado" onerror="this.src='assets/ruta2.png'">
+            </div>
+            <div class="stat-info">
+              <h1>{{ rutasAsignadas }}</h1>
+              <p>En Curso</p>
+            </div>
+          </div>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+
+    <h3 class="section-title ion-margin-top">Acciones Rápidas</h3>
+
+    <div class="shortcuts-list">
       
-      <ion-col size="12" size-md="5">
-        <ion-card class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title>Rutas Totales</ion-card-title>
-            <ion-card-subtitle style="color: #ddd;">Registradas</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
-              {{ rutasTotales }}
-            </span>
-          </ion-card-content>
-          <img src="assets/ruta.png" alt="rutas" class="card-image-absolute">
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="5">
-        <ion-card class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title>Repartidores</ion-card-title>
-            <ion-card-subtitle style="color: #ddd;">Activos</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
-              {{ repartidoresTotales }}
-            </span>
-          </ion-card-content>
-          <img src="assets/repartidor.png" onerror="this.src='assets/logo.png'" alt="repartidores" class="card-image-absolute">
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="5">
-        <ion-card class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title>Supervisores</ion-card-title>
-            <ion-card-subtitle style="color: #ddd;">Activos</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
-              {{ supervisoresTotales }}
-            </span>
-          </ion-card-content>
-          <img src="assets/supervisor.png" onerror="this.src='assets/campana.png'" alt="supervisores" class="card-image-absolute">
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="5">
-        <ion-card class="opcion-card card-with-image-right">
-          <ion-card-header>
-            <ion-card-title>Asignaciones</ion-card-title>
-            <ion-card-subtitle style="color: #ddd;">Rutas en curso</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <span style="font-size: 2.5rem; font-weight: bold; color: white;">
-              {{ rutasAsignadas }}
-            </span>
-          </ion-card-content>
-          <img src="assets/asignado.png" onerror="this.src='assets/ruta2.png'" alt="asignadas" class="card-image-absolute">
-        </ion-card>
-      </ion-col>
-
-    </ion-row>
-
- <ion-row class="ion-justify-content-center">
-      <ion-col size="12" size-md="8" size-lg="6">
-        
-        <div class="atajos-container">
-          <h3 class="ion-text-center">Atajos</h3> <ion-card class="atajos-card">
-            <ion-list lines="none">
-              
-              <ion-item button (click)="abrirModalCrearRuta()" detail="false" class="atajo-item">
-                <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                <ion-label>Crear nueva Ruta</ion-label>
-              </ion-item>
-    
-              <ion-item button (click)="abrirModalAgregarUsuario()" detail="false" class="atajo-item">
-                <ion-icon slot="start" name="person-add-outline"></ion-icon>
-                <ion-label>Agregar Usuario</ion-label>
-              </ion-item>
-    
-              </ion-list>
-          </ion-card>
+      <div class="shortcut-card" (click)="abrirModalCrearRuta()">
+        <div class="shortcut-icon">
+          <ion-icon name="add-circle-outline"></ion-icon>
         </div>
+        <div class="shortcut-text">
+          <h4>Nueva Ruta</h4>
+          <p>Crear y asignar zona</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
 
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <div style="height: 80px;"></div>
+      <div class="shortcut-card" (click)="abrirModalAgregarUsuario()">
+        <div class="shortcut-icon">
+          <ion-icon name="person-add-outline"></ion-icon>
+        </div>
+        <div class="shortcut-text">
+          <h4>Nuevo Usuario</h4>
+          <p>Registrar personal</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
+
+    </div>
+
+    <div style="height: 100px;"></div>
+  </div>
+
 </ion-content>
 
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">

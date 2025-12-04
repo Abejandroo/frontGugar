@@ -1,38 +1,67 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-light">
 
+  <div class="main-header">
+    <div class="header-content">
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="main-logo" />
+      </div>
 
-<ion-content [fullscreen]="true" class="card-container" >
-  <ion-grid fixed>
-    <ion-row>
-      <ion-col class="ion-text-center">
-        <img src="./assets/repartidor.png" alt="">
-        <br>
-        <button class="button2" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'repartidor' }">Repartidor</button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col class="ion-text-center">
-        <img src="./assets/supervisor.png" alt="">
-        <br>
-        <button class="button2" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'supervisor' }">Supervisor</button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col class="ion-text-center">
-        <img src="./assets/admin.png" alt="">
-        <br>
-        <button class="button2" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'admin' }">Admin</button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <div class="text-container">
+        <h2>BIENVENIDO</h2>
+        <p>Selecciona tu perfil para ingresar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="white-container">
+
+    <div class="roles-list">
+      
+      <div class="role-card" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'repartidor' }">
+        <div class="role-icon-box blue">
+          <img src="./assets/repartidor.png" alt="Repartidor" />
+        </div>
+        <div class="role-info">
+          <h3>Repartidor</h3>
+          <p>Acceso a rutas y entregas</p>
+        </div>
+        <div class="arrow-box">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+
+      <div class="role-card" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'supervisor' }">
+        <div class="role-icon-box purple">
+          <img src="./assets/supervisor.png" alt="Supervisor" />
+        </div>
+        <div class="role-info">
+          <h3>Supervisor</h3>
+          <p>Gestión de zonas y clientes</p>
+        </div>
+        <div class="arrow-box">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+
+      <div class="role-card" [routerLink]="['/auth/login']" [queryParams]="{ rol: 'admin' }">
+        <div class="role-icon-box dark">
+          <img src="./assets/admin.png" alt="Admin" />
+        </div>
+        <div class="role-info">
+          <h3>Administrador</h3>
+          <p>Control total del sistema</p>
+        </div>
+        <div class="arrow-box">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-note">
+      <p>© 2025 Gagarín. Todos los derechos reservados.</p>
+    </div>
+
+  </div>
+
 </ion-content>

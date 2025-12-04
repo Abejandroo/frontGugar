@@ -1,137 +1,129 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
+<ion-content [fullscreen]="true" class="bg-light">
 
-  <!-- BARRA DE BÚSQUEDA CON BOTÓN DE FILTRO -->
-  <ion-toolbar>
-    <div class="search-container">
-      <ion-searchbar [(ngModel)]="textoBusqueda" (ionInput)="onBuscar($event)" placeholder="Buscar ruta o repartidor"
-        animated>
-      </ion-searchbar>
-      <ion-button fill="clear" (click)="toggleFiltros()" class="btn-filtro">
-        <ion-icon name="filter-outline" [color]="mostrarFiltros ? 'primary' : 'medium'"></ion-icon>
+  <div class="main-header">
+    <div class="header-content">
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
+      </div>
+
+      <div class="text-container">
+        <h2>GESTIÓN DE RUTAS</h2>
+        <p>Administra y monitorea el avance</p>
+        <h1 class="big-number">{{ rutasFiltradas.length }}</h1>
+      </div>
+
+      <div class="search-wrapper">
+        <ion-searchbar 
+          [(ngModel)]="textoBusqueda" 
+          (ionInput)="onBuscar($event)" 
+          placeholder="Buscar ruta o repartidor..."
+          mode="ios"
+          class="custom-searchbar">
+        </ion-searchbar>
+        
+        <ion-button fill="clear" class="filter-btn" (click)="toggleFiltros()">
+          <ion-icon name="filter-outline" [color]="mostrarFiltros ? 'warning' : 'light'"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="white-container">
+
+    @if (mostrarFiltros) {
+      <div class="tabs-container">
+        <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()" mode="ios" class="custom-segment" scrollable>
+          <ion-segment-button value="todos">
+            <ion-label>Todas</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="en_curso">
+            <ion-label>En Curso</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="pendiente">
+            <ion-label>Pendientes</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="completada">
+            <ion-label>Fin</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    }
+
+    <div class="actions-row">
+      <ion-button fill="outline" shape="round" size="small" (click)="abrirImportador()">
+        <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+        Importar Excel
+      </ion-button>
+      <ion-button fill="outline" shape="round" size="small" color="secondary" (click)="generarReporteSemanal()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Reporte Semanal
       </ion-button>
     </div>
-  </ion-toolbar>
 
-  <!-- TABS DE FILTRO (SE MUESTRAN/OCULTAN) -->
-  <ion-toolbar *ngIf="mostrarFiltros">
-    <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()" mode="md" scrollable>
-      <ion-segment-button value="todos">
-        <ion-label>Todas</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="en_curso">
-        <ion-label>En Curso</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="pausada">
-        <ion-label>Pausadas</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="pendiente">
-        <ion-label>Pendientes</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="completada">
-        <ion-label>Completadas</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="ion-padding">
-
-  <ion-grid fixed>
-
-    <!-- BOTONES DE ACCIÓN -->
-    <ion-row>
-      <ion-col size="12" size-md="6">
-        <ion-button expand="block" color="success" (click)="abrirModalAgregarGrupo()">
-          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          Agregar Nueva Ruta
-        </ion-button>
-      </ion-col>
-      <ion-col size="12" size-md="6">
-        <ion-button expand="block" color="primary" (click)="abrirImportador()">
-          <ion-icon name="cloud-upload" slot="start"></ion-icon>
-          Importar desde Excel
-        </ion-button>
-      </ion-col>
-      <ion-col>
-        <ion-button expand="block" color="secondary" (click)="generarReporteSemanal()">
-          <ion-icon name="download-outline" slot="start"></ion-icon>
-          Descargar Reporte Semanal
-        </ion-button>
-      </ion-col>
-    </ion-row>
-
-    <!-- LISTA DE RUTAS PADRE -->
-    <ion-row>
+    <div class="lista-container">
       @for (ruta of rutasFiltradas; track ruta.id) {
-      <ion-col size="12">
-        <ion-card class="ruta-card-compact" button (click)="abrirOpcionesRuta(ruta)">
-          <ion-card-content>
-            <div class="card-wrapper">
+        
+        <div class="clean-card" (click)="abrirOpcionesRuta(ruta)">
+          
+          <div class="card-icon-box">
+            <ion-icon name="map-outline"></ion-icon>
+          </div>
 
-              <!-- BADGE DE ESTADO (basado en el día actual) -->
-              <div class="estado-badge">
-                <div class="punto-estado" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
-              </div>
-
-              <!-- INFO PRINCIPAL -->
-              <div class="ruta-info">
-                <!-- NOMBRE -->
-                <div class="ruta-nombre">{{ ruta.nombre }}</div>
-
-                <!-- META INFO: Ruta 1 · Lun - Jue · EN CURSO -->
-                <div class="ruta-meta">
-                  Ruta {{ ruta.id }} · {{ getDiaVisitaActual(ruta) }} · {{ getEstadoDiaActual(ruta) }}
-                </div>
-
-                <!-- PERSONAL -->
-                <div class="ruta-personal">
-                  <span>Supervisor: {{ ruta.supervisor?.name || 'SIN ASIGNAR' }}</span>
-                  <span>Repartidor: {{ ruta.repartidor?.name || 'SIN ASIGNAR' }}</span>
-                </div>
-
-                <!-- BARRA DE PROGRESO -->
-                <div class="progreso-wrapper">
-                  <div class="progreso-texto">
-                    {{ getClientesVisitados(ruta) }} / {{ getClientesTotalesDia(ruta) }} clientes por visitar hoy
-                  </div>
-                  <ion-progress-bar [value]="getProgresoRuta(ruta)" [color]="getColorProgreso(ruta)">
-                  </ion-progress-bar>
-                </div>
-              </div>
-
-              <!-- ÍCONO FLECHA -->
-              <ion-icon name="chevron-forward-outline" class="icono-flecha"></ion-icon>
-
+          <div class="card-info">
+            <div class="card-header-row">
+              <h3 class="ruta-title">{{ ruta.nombre }}</h3>
+              <div class="status-dot" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
             </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      }
-      @empty {
-      <ion-col size="12">
+            
+            <div class="meta-row">
+              <span>Ruta #{{ ruta.id }}</span> • 
+              <span>{{ getDiaVisitaActual(ruta) }}</span>
+            </div>
+
+            <div class="staff-row">
+              <div class="staff-item">
+                <ion-icon name="person-circle-outline"></ion-icon>
+                <span>{{ ruta.supervisor?.name || 'S/A' }}</span>
+              </div>
+              <div class="staff-item">
+                <ion-icon name="bicycle-outline"></ion-icon>
+                <span>{{ ruta.repartidor?.name || 'S/A' }}</span>
+              </div>
+            </div>
+
+            <div class="progress-section">
+              <div class="progress-text">
+                {{ getClientesVisitados(ruta) }}/{{ getClientesTotalesDia(ruta) }} clientes
+              </div>
+              <ion-progress-bar [value]="getProgresoRuta(ruta)" [color]="getColorProgreso(ruta)"></ion-progress-bar>
+            </div>
+          </div>
+
+          <div class="arrow-container">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+
+        </div>
+
+      } @empty {
         <div class="empty-state">
           <ion-icon name="map-outline" size="large"></ion-icon>
-          <p>No hay rutas {{ filtroEstado !== 'todos' ? 'con ese estado' : 'registradas' }}</p>
+          <p>No hay rutas con el filtro seleccionado</p>
         </div>
-      </ion-col>
       }
-    </ion-row>
+    </div>
 
-  </ion-grid>
+    <div style="height: 100px;"></div>
+  </div>
 
-  <div style="height: 80px;"></div>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="custom-fab">
+    <ion-fab-button (click)="abrirModalAgregarGrupo()" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>
 
-<ion-footer class="ion-no-border">
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
   <app-admin-navbar paginaActual="rutas"></app-admin-navbar>
 </ion-footer>

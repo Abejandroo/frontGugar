@@ -1,28 +1,126 @@
-.logo {
-  height: 40px;
-  width: auto;
-}
-/* Pega esto en tu archivo login.page.scss */
-
-ion-content {
-  // Esta es la forma correcta y más segura de poner una imagen de fondo
-  --background: url('/assets/bg.png') no-repeat center center / cover;
+// FUENTE GENERAL
+* {
+  font-family: 'Poppins', sans-serif;
 }
 
-ion-toolbar {
-  // Esto fuerza a la barra de navegación a ser transparente, siempre
-  --background: transparent;
-}
-/* Pega esto en tu archivo login.page.scss */
-
-ion-item {
-  --background: transparent;
-  --color: #ffffff; // Color del texto del input y los íconos
-  --border-color: rgba(255, 255, 255, 0.5); // Color de la línea de abajo
-  --highlight-color-focused: #ffffff; // Color de la línea al hacer clic
+.bg-light {
+  --background: #f4f6fa;
 }
 
-// Esto es para asegurar que el label también sea blanco
-ion-item .item-native ion-label {
-  color: #ffffff !important;
+// --- HEADER AZUL ---
+.main-header {
+  background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
+  padding: 40px 20px 80px 20px; // Alto para el overlap
+  color: white;
+  position: relative;
+  z-index: 1;
+
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+
+    // Estilo para el botón de atrás blanco
+    .white-back-btn {
+      --color: white;
+      --icon-font-size: 24px;
+    }
+
+    .header-logo {
+      height: 40px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+  }
+
+  .text-container {
+    text-align: center;
+    h2 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.5px; }
+    p { margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.9; font-weight: 300; }
+  }
+}
+
+// --- CONTENEDOR BLANCO ---
+.white-container {
+  background: white; // Fondo blanco puro para el form
+  margin-top: -50px; // Overlap
+  border-top-left-radius: 35px;
+  border-top-right-radius: 35px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+  padding: 40px 25px;
+}
+
+// --- FORMULARIO ---
+.form-wrapper {
+  .input-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-left: 5px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    // INPUT PERSONALIZADO (Estilo Caja)
+    .custom-input {
+      --background: #f4f6fa; // Gris muy clarito
+      --border-radius: 14px;
+      --padding-start: 15px;
+      --inner-padding-end: 10px;
+      --highlight-height: 0; // Quita la línea de abajo animada
+      width: 100%;
+      box-shadow: none;
+
+      ion-icon {
+        color: #0099ff; // Icono azul
+        margin-right: 10px;
+      }
+
+      ion-input {
+        --color: #333;
+        --placeholder-color: #aaa;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .eye-btn {
+        --color: #999;
+      }
+    }
+  }
+
+  .spacer { height: 20px; }
+
+  // BOTÓN PRINCIPAL
+  .main-button {
+    --background: linear-gradient(90deg, #0099ff 0%, #007acc 100%);
+    --border-radius: 14px;
+    --box-shadow: 0 10px 20px rgba(0, 153, 255, 0.3);
+    height: 55px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    --color: white;
+    margin-top: 10px;
+  }
+}
+
+// --- FOOTER LINK ---
+.footer-link {
+  text-align: center;
+  margin-top: 30px;
+  p {
+    font-size: 0.9rem;
+    color: #888;
+    span {
+      color: #0099ff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  }
 }

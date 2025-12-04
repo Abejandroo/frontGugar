@@ -1,41 +1,69 @@
-<ion-header [translucent]="true" class="ion-no-border">
-<ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">  
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home" text=""></ion-back-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content [fullscreen]="true" class="ion-padding">
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-   <ion-item>
-  <ion-icon slot="start" name="person-outline"></ion-icon>
-  <ion-label position="floating">Usuario</ion-label>
-  <ion-input type="text"  [(ngModel)]="correo" name="name" required></ion-input>
-</ion-item>
- <ion-item>
-  <ion-icon slot="start" name="lock-open-outline"></ion-icon>
-  <ion-label position="floating">Contraseña</ion-label>
-      <ion-input
-        [type]="mostrarContrasena ? 'text' : 'password'"
-        [(ngModel)]="contrasena"
-        name="password"
-        required>
-      </ion-input>
-      <ion-buttons slot="end">
-        <ion-button fill="clear" (click)="mostrarContrasena = !mostrarContrasena">
-          <ion-icon [name]="mostrarContrasena ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-item>
+<ion-content [fullscreen]="true" class="bg-light">
 
-    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid">Iniciar Sesión</ion-button>
-  </form>
+  <!-- 1. ENCABEZADO AZUL -->
+  <div class="main-header">
+    
+    <!-- Barra superior con Botón Atrás y Logo -->
+    <div class="top-nav">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/home" text="" mode="md" class="white-back-btn"></ion-back-button>
+      </ion-buttons>
+      <img src="./assets/logo.png" alt="Logo" class="header-logo" />
+      <div style="width: 48px"></div> <!-- Espaciador para centrar logo -->
+    </div>
+
+    <!-- Texto de Bienvenida -->
+    <div class="text-container">
+      <h2>HOLA DE NUEVO</h2>
+      <p>Ingresa tus credenciales para continuar</p>
+    </div>
+  </div>
+
+  <!-- 2. CONTENEDOR BLANCO (Overlap) -->
+  <div class="white-container">
+
+    <div class="form-wrapper">
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        
+        <!-- Input USUARIO (Estilo Caja) -->
+        <div class="input-group">
+          <label>Usuario</label>
+          <ion-item lines="none" class="custom-input">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-input type="text" [(ngModel)]="correo" name="name" placeholder="Ej. oswaldo" required></ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Input CONTRASEÑA (Estilo Caja) -->
+        <div class="input-group">
+          <label>Contraseña</label>
+          <ion-item lines="none" class="custom-input">
+            <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+            <ion-input 
+              [type]="mostrarContrasena ? 'text' : 'password'" 
+              [(ngModel)]="contrasena" 
+              name="password" 
+              placeholder="••••••"
+              required>
+            </ion-input>
+            <ion-button fill="clear" slot="end" (click)="mostrarContrasena = !mostrarContrasena" class="eye-btn">
+              <ion-icon [name]="mostrarContrasena ? 'eye-off-outline' : 'eye-outline'" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- Botón Grande -->
+        <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" class="main-button">
+          INICIAR SESIÓN
+          <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+        </ion-button>
+
+      </form>
+    
+    </div>
+
+  </div>
+
 </ion-content>
- 

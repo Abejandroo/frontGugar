@@ -1,89 +1,88 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-light">
 
-<ion-content [fullscreen]="true">
-  
-  <div class="header">
+  <div class="main-header">
     <div class="header-content">
-      <div>
-        <h1>MIS RUTAS</h1>
-        <small>Supervisa el avance de tus zonas</small>
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
       </div>
-      <div class="badge-count">{{ rutas.length }}</div>
+
+      <div class="text-container">
+        <h2>MIS RUTAS</h2>
+        <p>Administración general de rutas</p>
+        <h1 class="big-number">{{ rutas.length }}</h1>
+      </div>
     </div>
   </div>
 
-  <div class="lista-container">
-    
+  <div class="white-container">
+
     @if (cargando) {
-      <div class="rutas-grid">
-        @for (i of [1,2,3]; track i) {
-          <div class="ruta-card skeleton">
-            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      <div class="lista-container">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="clean-card skeleton-card">
+            <div class="card-icon-box skeleton-box"></div>
+            <div style="flex: 1">
+              <ion-skeleton-text animated style="width: 60%; height: 20px; border-radius: 5px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 15px; margin-top: 5px;"></ion-skeleton-text>
+            </div>
           </div>
         }
       </div>
-    } @else {
-      
-      <div class="rutas-grid">
+    } 
+    
+    @else {
+      <div class="lista-container">
+        
         @for (ruta of rutas; track ruta.id) {
-          <div class="ruta-card" (click)="verDetalleRuta(ruta)">
+          <div class="clean-card" (click)="verDetalleRuta(ruta)">
             
-            <div class="card-header">
-              <div class="ruta-icon">
-                <ion-icon name="map-outline"></ion-icon>
-              </div>
-              <div class="ruta-title">
-                <h3>{{ ruta.nombre }}</h3>
-                <small>Ruta #{{ ruta.id }}</small>
-              </div>
-              <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+            <div class="card-icon-box">
+              <ion-icon name="map-outline"></ion-icon>
             </div>
 
-            <div class="card-body">
-              <p class="info-row">
-                <ion-icon name="calendar-outline"></ion-icon> 
-                {{ obtenerDiasTexto(ruta) }}
-              </p>
+            <div class="card-info">
+              <div class="card-header-row">
+                <h3 class="ruta-title">{{ ruta.nombre }}</h3>
+              </div>
               
-              <div class="personal-info">
-                <div class="chip repartidor">
-                  <ion-icon name="bicycle-outline"></ion-icon>
-                  {{ ruta.repartidor?.name || 'Sin Repartidor' }}
-                </div>
-                </div>
+              <span class="ruta-subtitle">Ruta #{{ ruta.id }}</span>
+
+              <div class="detail-row">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ obtenerDiasTexto(ruta) }}</span>
+              </div>
+
+              <div class="repartidor-chip">
+                <ion-icon name="bicycle-outline"></ion-icon>
+                <span>{{ ruta.repartidor?.name || 'SIN ASIGNAR' | uppercase }}</span>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="footer-row">
+                <ion-icon name="location-outline"></ion-icon>
+                <span>{{ contarClientes(ruta) }} Clientes</span>
+              </div>
             </div>
 
-            <div class="card-footer">
-              <span class="badge-clientes">
-                <ion-icon name="location-outline"></ion-icon>
-                {{ contarClientes(ruta) }} Clientes
-              </span>
+            <div class="arrow-container">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
             </div>
 
           </div>
         } @empty {
           <div class="empty-state">
-            <ion-icon name="map-outline"></ion-icon>
+            <ion-icon name="map-outline" size="large"></ion-icon>
             <p>No tienes rutas asignadas.</p>
           </div>
         }
-      </div>
 
+      </div>
     }
+
+    <div style="height: 100px;"></div>
   </div>
 
-  <div style="height: 80px;"></div>
 </ion-content>
 
 <ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">

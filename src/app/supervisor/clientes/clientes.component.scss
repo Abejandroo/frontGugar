@@ -1,193 +1,126 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
-ion-content {
-  --background: #f6f8fb;
+// FUENTE GENERAL
+* {
   font-family: 'Poppins', sans-serif;
 }
 
-// --- ENCABEZADO AZUL ---
-.header {
-  background: linear-gradient(135deg, #0052d4, #65c7f7, #9cecfb);
-  padding: 30px 20px 40px 20px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  box-shadow: 0 4px 20px rgba(0, 82, 212, 0.25);
+.bg-light {
+  --background: #f4f6fa;
+}
+
+// --- HEADER AZUL ---
+.main-header {
+  background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
+  padding: 20px 20px 70px 20px; // Padding extra para búsqueda y overlap
+  color: white;
   position: relative;
-  
-  // ✨ AJUSTE CLAVE: Para que el azul suba detrás del logo y la barra de estado
-  padding-top: calc(var(--ion-safe-area-top) + 50px); 
-  margin-top: -60px; 
+  z-index: 1;
 
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    margin-top: 10px;
+  .top-bar {
+    display: flex; justify-content: center; margin-bottom: 10px;
+    .mini-logo { height: 35px; opacity: 0.9; }
+  }
 
-    h1 { color: #fff; font-weight: 700; font-size: 1.8rem; margin: 0; }
-    small { color: rgba(255,255,255,0.9); font-size: 0.9rem; }
-    
-    .badge-count {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(5px);
-      color: #fff;
-      padding: 5px 12px;
-      border-radius: 12px;
-      font-weight: bold;
+  .text-container {
+    text-align: center; // Centramos texto para esta vista
+    margin-bottom: 20px;
+    h2 { margin: 0; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; }
+    p { margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; font-weight: 300; }
+    .big-number { margin: 5px 0 0 0; font-size: 2.5rem; font-weight: 700; line-height: 1; }
+  }
+
+  // Estilo especial para la barra de búsqueda
+  .search-wrapper {
+    margin-top: 15px;
+    .custom-searchbar {
+      --background: #ffffff;
+      --color: #333;
+      --placeholder-color: #888;
+      --icon-color: #0099ff;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 0;
     }
   }
 }
 
-// --- LOGO (ESTE ERA EL CULPABLE) ---
-.logo {
-  height: 40px; // Tamaño controlado
-  width: auto;
-  object-fit: contain;
-  margin-top: 10px; // Un poco de espacio arriba
+// --- CONTENEDOR BLANCO ---
+.white-container {
+  background: #f4f6fa;
+  margin-top: -40px; 
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  min-height: 100vh;
   position: relative;
-  z-index: 10; // Para asegurar que quede encima del fondo
+  z-index: 2;
+  padding: 25px 15px;
 }
 
-// --- BUSCADOR ---
-.search-container {
-  ion-searchbar {
-    --background: #ffffff;
-    --border-radius: 14px;
-    --placeholder-color: #888;
-    --icon-color: #0052d4;
-    --box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    padding: 0;
-  }
-}
-
-// --- CONTENEDOR PRINCIPAL ---
-.lista-container {
-  padding: 20px;
-  margin-top: -20px; // Sube un poco sobre el header azul
-}
-
-// --- GRID SYSTEM (CUADRÍCULA VERTICAL) ---
-.grid-clientes {
-  display: grid;
-  // Tarjetas adaptables (mínimo 160px de ancho)
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-  gap: 15px;
-}
-
-// --- TARJETA DE CLIENTE ---
-.cliente-card {
-  background: #fff;
-  border-radius: 24px; 
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  text-align: center;
+// --- TARJETA CLIENTE (Clean UI) ---
+.clean-card {
+  background: white;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center; // Centrado verticalmente
+  gap: 15px;
   transition: transform 0.2s;
-  
-  // Altura mínima para que se vean uniformes y "grandes"
-  min-height: 240px; 
 
   &:active { transform: scale(0.98); }
 
-  // Icono Circular con Iniciales
-  .icon-header {
-    width: 60px;
-    height: 60px;
+  // CAJA DE INICIALES
+  .initials-box {
     background: linear-gradient(135deg, #e3f2fd, #bbdefb);
     color: #1565c0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 10px auto;
-    font-weight: 700;
-    font-size: 1.3rem;
+    min-width: 50px; height: 50px;
+    border-radius: 14px; // Cuadrado redondeado moderno
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.1rem;
   }
 
-  .info {
-    h3 {
-      font-size: 1.1rem;
-      color: #333;
-      margin: 0 0 5px 0;
-      font-weight: 700;
-      white-space: nowrap; 
-      overflow: hidden;
-      text-overflow: ellipsis; 
+  // INFO CENTRAL
+  .card-info {
+    flex: 1;
+    overflow: hidden; // Para textos largos
+    
+    .cliente-name {
+      margin: 0 0 4px 0;
+      font-size: 1rem; font-weight: 700; color: #333;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .dato {
-      font-size: 0.8rem;
-      color: #666;
-      margin: 4px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      
-      ion-icon { font-size: 1rem; color: #999; }
+    .detail-row {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.85rem; color: #666; margin-bottom: 6px;
+      ion-icon { color: #aaa; font-size: 0.9rem; }
     }
 
-    .precio-badge {
-      margin-top: 10px;
-      background: #e8f5e9;
-      color: #2e7d32;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 8px;
+    .price-badge {
       display: inline-block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      background: #f0f0f0; color: #666;
+      font-size: 0.7rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 6px;
     }
   }
 
-  // Botones de Acción (Abajo)
-  .actions {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    border-top: 1px solid #f4f4f4;
-    padding-top: 10px;
-
-    .btn-icon {
-      background: #f9f9f9;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      color: #666;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: background 0.2s;
-
-      &.edit { color: #ffb300; } // Amarillo
-      &.delete { color: #e53935; } // Rojo
-      
-      &:active { background: #eee; }
-    }
+  // ACCIONES (Derecha)
+  .actions-container {
+    display: flex; flex-direction: column; gap: 0;
+    border-left: 1px solid #f4f4f4;
+    padding-left: 5px;
+    
+    ion-button { margin: 0; height: 30px; }
   }
 }
 
-// Estado Vacío
 .empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px;
-  color: #999;
-  ion-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+  text-align: center; padding: 40px; color: #aaa;
+  ion-icon { opacity: 0.4; margin-bottom: 10px; }
 }
 
-// Skeleton Loading
-.skeleton-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+// Ajuste del FAB para que no tape el contenido final
+.custom-fab {
+  margin-bottom: 60px; 
+  margin-right: 10px;
 }

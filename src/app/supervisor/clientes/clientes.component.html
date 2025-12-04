@@ -1,100 +1,96 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="transparent" class="ion-text-center transparent-toolbar">
-    <ion-grid fixed>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col size="auto">
-          <img src="./assets/logo.png" alt="Logo" class="logo" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-light">
 
-<ion-content [fullscreen]="true">
-  
-  <div class="header">
+  <div class="main-header">
     <div class="header-content">
-      <div>
-        <h1>CLIENTES</h1>
-        <small>Gestiona tu cartera de clientes</small>
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
       </div>
-      <div class="badge-count">
-        {{ clientes.length }}
-      </div>
-    </div>
 
-    <div class="search-container">
-      <ion-searchbar 
-        placeholder="Buscar cliente..." 
-        [debounce]="500" 
-        (ionInput)="buscarCliente($event)"
-        mode="ios">
-      </ion-searchbar>
+      <div class="text-container">
+        <h2>CARTERA</h2>
+        <p>Gestiona tus clientes activos</p>
+        <h1 class="big-number">{{ clientes.length }}</h1>
+      </div>
+
+      <div class="search-wrapper">
+        <ion-searchbar 
+          placeholder="Buscar por nombre..." 
+          [debounce]="500" 
+          (ionInput)="buscarCliente($event)"
+          mode="ios"
+          class="custom-searchbar">
+        </ion-searchbar>
+      </div>
     </div>
   </div>
 
-  <div class="lista-container">
-    
+  <div class="white-container">
+
     @if (cargando) {
-      <div class="grid-clientes">
-        @for (item of [1,2,3,4,5,6]; track item) {
-          <div class="cliente-card skeleton">
-            <ion-skeleton-text animated style="width: 50px; height: 50px; border-radius: 50%; margin-bottom: 10px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 80%; height: 20px; margin-bottom: 5px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 60%; height: 15px;"></ion-skeleton-text>
+      <div class="lista-container">
+        @for (item of [1,2,3,4,5]; track item) {
+          <div class="clean-card skeleton-card">
+            <ion-skeleton-text animated style="width: 50px; height: 50px; border-radius: 12px; margin-right: 15px;"></ion-skeleton-text>
+            <div style="flex: 1">
+              <ion-skeleton-text animated style="width: 60%; height: 20px; border-radius: 5px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 15px; margin-top: 5px;"></ion-skeleton-text>
+            </div>
           </div>
         }
       </div>
-    } @else {
-      
-      <div class="grid-clientes">
+    } 
+    
+    @else {
+      <div class="lista-container">
+        
         @for (cliente of clientesFiltrados; track cliente.id) {
-          <div class="cliente-card">
+          <div class="clean-card">
             
-            <div class="icon-header">
+            <div class="initials-box">
               {{ obtenerIniciales(cliente.representante) }}
             </div>
 
-            <div class="info">
-              <h3>{{ cliente.representante }}</h3>
+            <div class="card-info">
+              <h3 class="cliente-name">{{ cliente.representante }}</h3>
               
-              <p class="dato">
-                <ion-icon name="call-outline"></ion-icon> {{ cliente.telefono }}
-              </p>
-              
-              <div class="precio-badge">
+              <div class="detail-row">
+                <ion-icon name="call-outline"></ion-icon>
+                <span>{{ cliente.telefono }}</span>
+              </div>
+
+              <div class="price-badge">
                 @if (cliente.tipoPrecio) {
                   {{ cliente.tipoPrecio.tipoCompra }}
                 } @else {
-                  Sin Tarifa
+                  Normal
                 }
               </div>
             </div>
 
-            <div class="actions">
-              <button class="btn-icon edit" (click)="abrirModalEditar(cliente)">
-                <ion-icon name="create-outline"></ion-icon>
-              </button>
-              <button class="btn-icon delete" (click)="confirmarEliminar(cliente)">
-                <ion-icon name="trash-outline"></ion-icon>
-              </button>
+            <div class="actions-container">
+              <ion-button fill="clear" size="small" color="warning" (click)="abrirModalEditar(cliente)">
+                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(cliente)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
             </div>
 
           </div>
         } @empty {
           <div class="empty-state">
-            <ion-icon name="people-outline"></ion-icon>
+            <ion-icon name="people-outline" size="large"></ion-icon>
             <p>No se encontraron clientes</p>
           </div>
         }
+
       </div>
     }
 
+    <div style="height: 100px;"></div>
   </div>
 
-  <div style="height: 100px;"></div>
-
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" style="margin-bottom: 60px; margin-right: 10px;">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="custom-fab">
     <ion-fab-button (click)="abrirModalCrear()" color="tertiary">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>

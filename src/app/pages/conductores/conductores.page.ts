@@ -51,6 +51,14 @@ export class ConductoresPage  {
     this.obtenerUsuarios();
   }
 
+  getRoleColor(role: string): string {
+    switch (role.toLowerCase()) {
+      case 'admin': return 'admin-badge';
+      case 'supervisor': return 'supervisor-badge';
+      case 'repartidor': return 'repartidor-badge';
+      default: return 'default-badge';
+    }
+  }
   obtenerUsuarios() {
     this.authService.getUsuarios().subscribe({
       next: (data) => {

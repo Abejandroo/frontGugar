@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
 
   userName: string = '';
   fechaHoy: string = '';
-  
+   diaSeleccionado: string = '';
   // Contadores
   rutasAsignadasCount: number = 0;
   rutasCompletadasCount: number = 0;
@@ -53,6 +53,7 @@ export class HomeComponent implements OnInit {
     this.generarFechaActual();
     this.cargarDatosEnTiempoReal();
   }
+  
 
   cargarInformacionUsuario() {
     const usuarioGuardado = localStorage.getItem('usuario');
