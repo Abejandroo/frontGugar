@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { RutaService } from 'src/app/service/ruta.service';
+import { Auth } from 'src/app/service/auth';
+import { addIcons } from 'ionicons';
+import { circle } from 'leaflet';
+import { logOutOutline, person, personCircle } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-repartidor-rutas',
@@ -16,13 +21,19 @@ export class RepartidorRutasPage implements OnInit {
   rutasAsignadas: any[] = [];
   usuarioActual: any = null;
   cargando: boolean = false;
+  fechaHoy: string = '';
+
 
   constructor(
     private router: Router,
     private rutasService: RutaService,
     private loadingController: LoadingController,
-    private toastController: ToastController
-  ) {}
+    private toastController: ToastController,
+    private authService: Auth,
+  ) {
+      addIcons({ personCircle, logOutOutline, person });
+      this.generarFechaActual();
+  }
 
   ngOnInit() {
     this.cargarUsuarioYRutas();
@@ -75,6 +86,14 @@ export class RepartidorRutasPage implements OnInit {
     return 'Domingo';
   }
 
+generarFechaActual() {
+    const fecha = new Date();
+    const opciones: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+    };
+    this.fechaHoy = fecha.toLocaleDateString('es-ES', opciones);
+    this.fechaHoy = this.fechaHoy.charAt(0).toUpperCase() + this.fechaHoy.slice(1);
+  }
   abrirRuta(ruta: any) {
     this.router.navigate([`/repartidor/ruta/${ruta.id}`]);
   }
@@ -117,8 +136,8 @@ export class RepartidorRutasPage implements OnInit {
     await toast.present();
   }
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
+  cerrarSesion() {
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 }

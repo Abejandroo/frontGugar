@@ -121,5 +121,18 @@
 }
 
 .custom-fab {
-  margin-bottom: 60px; margin-right: 10px;
+  margin-bottom: 60px; 
+  margin-right: 10px;
+
+  ion-fab-button {
+    // Usamos !important aquí para que no se sobreescriba
+    --background: #02EBCD !important;
+    --color: white !important;
+    --background-activated: #02cba8 !important;
+    --background-hover: #35efd7 !important;
+    
+    ion-icon {
+      color: white !important;
+    }
+  }
 }

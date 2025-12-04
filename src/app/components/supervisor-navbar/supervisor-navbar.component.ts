@@ -17,7 +17,8 @@ export class SupervisorNavbarComponent {
 
   constructor(
     private router: Router,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    
   ) {
     addIcons({ home, compass, people, settings });
   }
@@ -51,4 +52,5 @@ export class SupervisorNavbarComponent {
     });
     await popover.present();
   }
+  
 }

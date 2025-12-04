@@ -4,7 +4,7 @@ import { IonicModule, ModalController, ActionSheetController, ToastController } 
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
-import { add, searchOutline, peopleOutline, callOutline, mailOutline, ellipsisVertical, trashOutline, createOutline, close, trash, create } from 'ionicons/icons';
+import { add, searchOutline, peopleOutline, callOutline, mailOutline, ellipsisVertical, trashOutline, createOutline, close, trash, create, pricetagOutline } from 'ionicons/icons';
 import { AgregarClientePage } from 'src/app/modal/agregar-cliente/agregar-cliente.page';
 import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 
@@ -27,7 +27,7 @@ export class ClientesComponent {
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController 
   ) {
-    addIcons({ add, searchOutline, peopleOutline, callOutline, mailOutline, ellipsisVertical, trashOutline, createOutline, close, trash, create });
+    addIcons({ add, searchOutline, peopleOutline, callOutline, mailOutline, ellipsisVertical, trashOutline, createOutline, close, trash, create,pricetagOutline });
     this.cargarClientes();
   }
 
