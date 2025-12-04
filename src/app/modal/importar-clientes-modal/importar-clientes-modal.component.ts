@@ -774,6 +774,13 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   async importarABaseDatos() {
     this.loading = true;
     try {
+      console.log('datos para enviar',this.datosExcel, 'fecha',
+        this.fechaReporte,'nombre ruta',
+        this.nombreRuta, 'supervisorId',
+        this.supervisorId,'repartidorId',
+        this.repartidorId);
+      
+
       const resultado = await this.importService.importarClientes(
         this.datosExcel,
         this.fechaReporte,

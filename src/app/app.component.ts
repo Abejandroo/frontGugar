@@ -56,7 +56,11 @@ import {
   chevronDown,
   pricetag,
   lockClosed,
-  
+  alertCircle,
+  checkmark,
+  bicycleOutline,
+  cloudUploadOutline,
+  card
 } from 'ionicons/icons';
 
 @Component({
@@ -118,7 +122,12 @@ export class AppComponent {
   'list-outline': listOutline,
   'chevron-down': chevronDown,
   'pricetag': pricetag,
-  'lock-closed': lockClosed 
+  'lock-closed': lockClosed,
+  'alert-circle': alertCircle,
+  'checkmark': checkmark,
+  'bicycle-outline': bicycleOutline,
+  'cloud-upload-outline': cloudUploadOutline,
+  'card': card
 });
  }
   isAdmin() {
