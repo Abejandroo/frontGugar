@@ -9,7 +9,7 @@ export interface ClienteImport {
   precioGarrafon: number;
   esCredito: boolean;
   requiereFactura: boolean;
-  diasVisita: string[]; // Array con un solo elemento: la ruta asignada
+  diasVisita: string[];
   ordenVisita: number;
   latitud?: number;
   longitud?: number;
