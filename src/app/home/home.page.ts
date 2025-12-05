@@ -6,7 +6,7 @@ import { IonHeader, IonToolbar, IonContent, IonGrid, IonRow, IonCol, IonIcon } f
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonIcon, IonCol, IonRow, IonGrid, IonHeader, IonToolbar, IonContent,RouterModule],
+  imports: [IonIcon, IonContent,RouterModule],
 })
 export class HomePage {
   constructor() {}

@@ -60,7 +60,10 @@ import {
   checkmark,
   bicycleOutline,
   cloudUploadOutline,
-  card
+  card,
+  save,
+  chevronUp,
+  mapOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -127,7 +130,10 @@ export class AppComponent {
   'checkmark': checkmark,
   'bicycle-outline': bicycleOutline,
   'cloud-upload-outline': cloudUploadOutline,
-  'card': card
+  'card': card,
+  'save': save,
+  'chevron-up': chevronUp,
+  'map-outline': mapOutline
 });
  }
   isAdmin() {

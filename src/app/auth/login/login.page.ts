@@ -12,7 +12,7 @@ import { Auth } from 'src/app/service/auth';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonInput, IonIcon, IonButton, IonLabel, IonItem, IonBackButton, IonButtons, IonCol, IonRow, IonGrid, IonContent, IonHeader, IonToolbar, CommonModule, FormsModule]
+  imports: [IonInput, IonIcon, IonButton,  IonItem, IonBackButton, IonButtons, IonContent, CommonModule, FormsModule]
 })
 export class LoginPage {
   correo: string = '';

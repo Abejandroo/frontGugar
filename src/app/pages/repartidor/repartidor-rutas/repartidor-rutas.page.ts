@@ -67,6 +67,8 @@ export class RepartidorRutasPage implements OnInit {
       next: (rutas) => {
         this.rutasAsignadas = rutas;
         this.cargando = false;
+        console.log('rutas:',this.rutasAsignadas,'id usuario:',this.usuarioActual.id);
+        
       },
       error: (err: any) => {
         console.error('Error al cargar rutas:', err);

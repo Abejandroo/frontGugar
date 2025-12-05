@@ -22,9 +22,7 @@ export class RutaService {
     return this.http.get<any>(`${this.url}/rutas/${id}`);
   }
 
-  obtenerRutasPorEstado(estado: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}/rutas/dias-ruta/estado/${estado}`);
-  }
+
 
   obtenerRutasRepartidor(repartidorId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}/rutas/repartidor/${repartidorId}`);
@@ -37,6 +35,12 @@ export class RutaService {
     
     return this.http.get<any[]>(url);
   }
+
+  // // Cambiamos la URL para apuntar al controlador de Clientes
+  // obtenerClientesDisponibles(): Observable<any[]> {
+  //   // Usamos el endpoint que ya probamos ayer
+  //   return this.http.get<any[]>(`${this.url}/clientes/all`);
+  // }
 
   // ========================================
   // CREAR (POST)
