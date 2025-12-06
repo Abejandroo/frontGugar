@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController, AlertController, ToastController } from '@ionic/angular';
 import * as L from 'leaflet';
 import { addIcons } from 'ionicons';
-import { close, location, business, calendar, cash, document, trash, save, warning } from 'ionicons/icons';
+import { 
+  close, location, business, calendar, cash, document, trash, 
+  create, warning, card, documentText, person, listOutline 
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-detalle-cliente-modal',
@@ -27,14 +30,14 @@ import { close, location, business, calendar, cash, document, trash, save, warni
       <div class="mapa-container">
         <div #miniMapa class="mini-mapa"></div>
         @if (!tieneUbicacion) {
-        <div class="sin-ubicacion-overlay">
-          <ion-icon name="warning"></ion-icon>
-          <p>Sin ubicación GPS</p>
-          <ion-button size="small" fill="outline" (click)="agregarUbicacion()">
-            <ion-icon name="location" slot="start"></ion-icon>
-            Agregar Ubicación
-          </ion-button>
-        </div>
+          <div class="sin-ubicacion-overlay">
+            <ion-icon name="warning"></ion-icon>
+            <p>Sin ubicación GPS</p>
+            <ion-button size="small" fill="outline" (click)="abrirEditorCompleto()">
+              <ion-icon name="location" slot="start"></ion-icon>
+              Agregar Ubicación
+            </ion-button>
+          </div>
         }
       </div>
 
@@ -45,19 +48,19 @@ import { close, location, business, calendar, cash, document, trash, save, warni
           <ion-icon name="person" color="primary"></ion-icon>
           <div class="info-content">
             <label>Representante</label>
-            <h3>{{ clienteRuta.cliente.representante }}</h3>
+            <h3>{{ clienteRuta.cliente.representante || clienteRuta.cliente.nombre }}</h3>
           </div>
         </div>
 
         <!-- Negocio -->
         @if (clienteRuta.cliente.negocio) {
-        <div class="info-item">
-          <ion-icon name="business" color="primary"></ion-icon>
-          <div class="info-content">
-            <label>Negocio</label>
-            <p>{{ clienteRuta.cliente.negocio }}</p>
+          <div class="info-item">
+            <ion-icon name="business" color="primary"></ion-icon>
+            <div class="info-content">
+              <label>Negocio</label>
+              <p>{{ clienteRuta.cliente.negocio }}</p>
+            </div>
           </div>
-        </div>
         }
 
         <!-- Dirección -->
@@ -65,7 +68,10 @@ import { close, location, business, calendar, cash, document, trash, save, warni
           <ion-icon name="location" color="primary"></ion-icon>
           <div class="info-content">
             <label>Dirección</label>
-            <p>{{ clienteRuta.cliente.direcciones?.[0]?.direccion || 'Sin dirección' }}</p>
+            <p>{{ clienteRuta.cliente.calle }}, {{ clienteRuta.cliente.colonia }}</p>
+            @if (clienteRuta.cliente.referencia) {
+              <small class="referencia">{{ clienteRuta.cliente.referencia }}</small>
+            }
           </div>
         </div>
 
@@ -80,7 +86,7 @@ import { close, location, business, calendar, cash, document, trash, save, warni
 
         <!-- Orden de visita -->
         <div class="info-item">
-          <ion-icon name="list" color="medium"></ion-icon>
+          <ion-icon name="list-outline" color="medium"></ion-icon>
           <div class="info-content">
             <label>Orden de visita</label>
             <p># {{ clienteRuta.ordenVisita }}</p>
@@ -96,7 +102,7 @@ import { close, location, business, calendar, cash, document, trash, save, warni
           <ion-icon name="cash" color="success"></ion-icon>
           <div>
             <strong>Precio por garrafón</strong>
-            <p>\${{ clienteRuta.precio?.precioPorGarrafon || 0 }}</p>
+            <p>\${{ clienteRuta.cliente.tipoPrecio?.precioPorGarrafon || clienteRuta.precio?.precioPorGarrafon || 0 }}</p>
           </div>
         </div>
 
@@ -119,9 +125,9 @@ import { close, location, business, calendar, cash, document, trash, save, warni
 
       <!-- BOTONES DE ACCIÓN -->
       <div class="acciones-section">
-        <ion-button expand="block" color="primary" (click)="editarUbicacion()">
-          <ion-icon name="location" slot="start"></ion-icon>
-          {{ tieneUbicacion ? 'Editar Ubicación' : 'Agregar Ubicación' }}
+        <ion-button expand="block" color="primary" (click)="abrirEditorCompleto()">
+          <ion-icon name="create" slot="start"></ion-icon>
+          Editar Cliente
         </ion-button>
 
         <ion-button expand="block" fill="outline" color="danger" (click)="eliminarDeRuta()">
@@ -131,178 +137,210 @@ import { close, location, business, calendar, cash, document, trash, save, warni
       </div>
     </ion-content>
   `,
-styles: [`
-  ion-content {
-    --background: #f5f5f7;
-  }
-  
-  .mapa-container {
-    height: 250px;
-    position: relative;
-    background: #e5e5ea;
-    
-    .mini-mapa {
-      width: 100%;
-      height: 100%;
+  styles: [`
+    ion-content {
+      --background: #f4f6fa;
     }
     
-    .sin-ubicacion-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.75);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
+    // =====================================
+    // MAPA
+    // =====================================
+    .mapa-container {
+      height: 250px;
+      position: relative;
+      background: #e5e5ea;
+      
+      .mini-mapa {
+        width: 100%;
+        height: 100%;
+      }
+      
+      .sin-ubicacion-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 20px;
+        
+        ion-icon {
+          font-size: 64px;
+          color: #ff9500;
+          margin-bottom: 16px;
+        }
+        
+        p {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0 0 20px 0;
+        }
+        
+        ion-button {
+          --background: rgba(255,255,255,0.95);
+          --color: #1c1c1e;
+          --border-radius: 12px;
+          font-weight: 600;
+        }
+      }
+    }
+    
+    // =====================================
+    // INFORMACIÓN
+    // =====================================
+    .info-section {
+      background: white;
+      padding: 0;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      margin: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      
+      .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        > ion-icon {
+          font-size: 24px;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+        
+        .info-content {
+          flex: 1;
+          min-width: 0;
+          
+          label {
+            display: block;
+            font-size: 11px;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            font-weight: 600;
+          }
+          
+          h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: #1c1c1e;
+            word-wrap: break-word;
+          }
+          
+          p {
+            margin: 0;
+            font-size: 15px;
+            color: #3c3c43;
+            word-wrap: break-word;
+            line-height: 1.4;
+          }
+          
+          .referencia {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            color: #8e8e93;
+            font-style: italic;
+          }
+        }
+      }
+    }
+    
+    // =====================================
+    // CARACTERÍSTICAS
+    // =====================================
+    .caracteristicas-section {
+      background: white;
       padding: 20px;
+      margin: 0 16px 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       
-      ion-icon {
-        font-size: 64px;
-        color: #ff9500;
-        margin-bottom: 16px;
-      }
-      
-      p {
-        font-size: 18px;
+      h4 {
+        margin: 0 0 16px 0;
+        font-size: 13px;
         font-weight: 600;
-        margin: 0 0 20px 0;
+        color: #8e8e93;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
+      
+      .caracteristica {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 16px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        > ion-icon {
+          font-size: 28px;
+          flex-shrink: 0;
+        }
+        
+        > div {
+          flex: 1;
+          
+          strong {
+            display: block;
+            font-size: 13px;
+            color: #8e8e93;
+            margin-bottom: 4px;
+            font-weight: 500;
+          }
+          
+          p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1c1c1e;
+          }
+        }
+      }
+    }
+    
+    // =====================================
+    // BOTONES DE ACCIÓN
+    // =====================================
+    .acciones-section {
+      background: white;
+      padding: 20px;
+      margin: 0 16px;
+      padding-bottom: 32px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       
       ion-button {
-        --background: rgba(255,255,255,0.9);
-        --color: #1c1c1e;
+        margin-bottom: 12px;
+        --border-radius: 12px;
         font-weight: 600;
-      }
-    }
-  }
-  
-  .info-section {
-    background: white;
-    padding: 0;
-    margin-bottom: 12px;
-    
-    .info-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px 20px;
-      border-bottom: 1px solid #f0f0f0;
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      > ion-icon {
-        font-size: 24px;
-        margin-top: 2px;
-        flex-shrink: 0;
-      }
-      
-      .info-content {
-        flex: 1;
-        min-width: 0;
+        height: 48px;
+        text-transform: none;
         
-        label {
-          display: block;
-          font-size: 11px;
-          color: #8e8e93;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          margin-bottom: 4px;
-          font-weight: 600;
-        }
-        
-        h3 {
-          margin: 0;
-          font-size: 17px;
-          font-weight: 600;
-          color: #1c1c1e;
-          word-wrap: break-word;
-        }
-        
-        p {
-          margin: 0;
-          font-size: 15px;
-          color: #3c3c43;
-          word-wrap: break-word;
+        &:last-child {
+          margin-bottom: 0;
         }
       }
     }
-  }
-  
-  .caracteristicas-section {
-    background: white;
-    padding: 20px;
-    margin-bottom: 12px;
-    
-    h4 {
-      margin: 0 0 16px 0;
-      font-size: 13px;
-      font-weight: 600;
-      color: #8e8e93;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .caracteristica {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 16px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
-      > ion-icon {
-        font-size: 28px;
-        flex-shrink: 0;
-      }
-      
-      > div {
-        flex: 1;
-        
-        strong {
-          display: block;
-          font-size: 13px;
-          color: #8e8e93;
-          margin-bottom: 4px;
-          font-weight: 500;
-        }
-        
-        p {
-          margin: 0;
-          font-size: 16px;
-          font-weight: 600;
-          color: #1c1c1e;
-        }
-      }
-    }
-  }
-  
-  .acciones-section {
-    background: white;
-    padding: 20px;
-    padding-bottom: 32px;
-    
-    ion-button {
-      margin-bottom: 12px;
-      --border-radius: 12px;
-      font-weight: 600;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-`]
+  `]
 })
 export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
   @ViewChild('miniMapa', { static: false }) miniMapaElement!: ElementRef;
@@ -319,12 +357,17 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
     private alertController: AlertController,
     private toastController: ToastController
   ) {
-    addIcons({ close, location, business, calendar, cash, document, trash, save, warning });
+    addIcons({ 
+      close, location, business, calendar, cash, document, trash, 
+      create, warning, card, documentText, person, listOutline 
+    });
   }
 
   ngOnInit() {
-    const direccion = this.clienteRuta.cliente.direcciones?.[0];
-    this.tieneUbicacion = !!(direccion?.latitud && direccion?.longitud);
+    const lat = this.clienteRuta.cliente.latitud;
+    const lng = this.clienteRuta.cliente.longitud;
+    
+    this.tieneUbicacion = !!(lat && lng);
   }
 
   ngAfterViewInit() {
@@ -333,41 +376,64 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
     }
   }
 
-  inicializarMapa() {
-    const direccion = this.clienteRuta.cliente.direcciones[0];
-    
-    if (!direccion?.latitud || !direccion?.longitud) return;
+  ngOnDestroy() {
+    if (this.mapa) {
+      this.mapa.remove();
+      this.mapa = null;
+    }
+  }
 
+  inicializarMapa() {
+    const lat = Number(this.clienteRuta.cliente.latitud);
+    const lng = Number(this.clienteRuta.cliente.longitud);
+    
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+      console.warn('Coordenadas inválidas para el mapa');
+      return;
+    }
+
+    // Limpiar instancia previa
+    if (this.mapa) {
+      this.mapa.remove();
+      this.mapa = null;
+    }
+
+    // Inicializar mapa
     this.mapa = L.map(this.miniMapaElement.nativeElement, {
-      center: [direccion.latitud, direccion.longitud],
+      center: [lat, lng],
       zoom: 16,
       zoomControl: false,
       dragging: false,
-      scrollWheelZoom: false
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      touchZoom: false
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(this.mapa);
 
-    // Marker personalizado
     const iconHtml = `
       <div style="
         width: 40px;
         height: 40px;
-        background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-        border-radius: 50%;
+        background: linear-gradient(135deg, #0099ff 0%, #20b0ff 100%);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 3px solid white;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-weight: 700;
-        font-size: 18px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        border: 3px solid white;
-      ">${this.clienteRuta.ordenVisita}</div>
+      ">
+        <ion-icon name="location" style="
+          font-size: 20px;
+          color: white;
+          transform: rotate(45deg);
+        "></ion-icon>
+      </div>
     `;
-
+    
     const customIcon = L.divIcon({
       html: iconHtml,
       className: '',
@@ -375,22 +441,36 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
       iconAnchor: [20, 40]
     });
 
-    L.marker([direccion.latitud, direccion.longitud], { icon: customIcon })
-      .addTo(this.mapa);
+    L.marker([lat, lng], { icon: customIcon }).addTo(this.mapa);
+
+    // FIX: Forzar recalculo de tamaño
+    setTimeout(() => {
+      this.mapa?.invalidateSize();
+    }, 100);
   }
 
-  agregarUbicacion() {
-    this.mostrarToast('Función en desarrollo', 'warning');
+  // =====================================
+  // ABRIR EDITOR COMPLETO
+  // ✅ CAMBIO CRÍTICO: Cerrar este modal ANTES de abrir el editor
+  // =====================================
+  async abrirEditorCompleto() {
+    // Cerrar el modal actual y señalizar que queremos abrir el editor
+    await this.modalController.dismiss({ 
+      abrirEditor: true,
+      clienteRuta: this.clienteRuta
+    });
   }
 
-  editarUbicacion() {
-    this.mostrarToast('Función en desarrollo', 'warning');
-  }
-
+  // =====================================
+  // ELIMINAR DE RUTA
+  // =====================================
   async eliminarDeRuta() {
     const alert = await this.alertController.create({
       header: 'Eliminar Cliente',
-      message: `¿Eliminar a <strong>${this.clienteRuta.cliente.representante}</strong> de esta ruta del día <strong>${this.diaSemana}</strong>?`,
+      subHeader: 'El cliente permanecerá en el sistema',
+      message: `¿Eliminar a <strong>${this.clienteRuta.cliente.representante || this.clienteRuta.cliente.nombre}</strong> de la ruta del día <strong>${this.diaSemana}</strong>?`,
+      cssClass: 'alert-eliminar-cliente',
+      backdropDismiss: false,
       buttons: [
         {
           text: 'Cancelar',
@@ -412,6 +492,9 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
     await alert.present();
   }
 
+  // =====================================
+  // UTILIDADES
+  // =====================================
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,

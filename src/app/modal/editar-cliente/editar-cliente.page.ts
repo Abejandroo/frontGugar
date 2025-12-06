@@ -4,10 +4,10 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { addIcons } from 'ionicons';
-import { 
-  close, personOutline, callOutline, mailOutline, pricetagOutline, 
-  saveOutline, mapOutline, homeOutline, locationOutline, fingerPrint, 
-  checkmarkCircle, businessOutline,  calendarOutline, swapHorizontalOutline
+import {
+  close, personOutline, callOutline, mailOutline, pricetagOutline,
+  saveOutline, mapOutline, homeOutline, locationOutline, fingerPrint,
+  checkmarkCircle, businessOutline, calendarOutline, swapHorizontalOutline
 } from 'ionicons/icons';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
@@ -28,7 +28,7 @@ export class EditarClientePage implements OnInit {
   cargando: boolean = false;
   listaPrecios: any[] = [];
   rutasDisponibles: any[] = [];
-  
+
   // Info de ruta actual del cliente
   rutaActual: { rutaNombre: string; diaSemana: string; diaRutaId: number } | null = null;
 
@@ -48,17 +48,18 @@ export class EditarClientePage implements OnInit {
     private toastCtrl: ToastController,
     private alertCtrl: AlertController
   ) {
-    addIcons({ 
-      close, personOutline, callOutline, mailOutline, pricetagOutline, 
-      saveOutline, mapOutline, homeOutline, locationOutline, fingerPrint, 
-      checkmarkCircle, businessOutline,  calendarOutline, swapHorizontalOutline
+    addIcons({
+      close, personOutline, callOutline, mailOutline, pricetagOutline,
+      saveOutline, mapOutline, homeOutline, locationOutline, fingerPrint,
+      checkmarkCircle, businessOutline, calendarOutline, swapHorizontalOutline
     });
 
+    // ✅ Teléfono ahora es OPCIONAL
     this.formCliente = this.fb.group({
-      representante: ['', [Validators.required, Validators.minLength(3)]],
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
       negocio: [''],
       cte: [''],
-      telefono: ['', [Validators.required]],
+      telefono: [''], // Sin Validators.required
       correo: ['', [Validators.email]],
       tipoPrecioId: [null, [Validators.required]],
       calle: ['', [Validators.required]],
@@ -74,19 +75,19 @@ export class EditarClientePage implements OnInit {
     this.cargarRutas();
 
     if (this.cliente) {
-      console.log('Editando cliente:', this.cliente);
+      console.log('📝 Editando cliente:', this.cliente);
 
       // Cargar datos del cliente
       this.formCliente.patchValue({
-        representante: this.cliente.representante,
-        negocio: this.cliente.negocio,
-        cte: this.cliente.cte,
-        telefono: this.cliente.telefono,
-        correo: this.cliente.correo,
+        nombre: this.cliente.nombre || '',
+        negocio: this.cliente.negocio || '',
+        cte: this.cliente.cte || '',
+        telefono: this.cliente.telefono || '',
+        correo: this.cliente.correo || '',
         tipoPrecioId: this.cliente.tipoPrecio?.id || this.cliente.tipoPrecioId,
-        calle: this.cliente.calle,
-        colonia: this.cliente.colonia,
-        referencia: this.cliente.referencia,
+        calle: this.cliente.calle || '',
+        colonia: this.cliente.colonia || '',
+        referencia: this.cliente.referencia || '',
         latitud: this.cliente.latitud,
         longitud: this.cliente.longitud
       });
@@ -102,9 +103,9 @@ export class EditarClientePage implements OnInit {
 
       // Centrar mapa en ubicación del cliente
       if (this.cliente.latitud && this.cliente.longitud) {
-        const pos = { 
-          lat: Number(this.cliente.latitud), 
-          lng: Number(this.cliente.longitud) 
+        const pos = {
+          lat: Number(this.cliente.latitud),
+          lng: Number(this.cliente.longitud)
         };
         this.markerPosition = pos;
         this.center = pos;
@@ -114,8 +115,11 @@ export class EditarClientePage implements OnInit {
 
   cargarPrecios() {
     this.precioService.obtenerPrecios().subscribe({
-      next: (res) => this.listaPrecios = res,
-      error: (err) => console.error('Error cargando precios', err)
+      next: (res) => {
+        this.listaPrecios = res;
+        console.log('💰 Precios cargados:', res);
+      },
+      error: (err) => console.error('❌ Error cargando precios:', err)
     });
   }
 
@@ -135,8 +139,9 @@ export class EditarClientePage implements OnInit {
             });
           }
         });
+        console.log('🗺️ Rutas disponibles:', this.rutasDisponibles);
       },
-      error: (err) => console.error('Error cargando rutas:', err)
+      error: (err) => console.error('❌ Error cargando rutas:', err)
     });
   }
 
@@ -146,6 +151,7 @@ export class EditarClientePage implements OnInit {
       const lng = event.latLng.lng();
       this.markerPosition = { lat, lng };
       this.formCliente.patchValue({ latitud: lat, longitud: lng });
+      console.log('📍 Nueva ubicación:', { lat, lng });
     }
   }
 
@@ -154,36 +160,80 @@ export class EditarClientePage implements OnInit {
   }
 
   async actualizarCliente() {
+    console.log('🔄 Iniciando actualización...');
+    console.log('📋 Formulario válido:', this.formCliente.valid);
+    console.log('📋 Valores del formulario:', this.formCliente.value);
+    console.log('❌ Errores del formulario:', this.formCliente.errors);
+
     if (this.formCliente.invalid) {
       this.formCliente.markAllAsTouched();
+
+      // Mostrar campos con error
+      Object.keys(this.formCliente.controls).forEach(key => {
+        const control = this.formCliente.get(key);
+        if (control?.invalid) {
+          console.log(`❌ Campo inválido: ${key}`, control.errors);
+        }
+      });
+
+      await this.mostrarToast('Por favor completa los campos requeridos', 'warning');
       return;
     }
 
     this.cargando = true;
     const formValue = this.formCliente.value;
 
-    const datos = {
-      ...formValue,
-      cte: Number(formValue.cte),
+    // ✅ Preparar datos limpios (solo enviar lo que cambió)
+    const datos: any = {
+      nombre: formValue.nombre?.trim() || '',
       tipoPrecioId: Number(formValue.tipoPrecioId),
+      calle: formValue.calle?.trim() || '',
+      colonia: formValue.colonia?.trim() || '',
+
+      // ✅ Campos opcionales: enviar siempre (vacío, null, o con valor)
+      negocio: formValue.negocio?.trim() || null,
+      cte: formValue.cte ? Number(formValue.cte) : null,
+      telefono: formValue.telefono?.trim() || null, // ✅ Si está vacío, envía null
+      correo: formValue.correo?.trim() || null,
+      referencia: formValue.referencia?.trim() || null,
       latitud: formValue.latitud ? Number(formValue.latitud) : null,
       longitud: formValue.longitud ? Number(formValue.longitud) : null
     };
+    console.log('📤 Enviando al backend:', datos);
 
     this.clienteService.actualizarCliente(this.cliente.id, datos).subscribe({
-      next: async () => {
+      next: async (response) => {
         this.cargando = false;
+        console.log('✅ Respuesta del servidor:', response);
         await this.mostrarToast('Cliente actualizado correctamente', 'success');
         this.modalCtrl.dismiss({ actualizado: true });
       },
       error: async (err) => {
         this.cargando = false;
-        console.error('Error detallado:', err);
-        
-        let mensaje = 'Error al actualizar';
-        if (err.error?.message && Array.isArray(err.error.message)) {
-          mensaje = err.error.message.join(', ');
+        console.error('❌ Error completo:', err);
+        console.error('❌ Error.error:', err.error);
+        console.error('❌ Error.message:', err.message);
+        console.error('❌ Error.status:', err.status);
+
+        let mensaje = 'Error al actualizar cliente';
+
+        // Manejar diferentes tipos de errores
+        if (err.status === 400) {
+          if (err.error?.message && Array.isArray(err.error.message)) {
+            mensaje = err.error.message.join(', ');
+          } else if (err.error?.message) {
+            mensaje = err.error.message;
+          } else {
+            mensaje = 'Datos inválidos. Verifica los campos.';
+          }
+        } else if (err.status === 404) {
+          mensaje = 'Cliente no encontrado';
+        } else if (err.status === 500) {
+          mensaje = 'Error en el servidor. Intenta de nuevo.';
+        } else if (err.status === 0) {
+          mensaje = 'No se pudo conectar con el servidor';
         }
+
         await this.mostrarToast(mensaje, 'danger');
       }
     });
@@ -192,8 +242,8 @@ export class EditarClientePage implements OnInit {
   async cambiarRuta() {
     const alert = await this.alertCtrl.create({
       header: this.rutaActual ? 'Cambiar de Ruta' : 'Asignar a Ruta',
-      message: this.rutaActual 
-        ? `Actualmente en: ${this.rutaActual.rutaNombre} - ${this.rutaActual.diaSemana}` 
+      message: this.rutaActual
+        ? `Actualmente en: ${this.rutaActual.rutaNombre} - ${this.rutaActual.diaSemana}`
         : 'Selecciona la ruta a asignar',
       inputs: [
         {
@@ -250,7 +300,6 @@ export class EditarClientePage implements OnInit {
     if (this.rutaActual) {
       this.rutaService.desasignarClienteDeRuta(this.cliente.id, this.rutaActual.diaRutaId).subscribe({
         next: () => {
-          // Luego asignar a la nueva ruta
           this.asignarANuevaRuta(nuevoDiaRutaId);
         },
         error: async (err) => {
@@ -260,51 +309,51 @@ export class EditarClientePage implements OnInit {
         }
       });
     } else {
-      // Si no tiene ruta, asignar directamente
       this.asignarANuevaRuta(nuevoDiaRutaId);
     }
   }
 
- asignarANuevaRuta(diaRutaId: number | null) {
-  if (!diaRutaId) {
-    this.cargando = false;
-    return;
+  asignarANuevaRuta(diaRutaId: number | null) {
+    if (!diaRutaId) {
+      this.cargando = false;
+      return;
+    }
+
+    const tipoPrecioId = this.formCliente.value.tipoPrecioId;
+
+    this.rutaService.asignarClienteARuta({
+      clienteId: this.cliente.id,
+      diaRutaId,
+      precioId: tipoPrecioId
+    }).subscribe({
+      next: async () => {
+        this.cargando = false;
+
+        const rutaSeleccionada = this.rutasDisponibles.find(r => r.diaRutaId === diaRutaId);
+        if (rutaSeleccionada) {
+          this.rutaActual = {
+            rutaNombre: rutaSeleccionada.ruta,
+            diaSemana: rutaSeleccionada.dia,
+            diaRutaId: diaRutaId
+          };
+        }
+
+        await this.mostrarToast('Cliente asignado a nueva ruta', 'success');
+      },
+      error: async (err) => {
+        this.cargando = false;
+        console.error('Error al asignar:', err);
+        await this.mostrarToast('Error al asignar a ruta', 'danger');
+      }
+    });
   }
 
-  const tipoPrecioId = this.formCliente.value.tipoPrecioId;
-
-  this.rutaService.asignarClienteARuta({
-    clienteId: this.cliente.id,
-    diaRutaId,
-    precioId: tipoPrecioId
-  }).subscribe({
-    next: async () => {
-      this.cargando = false;
-      
-      const rutaSeleccionada = this.rutasDisponibles.find(r => r.diaRutaId === diaRutaId);
-      if (rutaSeleccionada) {
-        this.rutaActual = {
-          rutaNombre: rutaSeleccionada.ruta,
-          diaSemana: rutaSeleccionada.dia,
-          diaRutaId: diaRutaId
-        };
-      }
-      
-      await this.mostrarToast('Cliente asignado a nueva ruta', 'success');
-    },
-    error: async (err) => {
-      this.cargando = false;
-      console.error('Error al asignar:', err);
-      await this.mostrarToast('Error al asignar a ruta', 'danger');
-    }
-  });
-}
   async mostrarToast(msg: string, color: string) {
-    const toast = await this.toastCtrl.create({ 
-      message: msg, 
-      duration: 2000, 
-      color, 
-      position: 'bottom' 
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 2500,
+      color,
+      position: 'top'
     });
     toast.present();
   }

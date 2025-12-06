@@ -23,10 +23,6 @@ export class ClienteService {
     return this.http.patch(`${this.url}/clientes/${id}`, data);
   }
 
-  actualizarClientePorId(id: number, datos: any): Observable<any> {
-    return this.http.patch(`${this.url}/clientes/${id}`, datos);
-  }
-
   crearCliente(cliente: any): Observable<any> {
     return this.http.post(`${this.url}/clientes`, cliente);
   }

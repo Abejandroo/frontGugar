@@ -74,208 +74,6 @@ ion-menu[menuId="admin-menu"] {
 }
 
 // ========================================
-// FIX CRÍTICO: Z-INDEX Y BACKDROP
-// ========================================
-
-// IMPORTANTE: El backdrop NUNCA debe bloquear los controles
-ion-backdrop {
-  z-index: 9998 !important;
-}
-
-.custom-alert {
-  --backdrop-opacity: 0.6;
-
-}
-
-.alert-wrapper {
-  border-radius: 12px;
-}
-
-.alert-button-group {
-  padding: 8px;
-
-  button {
-    min-height: 50px !important;
-    font-size: 17px !important;
-    margin: 4px;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-
-    &:active {
-      opacity: 0.6;
-    }
-  }
-}
-
-.alert-button-cancel {
-  color: var(--ion-color-medium) !important;
-}
-
-.alert-button-delete {
-  color: var(--ion-color-danger) !important;
-  font-weight: 600 !important;
-  pointer-events: none !important; // ✅ Permite clicks a través del backdrop
-}
-
-// Los overlays SÍ deben capturar eventos
-ion-alert,
-ion-action-sheet,
-ion-modal,
-ion-loading,
-ion-toast {
-  pointer-events: auto !important;
-  z-index: 20001 !important;
-
-  // El contenido interno SÍ debe ser clickeable
-  .alert-wrapper,
-  .action-sheet-wrapper,
-  .modal-wrapper {
-    pointer-events: auto !important;
-    z-index: 20002 !important;
-  }
-}
-
-// ========================================
-// ACTION SHEETS (SELECTS)
-// ========================================
-
-.custom-action-sheet {
-  .action-sheet-wrapper {
-    .action-sheet-button {
-      font-size: 16px;
-    }
-  }
-}
-
-// ========================================
-// MODALS
-// ========================================
-
-.modal-detalle-cliente {
-  --height: auto;
-  --max-height: 90%;
-  --border-radius: 16px 16px 0 0;
-  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
-
-  ion-toolbar {
-    --background: white;
-    --color: #1c1c1e;
-    --border-width: 0 0 1px 0;
-    --border-color: #e5e5ea;
-
-    ion-title {
-      font-weight: 600;
-      font-size: 17px;
-    }
-
-    ion-button {
-      --color: #007aff;
-    }
-  }
-
-  @media (min-width: 768px) {
-    --width: 500px;
-    --height: 80%;
-    --border-radius: 16px;
-  }
-}
-
-.modal-dividir-ruta {
-  --height: auto;
-  --border-radius: 16px 16px 0 0;
-
-  @media (min-width: 768px) {
-    --width: 450px;
-    --height: auto;
-    --border-radius: 16px;
-  }
-}
-
-// ========================================
-// ALERTS
-// ========================================
-
-// Alert general limpio
-ion-alert {
-  .alert-wrapper {
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  .alert-head {
-    padding-top: 20px;
-  }
-
-  .alert-title {
-    font-size: 17px;
-    font-weight: 600;
-  }
-
-  .alert-sub-title {
-    font-size: 13px;
-    color: #8e8e93;
-    margin-top: 8px;
-  }
-
-  .alert-message {
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .alert-button-group {
-    border-top: 1px solid #e5e5ea;
-
-    .alert-button {
-      font-size: 17px;
-
-      &[role="destructive"] {
-        color: #ff3b30;
-        font-weight: 600;
-      }
-
-      &[role="cancel"] {
-        color: #007aff;
-      }
-    }
-  }
-}
-
-// Alert específico para eliminar ruta
-.alert-eliminar-ruta {
-  .alert-wrapper {
-    max-width: 400px;
-  }
-
-  .alert-message {
-    text-align: left;
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 12px 0;
-
-      li {
-        padding: 8px 12px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        margin-bottom: 6px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
-}
-
-// Alert para eliminar cliente
-.alert-eliminar-cliente {
-  .alert-wrapper {
-    max-width: 320px;
-  }
-}
-
-// ========================================
 // MAPA - ESTILOS CUSTOM
 // ========================================
 
@@ -324,4 +122,464 @@ ion-alert {
 .navegacion-info .info-item ion-icon {
   font-size: 20px;
   color: #10dc60;
+}
+
+/* ========================================
+   🔥 FIX CRÍTICO: BACKDROP NO DEBE BLOQUEAR
+   ======================================== */
+
+// El backdrop debe permitir clicks a través de él hacia el contenido
+ion-backdrop {
+  pointer-events: none !important; // ✅ CAMBIO CRÍTICO: none en lugar de auto
+}
+
+// Z-INDEX JERARQUÍA CLARA
+ion-modal {
+  z-index: 20000 !important;
+  pointer-events: auto !important; // ✅ El modal SÍ captura eventos
+  
+  &::part(backdrop) {
+    z-index: 19999 !important;
+    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+  }
+  
+  .modal-wrapper {
+    z-index: 20001 !important;
+    pointer-events: auto !important; // ✅ El contenido SÍ captura eventos
+  }
+}
+
+ion-alert {
+  z-index: 21000 !important;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    z-index: 20999 !important;
+    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+  }
+  
+  .alert-wrapper {
+    z-index: 21001 !important;
+    pointer-events: auto !important;
+  }
+}
+
+ion-action-sheet {
+  z-index: 21000 !important;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    z-index: 20999 !important;
+    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+  }
+  
+  .action-sheet-wrapper {
+    z-index: 21001 !important;
+    pointer-events: auto !important;
+  }
+}
+
+ion-loading {
+  z-index: 22000 !important;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    z-index: 21999 !important;
+    pointer-events: none !important;
+  }
+}
+
+ion-toast {
+  z-index: 23000 !important;
+  pointer-events: auto !important;
+}
+
+// ============================================
+// MODAL DETALLE CLIENTE (SHEET STYLE)
+// ============================================
+
+.modal-detalle-cliente {
+  --background: #f4f6fa;
+  pointer-events: auto !important;
+  
+  // Móvil: Sheet desde abajo
+  align-items: flex-end;
+  
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+
+  .modal-wrapper {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+    pointer-events: auto !important;
+  }
+
+  // Desktop: Centrado con ancho fijo
+  @media (min-width: 768px) {
+    align-items: center;
+    
+    .modal-wrapper {
+      width: 500px;
+      max-width: 90%;
+      height: auto;
+      max-height: 80vh;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+  }
+
+  ion-toolbar {
+    --background: white;
+    --color: #1c1c1e;
+    --border-width: 0 0 1px 0;
+    --border-color: #e5e5ea;
+
+    ion-title {
+      font-weight: 600;
+      font-size: 17px;
+    }
+
+    ion-button {
+      --color: #007aff;
+    }
+  }
+
+  ion-content {
+    --background: #f4f6fa;
+  }
+}
+
+// ============================================
+// MODAL DIVIDIR RUTA
+// ============================================
+
+.modal-dividir-ruta {
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+  
+  .modal-wrapper {
+    width: 90%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    pointer-events: auto !important;
+  }
+  
+  ion-content {
+    --background: white;
+  }
+  
+  @media (max-width: 767px) {
+    .modal-wrapper {
+      width: 95%;
+    }
+  }
+}
+
+// ============================================
+// MODAL EDITAR CLIENTE
+// ============================================
+
+.modal-editar-cliente {
+  --background: #f4f6fa;
+  pointer-events: auto !important;
+  
+  // Móvil: Pantalla completa
+  align-items: flex-end;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+  
+  .modal-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    pointer-events: auto !important;
+  }
+
+  // Desktop: Centrado con ancho fijo
+  @media (min-width: 768px) {
+    align-items: center;
+    
+    .modal-wrapper {
+      width: 600px;
+      max-width: 90%;
+      height: auto;
+      max-height: 85vh;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+  }
+
+  ion-toolbar {
+    --background: white;
+    --color: #1c1c1e;
+
+    ion-title {
+      font-weight: 600;
+      font-size: 17px;
+    }
+  }
+
+  ion-content {
+    --background: #f4f6fa;
+  }
+}
+
+// ============================================
+// ACTION SHEET PERSONALIZADO
+// ============================================
+
+.custom-action-sheet {
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+  
+  .action-sheet-wrapper {
+    pointer-events: auto !important;
+    
+    .action-sheet-container {
+      .action-sheet-group {
+        .action-sheet-button {
+          color: #1c1c1e !important;
+          font-weight: 500;
+          font-family: 'Poppins', sans-serif;
+          min-height: 56px;
+          pointer-events: auto !important;
+          
+          .action-sheet-button-inner {
+            justify-content: center;
+          }
+          
+          &.action-sheet-selected {
+            font-weight: 600;
+            color: #0099ff !important;
+            background: rgba(0, 153, 255, 0.08);
+          }
+        }
+      }
+      
+      .action-sheet-title {
+        font-weight: 600;
+        color: #8e8e93;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px;
+      }
+    }
+  }
+}
+
+// ============================================
+// ALERTS MEJORADOS
+// ============================================
+
+// Alert general
+ion-alert {
+  --backdrop-opacity: 0.5;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+  
+  .alert-wrapper {
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-width: 340px;
+    pointer-events: auto !important;
+  }
+
+  .alert-head {
+    padding: 20px 20px 12px 20px;
+    
+    .alert-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1c1c1e;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .alert-sub-title {
+      font-size: 13px;
+      color: #8e8e93;
+      margin-top: 4px;
+      font-family: 'Poppins', sans-serif;
+    }
+  }
+
+  .alert-message {
+    padding: 0 20px 20px 20px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #3c3c43;
+    font-family: 'Poppins', sans-serif;
+    
+    strong {
+      color: #1c1c1e;
+      font-weight: 600;
+    }
+  }
+
+  .alert-button-group {
+    padding: 8px;
+    border-top: 1px solid #e5e5ea;
+
+    .alert-button {
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      border-radius: 8px;
+      margin: 4px;
+      min-height: 48px;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+
+      &[role="destructive"] {
+        color: white !important;
+        background: #ff3b30;
+      }
+
+      &[role="cancel"] {
+        color: #8e8e93 !important;
+        background: #f2f2f7;
+      }
+      
+      &:active {
+        opacity: 0.6;
+      }
+    }
+  }
+}
+
+// Alert específico para eliminar cliente
+.alert-eliminar-cliente {
+  .alert-wrapper {
+    max-width: 340px;
+  }
+  
+  .alert-message {
+    strong {
+      color: #ff3b30;
+    }
+  }
+}
+
+// Alert específico para eliminar ruta
+.alert-eliminar-ruta {
+  .alert-wrapper {
+    max-width: 400px;
+  }
+
+  .alert-message {
+    text-align: left;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+
+      li {
+        padding: 8px 12px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 6px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Alert personalizado genérico
+.custom-alert {
+  --backdrop-opacity: 0.6;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+
+  .alert-wrapper {
+    border-radius: 12px;
+    pointer-events: auto !important;
+  }
+
+  .alert-button-group {
+    padding: 8px;
+
+    button {
+      min-height: 50px !important;
+      font-size: 17px !important;
+      margin: 4px;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+
+      &:active {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .alert-button-cancel {
+    color: var(--ion-color-medium) !important;
+  }
+
+  .alert-button-delete {
+    color: var(--ion-color-danger) !important;
+    font-weight: 600 !important;
+  }
+}
+
+// ============================================
+// TOASTS Y LOADING
+// ============================================
+
+ion-toast {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  pointer-events: auto !important;
+  
+  &::part(message) {
+    font-size: 14px;
+  }
+  
+  &::part(container) {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+ion-loading {
+  font-family: 'Poppins', sans-serif;
+  pointer-events: auto !important;
+  
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+  
+  &::part(content) {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: auto !important;
+  }
 }

@@ -68,7 +68,8 @@ import {
   fingerPrint,
   location,
   checkmarkCircleOutline,
-  alertCircleOutline
+  alertCircleOutline,
+  list
 } from 'ionicons/icons';
 
 @Component({
@@ -143,7 +144,8 @@ export class AppComponent {
   'map-outline': mapOutline,
   'arrow-back-outline': arrowBackOutline,
   'location': location,
-  'alert-circle-outline': alertCircleOutline
+  'alert-circle-outline': alertCircleOutline,
+  'list': list
 });
  }
   isAdmin() {

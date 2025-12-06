@@ -27,14 +27,14 @@ import {
 import * as L from 'leaflet';
 import { DividirRutaModalComponent } from '../../modal/dividir-ruta-modal/dividir-ruta-modal.component';
 import { DetalleClienteModalComponent } from '../../modal/detalle-cliente-modal/detalle-cliente-modal.component';
-
+import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 
 @Component({
   selector: 'app-detalle-ruta',
   templateUrl: './detalle-ruta.page.html',
   styleUrls: ['./detalle-ruta.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule,]
 })
 export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaLeaflet', { static: false }) mapaElement!: ElementRef;
@@ -103,7 +103,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       eye,
       eyeOff,
       closeCircle,
-      create 
+      create
     });
   }
 
@@ -125,6 +125,9 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.watchId) {
       Geolocation.clearWatch({ id: this.watchId });
     }
+    if (this.mapa) {
+      this.mapa.remove();
+    }
   }
 
   cargarPersonal() {
@@ -136,13 +139,13 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-cargarRuta() {
+  cargarRuta() {
     this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
       next: (data) => {
-        // PARCHE 1: Mapear IDs para que los selects funcionen
+        // Mapear IDs correctamente
         this.ruta = {
           ...data,
-          supervisor_id: data.supervisor?.id || data.supervisorId,
+          supervisorId: data.supervisor?.id || data.supervisorId,
           idRepartidor: data.repartidor?.id || data.idRepartidor
         };
         this.cargarDiasDisponibles();
@@ -154,56 +157,50 @@ cargarRuta() {
       }
     });
   }
- cargarDiasDisponibles() {
+
+  cargarDiasDisponibles() {
     if (this.ruta.diasRuta && this.ruta.diasRuta.length > 0) {
       this.diasDisponibles = this.ruta.diasRuta;
-      
-      // Seleccionar día actual o el primero por defecto
+
+      // Seleccionar día actual o el primero
       const hoy = new Date().getDay();
       let diaDefault = this.diasDisponibles[0];
-      // Lógica simple de mapeo de días (puedes ajustarla)
-      if ([1,4].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Lunes')) || diaDefault;
-      if ([2,5].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Martes')) || diaDefault;
-      if ([3,6].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Miércoles')) || diaDefault;
+
+      // Mapeo simple de días
+      if ([1, 4].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Lunes')) || diaDefault;
+      if ([2, 5].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Martes')) || diaDefault;
+      if ([3, 6].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Miércoles')) || diaDefault;
 
       this.diaSeleccionado = diaDefault.diaSemana;
       this.cambiarDia();
     }
   }
 
-// En detalle-ruta.page.ts
-
- cambiarDia() {
+  cambiarDia() {
     const dia = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
 
     if (dia) {
-      // --- PARCHE 2: ADAPTADOR DE DATOS ---
-      // Si viene de tabla intermedia (compañero), usa clientesRuta.
-      // Si viene directo (nuestro), usa clientes.
-      // Lo normalizamos a una estructura única: { cliente: {...}, precio: ..., ordenVisita: ... }
-      
       let listaCruda: any[] = [];
-      
+
+      // Adaptador de datos para diferentes estructuras
       if (dia.clientesRuta && dia.clientesRuta.length > 0) {
-         // Caso A: Tabla Intermedia
-         listaCruda = dia.clientesRuta;
+        listaCruda = dia.clientesRuta;
       } else if (dia.clientes && dia.clientes.length > 0) {
-         // Caso B: Directo (Lo adaptamos para que parezca Caso A)
-         listaCruda = dia.clientes.map((c: any, i: number) => ({
-             id: c.id, 
-             cliente: c,
-             precio: c.tipoPrecio,
-             ordenVisita: i + 1,
-             visitado: false,
-             es_credito: false,
-             requiere_factura: false
-         }));
+        listaCruda = dia.clientes.map((c: any, i: number) => ({
+          id: c.id,
+          cliente: c,
+          precio: c.tipoPrecio,
+          ordenVisita: i + 1,
+          visitado: false,
+          es_credito: false,
+          requiere_factura: false
+        }));
       }
 
       this.clientesDia = listaCruda.sort((a, b) => (a.ordenVisita || 0) - (b.ordenVisita || 0));
       this.clientesFiltrados = [...this.clientesDia];
       this.clienteSeleccionado = null;
-      
+
       this.calcularEstadisticas();
       this.actualizarMapa();
     } else {
@@ -212,7 +209,7 @@ cargarRuta() {
     }
   }
 
- calcularEstadisticas() {
+  calcularEstadisticas() {
     this.totalClientes = this.clientesDia.length;
     this.visitados = this.clientesDia.filter(c => c.visitado).length;
     this.pendientes = this.totalClientes - this.visitados;
@@ -222,19 +219,23 @@ cargarRuta() {
   // MAPA LEAFLET
   // ========================================
 
- inicializarMapa() {
+  inicializarMapa() {
     if (this.mapa) this.mapa.remove();
     const mapElement = this.mapaElement?.nativeElement;
     if (!mapElement) return;
 
     this.mapa = L.map(mapElement).setView([17.0732, -96.7266], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.mapa);
-    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(this.mapa);
+
     if (this.clientesDia.length > 0) this.actualizarMapa();
   }
 
-actualizarMapa() {
+  actualizarMapa() {
     if (!this.mapa) return;
+
+    // Limpiar markers anteriores
     this.markers.forEach(m => m.remove());
     this.markers.clear();
 
@@ -242,7 +243,6 @@ actualizarMapa() {
 
     this.clientesDia.forEach((clienteRuta, index) => {
       const c = clienteRuta.cliente;
-      // Usamos campos directos
       const lat = Number(c.latitud);
       const lng = Number(c.longitud);
 
@@ -251,10 +251,15 @@ actualizarMapa() {
         bounds.push(latlng);
 
         const iconHtml = `<div class="marker-custom"><div class="marker-numero">${clienteRuta.ordenVisita || index + 1}</div></div>`;
-        const customIcon = L.divIcon({ html: iconHtml, className: 'custom-marker-icon', iconSize: [32, 32], iconAnchor: [16, 32] });
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'custom-marker-icon',
+          iconSize: [36, 36],
+          iconAnchor: [18, 36]
+        });
 
         const marker = L.marker(latlng, { icon: customIcon })
-          .bindPopup(`<strong>${c.representante}</strong><br>${c.calle}`)
+          .bindPopup(`<strong>${c.representante || c.nombre}</strong><br>${c.calle}`)
           .on('click', () => { this.seleccionarCliente(clienteRuta); })
           .addTo(this.mapa!);
 
@@ -262,10 +267,12 @@ actualizarMapa() {
       }
     });
 
-    if (bounds.length > 0) this.mapa.fitBounds(bounds, { padding: [50, 50] });
+    if (bounds.length > 0) {
+      this.mapa.fitBounds(bounds, { padding: [50, 50] });
+    }
   }
 
-seleccionarCliente(clienteRuta: any) {
+  seleccionarCliente(clienteRuta: any) {
     this.clienteSeleccionado = clienteRuta;
     setTimeout(() => {
       const content = document.querySelector('ion-content');
@@ -273,17 +280,21 @@ seleccionarCliente(clienteRuta: any) {
     }, 100);
   }
 
-  deseleccionarCliente() { this.clienteSeleccionado = null; }
- seleccionarClienteEnMapa(clienteRuta: any) {
+  deseleccionarCliente() {
+    this.clienteSeleccionado = null;
+  }
+
+  seleccionarClienteEnMapa(clienteRuta: any) {
     const lat = Number(clienteRuta.cliente.latitud);
     const lng = Number(clienteRuta.cliente.longitud);
 
     if (lat && lng) {
       this.clienteSeleccionado = clienteRuta;
       if (this.mapa) this.mapa.setView([lat, lng], 16);
+
       const marker = this.markers.get(clienteRuta.id);
       if (marker) marker.openPopup();
-      
+
       setTimeout(() => {
         const mapaElement = document.getElementById('mapa-leaflet');
         mapaElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -312,7 +323,6 @@ seleccionarCliente(clienteRuta: any) {
       this.monitoreando = true;
       this.mostrarToast('Monitoreando repartidor...', 'success');
 
-      // Tracking GPS cada 5 segundos
       this.watchId = await Geolocation.watchPosition(
         {
           enableHighAccuracy: true,
@@ -359,12 +369,10 @@ seleccionarCliente(clienteRuta: any) {
   actualizarPosicionRepartidor(posicion: { lat: number; lng: number }) {
     if (!this.mapa) return;
 
-    // Eliminar marker anterior
     if (this.markerRepartidor) {
       this.markerRepartidor.remove();
     }
 
-    // Crear ícono de repartidor
     const iconHtml = `
       <div class="marker-repartidor">
         <ion-icon name="car" style="color: white; font-size: 20px;"></ion-icon>
@@ -374,17 +382,17 @@ seleccionarCliente(clienteRuta: any) {
     const repartidorIcon = L.divIcon({
       html: iconHtml,
       className: 'custom-repartidor-icon',
-      iconSize: [40, 40],
-      iconAnchor: [20, 20]
+      iconSize: [44, 44],
+      iconAnchor: [22, 22]
     });
 
     this.markerRepartidor = L.marker([posicion.lat, posicion.lng], {
       icon: repartidorIcon
     })
       .bindPopup(`
-      <strong>🚗 ${this.ruta.repartidor?.name || 'Repartidor'}</strong><br>
-      Ubicación en tiempo real
-    `)
+        <strong>🚗 ${this.ruta.repartidor?.name || 'Repartidor'}</strong><br>
+        Ubicación en tiempo real
+      `)
       .addTo(this.mapa);
 
     console.log('📍 Posición actualizada:', posicion);
@@ -402,23 +410,30 @@ seleccionarCliente(clienteRuta: any) {
 
     const puntoMedio = Math.floor(this.clientesDia.length / 2);
 
-    const modal = await this.modalController.create({
-      component: DividirRutaModalComponent,
-      componentProps: {
-        totalClientes: this.clientesDia.length,
-        puntoCorteDefault: puntoMedio,
-        diaSemana: this.diaSeleccionado
-      },
-      cssClass: 'modal-dividir-ruta',
-      backdropDismiss: true
-    });
+    try {
+      const modal = await this.modalController.create({
+        component: DividirRutaModalComponent,
+        componentProps: {
+          totalClientes: this.clientesDia.length,
+          puntoCorteDefault: puntoMedio,
+          diaSemana: this.diaSeleccionado
+        },
+        cssClass: 'modal-dividir-ruta',
+        backdropDismiss: true,
+        mode: 'ios'
+      });
 
-    await modal.present();
+      await modal.present();
+      console.log('✅ Modal dividir ruta presentado');
 
-    const { data } = await modal.onWillDismiss();
+      const { data } = await modal.onWillDismiss();
 
-    if (data?.confirmar) {
-      await this.ejecutarDivision(data.puntoCorte);
+      if (data?.confirmar) {
+        await this.ejecutarDivision(data.puntoCorte);
+      }
+    } catch (error) {
+      console.error('❌ Error abriendo modal dividir:', error);
+      this.mostrarToast('Error al abrir el modal', 'danger');
     }
   }
 
@@ -430,17 +445,14 @@ seleccionarCliente(clienteRuta: any) {
     await loading.present();
 
     try {
-      // Dividir clientes en 2 grupos
       const grupo1 = this.clientesDia.slice(0, puntoCorte);
       const grupo2 = this.clientesDia.slice(puntoCorte);
 
-      // Calcular rutas optimizadas con Google Directions API
       const rutaOptimizada1 = await this.calcularRutaOptimizada(grupo1);
       const rutaOptimizada2 = await this.calcularRutaOptimizada(grupo2);
 
       await loading.dismiss();
 
-      // Mostrar confirmación
       const confirmAlert = await this.alertController.create({
         header: 'División Completada',
         message: `
@@ -456,7 +468,6 @@ seleccionarCliente(clienteRuta: any) {
           {
             text: 'Crear Sub-rutas',
             handler: () => {
-              // TODO: Guardar en BD
               this.mostrarToast('Sub-rutas creadas (función en desarrollo)', 'success');
             }
           }
@@ -478,16 +489,13 @@ seleccionarCliente(clienteRuta: any) {
     }
 
     const puntos = clientes
-      .filter(cr => cr.cliente.direcciones?.[0]?.latitud)
+      .filter(cr => cr.cliente.latitud && cr.cliente.longitud)
       .map(cr => ({
-        lat: cr.cliente.direcciones[0].latitud,
-        lng: cr.cliente.direcciones[0].longitud
+        lat: Number(cr.cliente.latitud),
+        lng: Number(cr.cliente.longitud)
       }));
 
     if (puntos.length < 2) {
-      console.warn('Menos de 2 puntos con ubicación, usando distancia estimada');
-
-      // Calcular distancia en línea recta (fallback)
       let distanciaTotal = 0;
       for (let i = 0; i < puntos.length - 1; i++) {
         distanciaTotal += this.directionsService.calcularDistancia(puntos[i], puntos[i + 1]);
@@ -495,7 +503,7 @@ seleccionarCliente(clienteRuta: any) {
 
       return {
         totalDistance: distanciaTotal,
-        totalDuration: distanciaTotal / 8.33, // ~30 km/h promedio
+        totalDuration: distanciaTotal / 8.33,
         steps: []
       };
     }
@@ -503,7 +511,7 @@ seleccionarCliente(clienteRuta: any) {
     try {
       const origen = puntos[0];
       const destino = puntos[puntos.length - 1];
-      const waypoints = puntos.slice(1, -1).slice(0, 25); // Límite de Google: 25 waypoints
+      const waypoints = puntos.slice(1, -1).slice(0, 25);
 
       const ruta = await this.directionsService.calcularRuta(origen, destino, waypoints);
 
@@ -516,7 +524,6 @@ seleccionarCliente(clienteRuta: any) {
     } catch (error) {
       console.error('Error en calcularRutaOptimizada:', error);
 
-      // Fallback: calcular distancia en línea recta
       let distanciaTotal = 0;
       for (let i = 0; i < puntos.length - 1; i++) {
         distanciaTotal += this.directionsService.calcularDistancia(puntos[i], puntos[i + 1]);
@@ -534,15 +541,19 @@ seleccionarCliente(clienteRuta: any) {
   // EDICIÓN
   // ========================================
 
-  marcarCambio() { this.hayaCambios = true; }
+  marcarCambio() {
+    this.hayaCambios = true;
+  }
 
- async guardarCambios() {
+  async guardarCambios() {
     if (!this.hayaCambios) return;
+
     const datos = {
       nombre: this.ruta.nombre,
-      idSupervisor: this.ruta.supervisor_id,
+      idSupervisor: this.ruta.supervisorId,
       idRepartidor: this.ruta.idRepartidor
     };
+
     this.rutasService.actualizarRuta(this.rutaId, datos).subscribe({
       next: () => {
         this.hayaCambios = false;
@@ -556,104 +567,144 @@ seleccionarCliente(clienteRuta: any) {
   // ACCIONES DE CLIENTES
   // ========================================
 
-// ========================================
-// ACCIONES DE CLIENTES
-// ========================================
-
-buscarCliente(event: any) {
+  buscarCliente(event: any) {
     const busqueda = event.target.value.toLowerCase();
     if (!busqueda) {
       this.clientesFiltrados = [...this.clientesDia];
       return;
     }
+
     this.clientesFiltrados = this.clientesDia.filter(cr => {
       const c = cr.cliente;
-      // Buscamos por nombre y calle
-      return (c.representante || '').toLowerCase().includes(busqueda) ||
-             (c.calle || '').toLowerCase().includes(busqueda);
+      return (c.representante || c.nombre || '').toLowerCase().includes(busqueda) ||
+        (c.calle || '').toLowerCase().includes(busqueda);
     });
   }
 
+  // ========================================
+  // MODAL DETALLE CLIENTE (Reutiliza el existente)
+  // ========================================
+  // En DetalleRutaPage.ts
+
 async editarUbicacionCliente(clienteRuta: any) {
-  const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-  
-  const modal = await this.modalController.create({
-    component: DetalleClienteModalComponent,
-    componentProps: {
-      clienteRuta: clienteRuta,
-      diaSemana: this.diaSeleccionado,
-      diaRutaId: diaRuta?.id
-    },
-    cssClass: 'modal-detalle-cliente',
-    backdropDismiss: true
-  });
+    try {
+      const modal = await this.modalController.create({
+        component: DetalleClienteModalComponent,
+        componentProps: {
+          clienteRuta: clienteRuta,
+          diaSemana: this.diaSeleccionado
+        },
+        cssClass: 'modal-detalle-cliente',
+        breakpoints: [0, 0.5, 0.9],
+        initialBreakpoint: 0.9,
+        handle: true,
+        mode: 'ios'
+      });
 
-  await modal.present();
+      await modal.present();
+      console.log('✅ Modal detalle cliente presentado');
 
-  const { data } = await modal.onWillDismiss();
+      const { data } = await modal.onWillDismiss();
 
-  if (data?.eliminar) {
-    await this.eliminarClienteDeRutaDirecto(clienteRuta);
-  }
-}
-
-async eliminarClienteDeRuta(clienteRuta: any) {
-  const alert = await this.alertController.create({
-    header: 'Eliminar Cliente',
-    subHeader: 'El cliente permanecerá en el sistema',
-    message: `¿Eliminar a ${clienteRuta.cliente.representante} de la ruta del día ${this.diaSeleccionado}?`,
-    cssClass: 'alert-eliminar-cliente',
-    backdropDismiss: false, // ✅ Solo se cierra con botones
-    buttons: [
-      { 
-        text: 'Cancelar', 
-        role: 'cancel'
-      },
-      {
-        text: 'Eliminar',
-        role: 'destructive',
-        handler: () => {
-          this.eliminarClienteDeRutaDirecto(clienteRuta);
-          return true; // ✅ Cierra el alert
-        }
+      if (data?.eliminar) {
+        await this.eliminarClienteDeRutaDirecto(clienteRuta);
+      } else if (data?.actualizado) {
+        this.cargarRuta();
+      } else if (data?.abrirEditor) {
+        await this.abrirEditorCompleto(data.clienteRuta);
       }
-    ]
-  });
 
-  await alert.present();
-}
-private eliminarClienteDeRutaDirecto(clienteRuta: any) {
-  const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-  
-  if (!diaRuta) {
-    this.mostrarToast('Error: día de ruta no encontrado', 'danger');
-    return;
-  }
-  
-  this.rutasService.eliminarClienteDeRuta(diaRuta.id, clienteRuta.cliente.id).subscribe({
-    next: () => {
-      this.mostrarToast('Cliente eliminado de la ruta', 'success');
-      this.deseleccionarCliente();
-      this.cargarRuta();
-    },
-    error: (err) => {
-      console.error('Error eliminando cliente:', err);
-      this.mostrarToast('Error al eliminar cliente', 'danger');
+    } catch (error) {
+      console.error('❌ Error abriendo modal detalle cliente:', error);
+      this.mostrarToast('Error al abrir el modal', 'danger');
     }
-  });
-}
+  }
+
+
+  async abrirEditorCompleto(clienteRuta: any) {
+    try {
+      const modal = await this.modalController.create({
+        component: EditarClientePage,
+        componentProps: {
+          cliente: clienteRuta.cliente
+        },
+        cssClass: 'modal-editar-cliente'
+      });
+
+      await modal.present();
+      console.log('✅ Modal editar cliente presentado');
+
+      const { data } = await modal.onWillDismiss();
+      
+      if (data?.actualizado) {
+        this.mostrarToast('Cliente actualizado correctamente', 'success');
+        this.cargarRuta();
+      }
+    } catch (error) {
+      console.error('❌ Error abriendo editor completo:', error);
+      this.mostrarToast('Error al abrir el editor', 'danger');
+    }
+  }
+
+
+  async eliminarClienteDeRuta(clienteRuta: any) {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Cliente',
+      subHeader: 'El cliente permanecerá en el sistema',
+      message: `¿Eliminar a ${clienteRuta.cliente.representante || clienteRuta.cliente.nombre} de la ruta del día ${this.diaSeleccionado}?`,
+      cssClass: 'alert-eliminar-cliente',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            this.eliminarClienteDeRutaDirecto(clienteRuta);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private eliminarClienteDeRutaDirecto(clienteRuta: any) {
+    const diaRuta = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+    if (!diaRuta) {
+      this.mostrarToast('Error: día de ruta no encontrado', 'danger');
+      return;
+    }
+
+    this.rutasService.eliminarClienteDeRuta(diaRuta.id, clienteRuta.cliente.id).subscribe({
+      next: () => {
+        this.mostrarToast('Cliente eliminado de la ruta', 'success');
+        this.deseleccionarCliente();
+        this.cargarRuta();
+      },
+      error: (err) => {
+        console.error('Error eliminando cliente:', err);
+        this.mostrarToast('Error al eliminar cliente', 'danger');
+      }
+    });
+  }
 
   // ========================================
   // UTILIDADES
   // ========================================
 
-  getDiaActual(): string {
-    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    return dias[new Date().getDay()];
-  }
-
- async mostrarToast(msg: string, color: string) {
-    const t = await this.toastController.create({ message: msg, duration: 2000, color, position: 'top' });
+  async mostrarToast(msg: string, color: string) {
+    const t = await this.toastController.create({
+      message: msg,
+      duration: 2000,
+      color,
+      position: 'top'
+    });
     t.present();
   }
 

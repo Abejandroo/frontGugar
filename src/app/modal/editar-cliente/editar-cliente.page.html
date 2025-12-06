@@ -49,9 +49,9 @@
 
       <ion-item lines="none">
         <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-        <ion-input label="Representante" labelPlacement="floating" formControlName="representante"></ion-input>
+        <ion-input label="Representante" labelPlacement="floating" formControlName="nombre"></ion-input>
       </ion-item>
-      @if (formCliente.get('representante')?.invalid && formCliente.get('representante')?.touched) {
+      @if (formCliente.get('nombre')?.invalid && formCliente.get('nombre')?.touched) {
         <div class="error-msg">Nombre requerido.</div>
       }
 
