@@ -147,5 +147,15 @@ export class RutaService {
   eliminarClienteDeRuta(diaRutaId: number, clienteId: number): Observable<any> {
     return this.http.delete(`${this.url}/rutas/${diaRutaId}/clientes/${clienteId}`);
   }
+
+  dividirRuta(datos: {
+    rutaId: number;
+    diaRutaId: number;
+    puntoCorte: number;
+    diaSemana: string;
+  }): Observable<any> {
+    return this.http.post(`${this.url}/rutas/dividir`, datos);
+  }
+
 }
 

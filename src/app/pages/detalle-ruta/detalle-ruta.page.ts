@@ -408,12 +408,24 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // 🛑 Obtener el objeto completo del día de ruta
+    const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+    if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
+      this.mostrarToast('Error: No se encontró el ID del Día de Ruta seleccionado.', 'danger');
+      return;
+    }
+
     const puntoMedio = Math.floor(this.clientesDia.length / 2);
 
     try {
       const modal = await this.modalController.create({
         component: DividirRutaModalComponent,
         componentProps: {
+          // 💡 CORRECCIÓN: Pasar los IDs
+          rutaId: this.rutaId,
+          diaRutaId: diaRutaSeleccionado.id, // ID del día de ruta
+
           totalClientes: this.clientesDia.length,
           puntoCorteDefault: puntoMedio,
           diaSemana: this.diaSeleccionado
@@ -586,7 +598,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // ========================================
   // En DetalleRutaPage.ts
 
-async editarUbicacionCliente(clienteRuta: any) {
+  async editarUbicacionCliente(clienteRuta: any) {
     try {
       const modal = await this.modalController.create({
         component: DetalleClienteModalComponent,
@@ -635,7 +647,7 @@ async editarUbicacionCliente(clienteRuta: any) {
       console.log('✅ Modal editar cliente presentado');
 
       const { data } = await modal.onWillDismiss();
-      
+
       if (data?.actualizado) {
         this.mostrarToast('Cliente actualizado correctamente', 'success');
         this.cargarRuta();

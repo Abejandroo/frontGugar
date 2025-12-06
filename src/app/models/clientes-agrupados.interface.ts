@@ -49,3 +49,24 @@ export interface ClientesAgrupados {
   totalAsignados: number;
   totalNoAsignados: number;
 }
+
+
+export interface SubRutaResult {
+  totalClientes: number;
+  distanciaKm: string; // Lo tienes como string con 2 decimales en el backend
+  tiempoMinutos: number;
+  clientes: { id: number; nombre: string; direccion: string }[];
+}
+
+export interface RutaOriginalResult {
+  nombre: string;
+  diaSemana: string;
+  totalClientes: number;
+}
+
+export interface DividirRutaResponse {
+  mensaje: string;
+  rutaOriginal: RutaOriginalResult;
+  subRutaA: SubRutaResult;
+  subRutaB: SubRutaResult;
+}

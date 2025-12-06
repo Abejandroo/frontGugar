@@ -1,9 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, LoadingController, AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close, cutOutline, peopleOutline } from 'ionicons/icons';
+import { ResultadoDivisionModalComponent } from '../resultado-division-modal/resultado-division-modal.component';
+import { RutaService } from 'src/app/service/ruta.service';
 
 @Component({
   selector: 'app-dividir-ruta-modal',
@@ -24,7 +26,6 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
     <ion-content>
       <div class="contenido-modal">
         
-        <!-- INFORMACIÓN -->
         <div class="info-section">
           <div class="dia-badge">
             <ion-icon name="calendar-outline"></ion-icon>
@@ -40,7 +41,6 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
           </p>
         </div>
 
-        <!-- INPUT DE PUNTO DE CORTE -->
         <div class="input-section">
           <ion-item lines="none" class="input-item">
             <ion-label position="floating">Punto de corte (cliente #)</ion-label>
@@ -53,7 +53,6 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
             </ion-input>
           </ion-item>
           
-          <!-- PREVIEW DE LA DIVISIÓN -->
           <div class="preview">
             <div class="grupo grupo-a">
               <div class="grupo-icon">
@@ -61,8 +60,8 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
               </div>
               <div class="grupo-info">
                 <strong>Grupo A</strong>
-                <p>{{ puntoCorte || puntoCorteDefault }} clientes</p>
-                <span class="rango">Clientes #1 - #{{ puntoCorte || puntoCorteDefault }}</span>
+                <p>{{ puntoCorteEstimado }} clientes</p>
+                <span class="rango">Clientes #1 - #{{ puntoCorteEstimado }}</span>
               </div>
             </div>
             
@@ -76,14 +75,13 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
               </div>
               <div class="grupo-info">
                 <strong>Grupo B</strong>
-                <p>{{ totalClientes - (puntoCorte || puntoCorteDefault) }} clientes</p>
-                <span class="rango">Clientes #{{ (puntoCorte || puntoCorteDefault) + 1 }} - #{{ totalClientes }}</span>
+                <p>{{ totalClientes - puntoCorteEstimado }} clientes</p>
+                <span class="rango">Clientes #{{ puntoCorteEstimado + 1 }} - #{{ totalClientes }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ADVERTENCIA -->
         @if (!esValido()) {
           <div class="advertencia">
             <ion-icon name="warning-outline"></ion-icon>
@@ -91,7 +89,6 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
           </div>
         }
 
-        <!-- BOTONES -->
         <div class="botones-section">
           <ion-button 
             expand="block" 
@@ -351,32 +348,114 @@ import { close, cutOutline, peopleOutline } from 'ionicons/icons';
   `]
 })
 export class DividirRutaModalComponent {
+  // **NUEVOS INPUTS**
+  @Input() rutaId!: number;
+  @Input() diaRutaId!: number;
+
   @Input() totalClientes!: number;
   @Input() puntoCorteDefault!: number;
   @Input() diaSemana!: string;
 
   puntoCorte: number = 0;
 
-  constructor(private modalController: ModalController) {
-    addIcons({ close, cutOutline, peopleOutline });
+  get puntoCorteEstimado(): number {
+    return this.puntoCorte || this.puntoCorteDefault;
   }
+
+  constructor(
+    private modalController: ModalController,
+    private rutasService: RutaService, // **Inyectar el servicio**
+    private loadingController: LoadingController, // Para la carga
+    private alertController: AlertController // Para errores
+  ) { }
 
   ngOnInit() {
     this.puntoCorte = this.puntoCorteDefault;
   }
 
   esValido(): boolean {
+    const pc = this.puntoCorte;
     // Debe haber al menos 2 clientes en cada grupo
-    return this.puntoCorte >= 2 && this.puntoCorte <= this.totalClientes - 2;
+    return pc >= 2 && pc <= this.totalClientes - 2;
   }
 
-  calcular() {
-    if (this.esValido()) {
-      this.modalController.dismiss({
-        confirmar: true,
-        puntoCorte: this.puntoCorte
-      });
+  async calcular() {
+    if (!this.esValido()) {
+      return;
     }
+
+    // 1. Convertir y validar los IDs de entrada
+    const rutaIdNum = Number(this.rutaId);
+    const diaRutaIdNum = Number(this.diaRutaId);
+
+    if (rutaIdNum <= 0 || diaRutaIdNum <= 0 || isNaN(rutaIdNum) || isNaN(diaRutaIdNum)) {
+      const alert = await this.alertController.create({
+        header: 'Error de Datos',
+        message: 'Los IDs de Ruta y Día de Ruta son obligatorios y deben ser números válidos.',
+        buttons: ['OK'],
+      });
+      await alert.present();
+      return; // Detener la ejecución si los IDs son inválidos
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Calculando rutas optimizadas...',
+    });
+    await loading.present();
+
+    // 2. Enviar los números validados
+    const datos = {
+      rutaId: this.rutaId,        // Ya es number
+      diaRutaId: this.diaRutaId,  // Ya es number
+      puntoCorte: this.puntoCorte, // Ya es number
+      diaSemana: this.diaSemana,   // Ya es string
+    };
+
+    this.rutasService.dividirRuta(datos).subscribe({
+      next: async (resultado) => {
+        await loading.dismiss();
+
+        // 1. Muestra el modal de resultados
+        const modalResultados = await this.mostrarResultados(resultado);
+
+        // 2. Espera a que el modal de resultados se cierre
+        const { data } = await modalResultados.onWillDismiss();
+
+        // 3. Cierra el modal de DIVISIÓN SÓLO después de que el usuario vea los resultados
+        // Y devuelve el indicador de recarga al componente padre (DetalleRutaPage)
+        if (data?.recargar) {
+          this.modalController.dismiss({ recargar: true });
+        } else {
+          this.modalController.dismiss(); // Cierre normal sin recarga
+        } // Opcional: indicar que se debe recargar la lista de rutas
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        console.error('Error al dividir la ruta:', err);
+
+        // Mostrar alerta de error
+        const mensaje = err.error?.message || 'Ocurrió un error al calcular las sub-rutas.';
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: mensaje,
+          buttons: ['OK'],
+        });
+        await alert.present();
+      }
+    });
+  }
+
+  async mostrarResultados(resultado: any) {
+    const modal = await this.modalController.create({
+      component: ResultadoDivisionModalComponent,
+      componentProps: {
+        resultado: resultado // Pasar el objeto de respuesta del backend
+      },
+      cssClass: 'auto-height-modal', // Una clase CSS personalizada si es necesario
+    });
+    await modal.present();
+
+    return modal;
   }
 
   cerrar() {
