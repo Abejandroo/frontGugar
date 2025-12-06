@@ -29,16 +29,7 @@
       <span>Clientes</span>
     }
   </div>
-  <div 
-    class="nav-item" 
-    [class.active]="paginaActual === 'precios'"
-    (click)="navegar('precios')">
-    <ion-icon name="pricetag"></ion-icon>
-    
-    @if (paginaActual === 'precios') {
-      <span>Precios</span>
-    }
-  </div>
+
   <div 
     class="nav-item" 
     (click)="abrirMenu($event)">

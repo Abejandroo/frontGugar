@@ -1,47 +1,49 @@
-// src/app/supervisor/clientes/clientes.component.ts
+// src/app/pages/clientes/clientes.page.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
+import { IonicModule, ModalController, ActionSheetController, ToastController } from '@ionic/angular';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
 import { 
-  searchOutline, mapOutline, personOutline, callOutline, 
-  createOutline, listOutline, arrowBackOutline, calendarOutline,
-  add, trashOutline, close, trash
+  add, searchOutline, peopleOutline, callOutline, 
+  ellipsisVertical, trashOutline, createOutline, close, 
+  trash, create, pricetagOutline, mapOutline, personOutline,
+  calendarOutline, listOutline
 } from 'ionicons/icons';
-import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 import { AgregarClientePage } from 'src/app/modal/agregar-cliente/agregar-cliente.page';
+import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
+import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 import { 
   ClientesAgrupados, 
   RutaConClientes, 
   ClienteConRuta,
   DiaRutaConClientes
-} from '../../models/clientes-agrupados.interface';
+} from '../../../models/clientes-agrupados.interface';
 
 @Component({
   selector: 'app-clientes',
-  templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.scss'],
+  templateUrl: './clientes.page.html',
+  styleUrls: ['./clientes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, SupervisorNavbarComponent]
+  imports: [IonicModule, CommonModule, AdminNavbarComponent]
 })
-export class ClientesComponent implements OnInit {
+export class ClientesPage implements OnInit {
 
-  // Datos del supervisor
-  supervisorId: number = 0;
-  supervisorNombre: string = '';
-
-  // Datos de rutas y clientes
+  // Segmento principal
+  segmentoActivo: 'asignados' | 'noAsignados' = 'asignados';
+  
+  // Datos agrupados
   datosAgrupados: ClientesAgrupados | null = null;
   
-  // Ruta seleccionada
+  // Para filtrado
+  terminoBusqueda: string = '';
+  
+  // Ruta seleccionada para mostrar detalles
   rutaSeleccionada: RutaConClientes | null = null;
   diaSeleccionado: string = 'Lunes-Jueves';
   
-  // Búsqueda
-  terminoBusqueda: string = '';
+  // Búsqueda de clientes dentro de la ruta
   busquedaClientesRuta: string = '';
   
   cargando: boolean = true;
@@ -49,55 +51,46 @@ export class ClientesComponent implements OnInit {
   constructor(
     private clienteService: ClienteService,
     private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController
   ) {
     addIcons({ 
-      searchOutline, mapOutline, personOutline, callOutline, 
-      createOutline, listOutline, arrowBackOutline, calendarOutline,
-      add, trashOutline, close, trash
+      add, searchOutline, peopleOutline, callOutline, 
+      ellipsisVertical, trashOutline, createOutline, close, 
+      trash, create, pricetagOutline, mapOutline, personOutline,
+      calendarOutline, listOutline
     });
   }
 
   ngOnInit() {
-    this.cargarDatosSupervisor();
-    this.cargarRutas();
+    this.cargarDatos();
   }
 
-  // Obtener datos del supervisor del localStorage
-  cargarDatosSupervisor() {
-    const usuarioStr = localStorage.getItem('usuario');
-    if (usuarioStr) {
-      const usuario = JSON.parse(usuarioStr);
-      this.supervisorId = usuario.id;
-      this.supervisorNombre = usuario.name || usuario.nombre || 'Supervisor';
-    }
-  }
-
-  // Cargar rutas asignadas al supervisor
-  cargarRutas() {
-    if (!this.supervisorId) {
-      this.mostrarToast('No se pudo identificar al supervisor', 'danger');
-      this.cargando = false;
-      return;
-    }
-
+  cargarDatos() {
     this.cargando = true;
-    this.clienteService.obtenerRutasDeSupervisor(this.supervisorId).subscribe({
+    this.clienteService.obtenerClientesAgrupados().subscribe({
       next: (datos) => {
         this.datosAgrupados = datos;
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al cargar rutas del supervisor:', err);
+        console.error('Error al cargar clientes agrupados:', err);
         this.cargando = false;
-        this.mostrarToast('Error al cargar las rutas', 'danger');
       }
     });
+  }
+
+  // Cambiar segmento principal
+  cambiarSegmento(event: any) {
+    this.segmentoActivo = event.detail.value;
+    this.rutaSeleccionada = null;
+    this.terminoBusqueda = '';
   }
 
   // Seleccionar una ruta para ver sus clientes
   seleccionarRuta(ruta: RutaConClientes) {
     this.rutaSeleccionada = ruta;
+    // Seleccionar el primer día disponible
     if (ruta.diasRuta.length > 0) {
       this.diaSeleccionado = ruta.diasRuta[0].diaSemana;
     }
@@ -107,39 +100,18 @@ export class ClientesComponent implements OnInit {
   volverARutas() {
     this.rutaSeleccionada = null;
     this.terminoBusqueda = '';
-    this.busquedaClientesRuta = '';
+    this.busquedaClientesRuta = ''; // Limpiar búsqueda de clientes
   }
 
   // Cambiar día de visita
   cambiarDia(event: any) {
     this.diaSeleccionado = event.detail.value;
-    this.busquedaClientesRuta = '';
-  }
-
-  // Buscar rutas
-  buscar(event: any) {
-    this.terminoBusqueda = event.target.value?.toLowerCase() || '';
+    this.busquedaClientesRuta = ''; // Limpiar búsqueda al cambiar de día
   }
 
   // Buscar clientes dentro de la ruta
   buscarClienteEnRuta(event: any) {
     this.busquedaClientesRuta = event.target.value?.toLowerCase() || '';
-  }
-
-  // Obtener rutas filtradas
-  get rutasFiltradas(): RutaConClientes[] {
-    if (!this.datosAgrupados) return [];
-    
-    if (!this.terminoBusqueda) {
-      return this.datosAgrupados.asignados;
-    }
-
-    const termino = this.terminoBusqueda.toLowerCase();
-    return this.datosAgrupados.asignados.filter(r => 
-      r.nombre.toLowerCase().includes(termino) ||
-      r.numeroRuta.toLowerCase().includes(termino) ||
-      (r.repartidor && r.repartidor.nombre.toLowerCase().includes(termino))
-    );
   }
 
   // Obtener clientes del día seleccionado
@@ -162,6 +134,42 @@ export class ClientesComponent implements OnInit {
     );
   }
 
+  // Obtener clientes no asignados filtrados
+  get clientesNoAsignadosFiltrados(): ClienteConRuta[] {
+    if (!this.datosAgrupados) return [];
+    
+    if (!this.terminoBusqueda) {
+      return this.datosAgrupados.noAsignados;
+    }
+
+    const termino = this.terminoBusqueda.toLowerCase();
+    return this.datosAgrupados.noAsignados.filter(c => 
+      c.nombre.toLowerCase().includes(termino) || 
+      (c.telefono && c.telefono.includes(termino)) ||
+      (c.negocio && c.negocio.toLowerCase().includes(termino))
+    );
+  }
+
+  // Obtener rutas filtradas
+  get rutasFiltradas(): RutaConClientes[] {
+    if (!this.datosAgrupados) return [];
+    
+    if (!this.terminoBusqueda) {
+      return this.datosAgrupados.asignados;
+    }
+
+    const termino = this.terminoBusqueda.toLowerCase();
+    return this.datosAgrupados.asignados.filter(r => 
+      r.nombre.toLowerCase().includes(termino) ||
+      r.numeroRuta.toLowerCase().includes(termino)
+    );
+  }
+
+  // Buscar
+  buscar(event: any) {
+    this.terminoBusqueda = event.target.value?.toLowerCase() || '';
+  }
+
   // Obtener iniciales
   obtenerIniciales(nombre: string): string {
     if (!nombre) return '';
@@ -169,6 +177,16 @@ export class ClientesComponent implements OnInit {
     return partes.length >= 2 
       ? (partes[0][0] + partes[1][0]).toUpperCase() 
       : nombre.substring(0, 2).toUpperCase();
+  }
+
+  // Modal crear cliente
+  async abrirModalCrear() {
+    const modal = await this.modalCtrl.create({
+      component: AgregarClientePage
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data?.registrado) this.cargarDatos();
   }
 
   // Modal editar cliente
@@ -179,33 +197,10 @@ export class ClientesComponent implements OnInit {
     });
     await modal.present();
     const { data } = await modal.onDidDismiss();
-    if (data?.actualizado) this.cargarRutas();
+    if (data?.actualizado) this.cargarDatos();
   }
 
-  // Obtener color del badge de día
-  getColorDia(dia: string): string {
-    const colores: { [key: string]: string } = {
-      'Lunes-Jueves': 'primary',
-      'Martes-Viernes': 'success',
-      'Miércoles-Sábado': 'warning'
-    };
-    return colores[dia] || 'medium';
-  }
-
-  // Modal agregar cliente
-  async abrirModalCrear() {
-    const modal = await this.modalCtrl.create({
-      component: AgregarClientePage,
-      componentProps: {
-        supervisorId: this.supervisorId // Pasar el ID del supervisor
-      }
-    });
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if (data?.registrado) this.cargarRutas();
-  }
-
-  // Confirmar eliminación de cliente
+  // Confirmar eliminación
   async confirmarEliminar(cliente: ClienteConRuta) {
     const toast = await this.toastCtrl.create({
       header: 'Confirmar eliminación',
@@ -246,7 +241,7 @@ export class ClientesComponent implements OnInit {
           position: 'bottom'
         });
         toastExito.present();
-        this.cargarRutas();
+        this.cargarDatos();
       },
       error: async (err) => {
         this.cargando = false;
@@ -262,14 +257,13 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  // Mostrar toast
-  async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastCtrl.create({
-      message: mensaje,
-      duration: 2000,
-      color,
-      position: 'bottom'
-    });
-    toast.present();
+  // Obtener color del badge de día
+  getColorDia(dia: string): string {
+    const colores: { [key: string]: string } = {
+      'Lunes-Jueves': 'primary',
+      'Martes-Viernes': 'success',
+      'Miércoles-Sábado': 'warning'
+    };
+    return colores[dia] || 'medium';
   }
 }

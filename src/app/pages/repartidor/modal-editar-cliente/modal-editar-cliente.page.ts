@@ -16,8 +16,8 @@ import { ModalEditarVentaPage } from '../modal-editar-venta/modal-editar-venta.p
 export class ModalEditarClientePage implements OnInit {
   
   @Input() cliente: any;
-  @Input() clienteRuta: any; // Para saber si tiene venta
-  @Input() venta: any; // La venta si existe
+  @Input() clienteRuta: any;
+  @Input() venta: any;
 
   formCliente!: FormGroup;
   guardando: boolean = false;
@@ -35,16 +35,15 @@ export class ModalEditarClientePage implements OnInit {
   }
 
   ngOnInit() {
-    const direccion = this.cliente.direcciones?.[0] || {};
-    
+    // Acceder directamente a los campos del cliente (sin direcciones[0])
     this.formCliente = this.fb.group({
       representante: [this.cliente.representante, Validators.required],
       negocio: [this.cliente.negocio || ''],
       telefono: [this.cliente.telefono || ''],
-      direccion: [direccion.direccion || '', Validators.required],
-      colonia: [direccion.colonia || '', Validators.required],
-      latitud: [direccion.latitud || 0],
-      longitud: [direccion.longitud || 0]
+      calle: [this.cliente.calle || '', Validators.required],
+      colonia: [this.cliente.colonia || '', Validators.required],
+      latitud: [this.cliente.latitud || null],
+      longitud: [this.cliente.longitud || null]
     });
   }
 
@@ -78,7 +77,6 @@ export class ModalEditarClientePage implements OnInit {
     const { data } = await modal.onWillDismiss();
 
     if (data?.actualizado) {
-      // Actualizar la venta localmente
       this.venta.cantidadVendida = data.cantidadVendida;
       this.mostrarToast('Venta actualizada', 'success');
     }
@@ -92,21 +90,18 @@ export class ModalEditarClientePage implements OnInit {
 
     this.guardando = true;
 
+    // Construir objeto con los datos actualizados
     const clienteActualizado = {
-      ...this.cliente,
       representante: this.formCliente.value.representante,
       negocio: this.formCliente.value.negocio,
       telefono: this.formCliente.value.telefono,
-      direcciones: [{
-        ...this.cliente.direcciones[0],
-        direccion: this.formCliente.value.direccion,
-        colonia: this.formCliente.value.colonia,
-        latitud: this.formCliente.value.latitud,
-        longitud: this.formCliente.value.longitud
-      }]
+      calle: this.formCliente.value.calle,
+      colonia: this.formCliente.value.colonia,
+      latitud: this.formCliente.value.latitud,
+      longitud: this.formCliente.value.longitud
     };
 
-   this.clienteService.actualizarCliente(this.cliente.id, clienteActualizado).subscribe({
+    this.clienteService.actualizarCliente(this.cliente.id, clienteActualizado).subscribe({
       next: async () => {
         this.guardando = false;
         await this.mostrarToast('Cliente actualizado correctamente', 'success');

@@ -72,9 +72,9 @@
 
       <ion-item>
         <ion-textarea
-          label="Dirección *"
+          label="Calle / Dirección *"
           labelPlacement="floating"
-          formControlName="direccion"
+          formControlName="calle"
           rows="2"
           placeholder="Ej. Av. Independencia #123">
         </ion-textarea>
@@ -93,8 +93,8 @@
       <ion-item>
         <ion-label>
           <h3>Coordenadas GPS</h3>
-          <p>Lat: {{ formCliente.get('latitud')?.value }}</p>
-          <p>Lng: {{ formCliente.get('longitud')?.value }}</p>
+          <p>Lat: {{ formCliente.get('latitud')?.value || 'No definida' }}</p>
+          <p>Lng: {{ formCliente.get('longitud')?.value || 'No definida' }}</p>
         </ion-label>
         <ion-button slot="end" fill="outline" (click)="obtenerUbicacionActual()">
           <ion-icon name="navigate" slot="start"></ion-icon>

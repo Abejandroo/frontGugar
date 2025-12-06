@@ -7,13 +7,14 @@ import { add, pricetag, createOutline, trashOutline, walletOutline, close } from
 import { AgregarprecioPage } from 'src/app/modal/agregarprecio/agregarprecio.page';
 import { EditarprecioPage } from 'src/app/modal/editarprecio/editarprecio.page';
 import { PrecioService } from 'src/app/service/precio';
+import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 
 @Component({
   selector: 'app-precios',
   templateUrl: './precios.page.html',
   styleUrls: ['./precios.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, SupervisorNavbarComponent]
+  imports: [IonicModule, CommonModule,  AdminNavbarComponent]
 })
 export class PreciosPage  {
 

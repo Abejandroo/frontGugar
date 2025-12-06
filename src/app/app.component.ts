@@ -63,7 +63,12 @@ import {
   card,
   save,
   chevronUp,
-  mapOutline
+  mapOutline,
+  arrowBackOutline,
+  fingerPrint,
+  location,
+  checkmarkCircleOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -75,6 +80,7 @@ import {
 export class AppComponent {
  constructor(private readonly menu: MenuController, private readonly router: Router) {
   addIcons({
+    'checkmark-circle-outline': checkmarkCircleOutline,
   'person-circle-outline': personCircleOutline,
   'home-outline': homeOutline,
   'settings-outline': settingsOutline,
@@ -114,6 +120,7 @@ export class AppComponent {
   'water-outline': waterOutline,
   'volume-high': volumeHigh,
   'flag':flag,
+  'finger-print': fingerPrint,
   'volume-mute':volumeMute,
   'pause-circle': pauseCircle,
   'download-outline': downloadOutline,
@@ -133,7 +140,10 @@ export class AppComponent {
   'card': card,
   'save': save,
   'chevron-up': chevronUp,
-  'map-outline': mapOutline
+  'map-outline': mapOutline,
+  'arrow-back-outline': arrowBackOutline,
+  'location': location,
+  'alert-circle-outline': alertCircleOutline
 });
  }
   isAdmin() {

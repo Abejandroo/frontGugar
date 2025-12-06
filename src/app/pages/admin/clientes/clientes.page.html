@@ -1,0 +1,296 @@
+<ion-content [fullscreen]="true" class="bg-light">
+
+  <!-- HEADER -->
+  <div class="main-header">
+    <div class="header-content">
+      <div class="top-bar">
+        <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
+      </div>
+
+      <div class="text-container">
+        <h2>CARTERA DE CLIENTES</h2>
+        <p>Gestiona tu cartera activa</p>
+        @if (datosAgrupados) {
+          <div class="stats-row">
+            <div class="stat-item">
+              <h1 class="big-number">{{ datosAgrupados.totalAsignados }}</h1>
+              <span>Asignados</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <h1 class="big-number secondary">{{ datosAgrupados.totalNoAsignados }}</h1>
+              <span>Sin ruta</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- SEGMENTO PRINCIPAL -->
+      <ion-segment 
+        [value]="segmentoActivo" 
+        (ionChange)="cambiarSegmento($event)"
+        mode="md"
+        class="main-segment">
+        <ion-segment-button value="asignados">
+          <ion-label>Asignados</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="noAsignados">
+          <ion-label>No asignados</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- BARRA DE BÚSQUEDA -->
+      <div class="search-wrapper">
+        <ion-searchbar 
+          [placeholder]="segmentoActivo === 'asignados' ? 'Buscar ruta...' : 'Buscar cliente...'"
+          [debounce]="300" 
+          (ionInput)="buscar($event)"
+          mode="ios"
+          class="custom-searchbar">
+        </ion-searchbar>
+      </div>
+    </div>
+  </div>
+
+  <div class="white-container">
+
+    <!-- LOADING -->
+    @if (cargando) {
+      <div class="lista-container">
+        @for (item of [1,2,3,4,5]; track item) {
+          <div class="clean-card skeleton-card">
+            <ion-skeleton-text animated style="width: 50px; height: 50px; border-radius: 12px; margin-right: 15px;"></ion-skeleton-text>
+            <div style="flex: 1">
+              <ion-skeleton-text animated style="width: 60%; height: 20px; border-radius: 5px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 15px; margin-top: 5px;"></ion-skeleton-text>
+            </div>
+          </div>
+        }
+      </div>
+    } 
+
+    @else {
+
+      <!-- ==================== VISTA: ASIGNADOS ==================== -->
+      @if (segmentoActivo === 'asignados') {
+
+        <!-- Lista de rutas (cuando no hay ruta seleccionada) -->
+        @if (!rutaSeleccionada) {
+          <div class="lista-container">
+            @for (ruta of rutasFiltradas; track ruta.id) {
+              <div class="ruta-card" (click)="seleccionarRuta(ruta)">
+                
+                <div class="ruta-header">
+                  <div class="ruta-icon">
+                    <ion-icon name="map-outline"></ion-icon>
+                  </div>
+                  
+                  <div class="ruta-info">
+                    <h3>{{ ruta.nombre }}</h3>
+                    <p class="ruta-numero">{{ ruta.numeroRuta }}</p>
+                    
+                    @if (ruta.repartidor) {
+                      <div class="detail-row mini">
+                        <ion-icon name="person-outline"></ion-icon>
+                        <span>{{ ruta.repartidor.nombre }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="ruta-badge">
+                    <span class="badge-number">{{ ruta.totalClientes }}</span>
+                    <span class="badge-label">clientes</span>
+                  </div>
+                </div>
+
+                <!-- Días con cantidad de clientes -->
+                <div class="dias-chips">
+                  @for (dia of ruta.diasRuta; track dia.id) {
+                    <ion-chip [color]="getColorDia(dia.diaSemana)" size="small">
+                      <ion-label>{{ dia.diaSemana }}: {{ dia.cantidadClientes }}</ion-label>
+                    </ion-chip>
+                  }
+                </div>
+
+              </div>
+            } @empty {
+              <div class="empty-state">
+                <ion-icon name="map-outline" size="large"></ion-icon>
+                <p>No hay rutas asignadas</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Detalle de ruta seleccionada -->
+        @if (rutaSeleccionada) {
+          <div class="ruta-detalle-container">
+            
+            <!-- Botón volver -->
+            <div class="back-button" (click)="volverARutas()">
+              <ion-icon name="arrow-back-outline"></ion-icon>
+              <span>Volver a rutas</span>
+            </div>
+
+            <!-- Info de la ruta -->
+            <div class="ruta-info-card">
+              <h2>{{ rutaSeleccionada.nombre }}</h2>
+              <p class="numero-ruta">{{ rutaSeleccionada.numeroRuta }}</p>
+              
+              @if (rutaSeleccionada.repartidor) {
+                <div class="detail-row">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <span>{{ rutaSeleccionada.repartidor.nombre }}</span>
+                </div>
+              }
+
+              <div class="total-badge">
+                Total: <strong>{{ rutaSeleccionada.totalClientes }}</strong> clientes
+              </div>
+            </div>
+
+            <!-- Segmento de días -->
+            <ion-segment 
+              [value]="diaSeleccionado" 
+              (ionChange)="cambiarDia($event)"
+              mode="ios"
+              class="dias-segment">
+              @for (dia of rutaSeleccionada.diasRuta; track dia.id) {
+                <ion-segment-button [value]="dia.diaSemana">
+                  <ion-label class="dia-label">
+                    <div>{{ dia.diaSemana }}</div>
+                    <small>({{ dia.cantidadClientes }})</small>
+                  </ion-label>
+                </ion-segment-button>
+              }
+            </ion-segment>
+
+            <!-- BUSCADOR DE CLIENTES DENTRO DE LA RUTA -->
+            <div class="search-clientes-ruta">
+              <ion-searchbar 
+                placeholder="Buscar cliente en esta ruta..."
+                [debounce]="300" 
+                (ionInput)="buscarClienteEnRuta($event)"
+                mode="ios"
+                class="search-bar-ruta">
+              </ion-searchbar>
+            </div>
+
+            <!-- Lista de clientes del día -->
+            <div class="lista-container">
+              @for (cliente of clientesDelDiaSeleccionado; track cliente.id) {
+                <div class="clean-card">
+                  
+                  <div class="initials-box">
+                    {{ obtenerIniciales(cliente.nombre) }}
+                  </div>
+
+                  <div class="card-info">
+                    <h3 class="cliente-name">{{ cliente.nombre }}</h3>
+                    
+                    @if (cliente.negocio) {
+                      <p class="negocio-name">{{ cliente.negocio }}</p>
+                    }
+                    
+                    <div class="detail-row">
+                      <ion-icon name="call-outline"></ion-icon>
+                      <span>{{ cliente.telefono }}</span>
+                    </div>
+
+                    <div class="price-badge">
+                      @if (cliente.tipoPrecio) {
+                        {{ cliente.tipoPrecio.tipoCompra }}
+                      } @else {
+                        Normal
+                      }
+                    </div>
+                  </div>
+
+                  <div class="actions-container">
+                    <ion-button fill="clear" size="small" color="warning" (click)="abrirModalEditar(cliente)">
+                      <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(cliente)">
+                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </div>
+
+                </div>
+              } @empty {
+                <div class="empty-state">
+                  <ion-icon name="calendar-outline" size="large"></ion-icon>
+                  <p>No hay clientes para este día</p>
+                </div>
+              }
+            </div>
+
+          </div>
+        }
+
+      }
+
+      <!-- ==================== VISTA: NO ASIGNADOS ==================== -->
+      @if (segmentoActivo === 'noAsignados') {
+        <div class="lista-container">
+          
+          @for (cliente of clientesNoAsignadosFiltrados; track cliente.id) {
+            <div class="clean-card">
+              
+              <div class="initials-box no-ruta">
+                {{ obtenerIniciales(cliente.nombre) }}
+              </div>
+
+              <div class="card-info">
+                <h3 class="cliente-name">{{ cliente.nombre }}</h3>
+                
+                @if (cliente.negocio) {
+                  <p class="negocio-name">{{ cliente.negocio }}</p>
+                }
+                
+                <div class="detail-row">
+                  <ion-icon name="call-outline"></ion-icon>
+                  <span>{{ cliente.telefono }}</span>
+                </div>
+
+                <div class="no-ruta-badge">
+                  Sin ruta asignada
+                </div>
+              </div>
+
+              <div class="actions-container">
+                <ion-button fill="clear" size="small" color="warning" (click)="abrirModalEditar(cliente)">
+                  <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(cliente)">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <ion-icon name="checkmark-circle-outline" size="large"></ion-icon>
+              <p>Todos los clientes están asignados</p>
+            </div>
+          }
+
+        </div>
+      }
+
+    }
+
+    <div style="height: 100px;"></div>
+  </div>
+
+  <!-- FAB BUTTON -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="custom-fab">
+    <ion-fab-button (click)="abrirModalCrear()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<ion-footer class="ion-no-border" style="background: transparent; box-shadow: none;">
+  <app-admin-navbar paginaActual="clientes"></app-admin-navbar>
+</ion-footer>

@@ -42,7 +42,7 @@
           <p>{{ cliente.cliente.negocio || 'Sin negocio' }}</p>
           <p class="direccion-text">
             <ion-icon name="location-outline"></ion-icon>
-            {{ cliente.cliente.direcciones[0]?.direccion }}, {{ cliente.cliente.direcciones[0]?.colonia }}
+            {{ cliente.cliente.calle }}, {{ cliente.cliente.colonia }}
           </p>
           
           @if (tieneVenta(cliente)) {

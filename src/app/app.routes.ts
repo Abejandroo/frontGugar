@@ -80,6 +80,18 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { role: 'admin' }
   },
+  {
+    path: 'admin/precios',
+    loadComponent: () => import('./supervisor/precios/precios.page').then(m => m.PreciosPage),
+    canActivate: [authGuard],
+    data: { role: 'admin' }
+  },
+  {
+    path: 'admin/clientes',
+    loadComponent: () => import('./pages/admin/clientes/clientes.page').then((m) => m.ClientesPage),
+    canActivate: [authGuard],
+    data: { role: 'admin' }
+  },
 
   // ========================================
   // RUTAS SUPERVISOR
@@ -99,18 +111,6 @@ export const routes: Routes = [
   {
     path: 'supervisores/rutas',
     loadComponent: () => import('./supervisor/rutas/rutas.component').then((m) => m.RutasComponent),
-    canActivate: [authGuard],
-    data: { role: 'supervisor' }
-  },
-  {
-    path: 'supervisores/precios',
-    loadComponent: () => import('./supervisor/precios/precios.page').then(m => m.PreciosPage),
-    canActivate: [authGuard],
-    data: { role: 'supervisor' }
-  },
-  {
-    path: 'supervisor/detalle-ruta/:id',
-    loadComponent: () => import('./pages/detalle-ruta/detalle-ruta.page').then(m => m.DetalleRutaPage),
     canActivate: [authGuard],
     data: { role: 'supervisor' }
   },

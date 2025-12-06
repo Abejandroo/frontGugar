@@ -73,7 +73,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     
     this.formRuta = this.fb.group({
       rutaExistenteId: [null],
-      representanteRuta: [''],
+      nombre: [''],
       supervisorId: [null],
       repartidorId: [null],
       diaSemana: ['', Validators.required],
@@ -351,13 +351,13 @@ agregarMarcadorCliente(cliente: any) {
   onModoChange() {
     if (this.modoCreacion === 'nueva') {
       this.formRuta.get('rutaExistenteId')?.clearValidators();
-      this.formRuta.get('representanteRuta')?.setValidators([Validators.required]);
+      this.formRuta.get('nombre')?.setValidators([Validators.required]);
     } else {
-      this.formRuta.get('representanteRuta')?.clearValidators();
+      this.formRuta.get('nombre')?.clearValidators();
       this.formRuta.get('rutaExistenteId')?.setValidators([Validators.required]);
     }
     this.formRuta.get('rutaExistenteId')?.updateValueAndValidity();
-    this.formRuta.get('representanteRuta')?.updateValueAndValidity();
+    this.formRuta.get('nombre')?.updateValueAndValidity();
   }
 
   onRutaExistenteChange(event: any) {
@@ -452,7 +452,7 @@ agregarMarcadorCliente(cliente: any) {
 
   private async crearNuevaRuta(formValues: any, clientesIds: number[]) {
     const rutaData = {
-      representante: formValues.representanteRuta.toUpperCase(),
+      nombre: formValues.nombre.toUpperCase(),
       supervisorId: formValues.supervisorId || null,
       repartidorId: formValues.repartidorId || null,
       diaSemana: formValues.diaSemana,

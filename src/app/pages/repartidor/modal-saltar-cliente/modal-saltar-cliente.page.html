@@ -18,7 +18,7 @@
       <p>{{ clienteRuta.cliente.negocio || 'Sin negocio' }}</p>
       <p class="direccion-text">
         <ion-icon name="location-outline"></ion-icon>
-        {{ clienteRuta.cliente.direcciones[0]?.direccion }}
+        {{ clienteRuta.cliente.calle }}, {{ clienteRuta.cliente.colonia }}
       </p>
     </ion-card-content>
   </ion-card>
@@ -66,9 +66,13 @@
       color="danger"
       size="large"
       (click)="saltarCliente()"
-      [disabled]="formSaltar.invalid">
+      [disabled]="formSaltar.invalid || guardando">
       <ion-icon name="play-skip-forward" slot="start"></ion-icon>
-      Saltar y Continuar con Siguiente
+      @if (guardando) {
+        Procesando...
+      } @else {
+        Saltar y Continuar con Siguiente
+      }
     </ion-button>
 
     <ion-button 

@@ -14,17 +14,51 @@
   <div class="form-container">
     <p class="intro-text">Modifica los datos y la ubicación del cliente.</p>
 
+    <!-- BADGE DE RUTA ACTUAL -->
+    @if (rutaActual) {
+      <div class="ruta-actual-badge">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <div>
+          <strong>{{ rutaActual.rutaNombre }}</strong>
+          <span>{{ rutaActual.diaSemana }}</span>
+        </div>
+        <ion-button fill="clear" size="small" (click)="cambiarRuta()">
+          <ion-icon name="swap-horizontal-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    } @else {
+      <div class="sin-ruta-badge" (click)="cambiarRuta()">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Sin ruta asignada - <strong>Toca para asignar</strong></span>
+      </div>
+    }
+
     <form [formGroup]="formCliente">
       
-      <h3 class="section-title">Datos Personales</h3>
+      <h3 class="section-title">Datos del Cliente</h3>
+
+      <ion-item lines="none">
+        <ion-icon name="finger-print" slot="start" color="primary"></ion-icon>
+        <ion-input 
+          label="Número de Cliente (CTE)" 
+          labelPlacement="floating" 
+          formControlName="cte"
+          type="number">
+        </ion-input>
+      </ion-item>
 
       <ion-item lines="none">
         <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-        <ion-input label="Nombre" labelPlacement="floating" formControlName="representante"></ion-input>
+        <ion-input label="Representante" labelPlacement="floating" formControlName="representante"></ion-input>
       </ion-item>
       @if (formCliente.get('representante')?.invalid && formCliente.get('representante')?.touched) {
         <div class="error-msg">Nombre requerido.</div>
       }
+
+      <ion-item lines="none">
+        <ion-icon name="business-outline" slot="start" color="primary"></ion-icon>
+        <ion-input label="Nombre del Negocio (Opcional)" labelPlacement="floating" formControlName="negocio"></ion-input>
+      </ion-item>
 
       <ion-item lines="none">
         <ion-icon name="call-outline" slot="start" color="primary"></ion-icon>
@@ -33,7 +67,7 @@
 
       <ion-item lines="none">
         <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
-        <ion-input label="Correo" labelPlacement="floating" formControlName="correo" type="email"></ion-input>
+        <ion-input label="Correo (Opcional)" labelPlacement="floating" formControlName="correo" type="email"></ion-input>
       </ion-item>
 
       <ion-item lines="none">

@@ -7,8 +7,32 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RutaService {
   private url = 'http://localhost:3000';
-  
+
   constructor(private http: HttpClient) { }
+
+
+  // ========================================
+  // ASIGNACIÓN Y DESASIGNACIÓN DE CLIENTES
+  // ========================================
+
+  /**
+   * Asignar un cliente a una ruta (día específico)
+   */
+  asignarClienteARuta(data: {
+    clienteId: number;
+    diaRutaId: number;
+    precioId: number;
+  }): Observable<any> {
+    return this.http.post(`${this.url}/rutas/asignar-cliente`, data);
+  }
+
+  /**
+   * Desasignar un cliente de una ruta
+   */
+  desasignarClienteDeRuta(clienteId: number, diaRutaId: number): Observable<any> {
+    return this.http.delete(`${this.url}/rutas/desasignar-cliente/${clienteId}/${diaRutaId}`);
+  }
+
 
   // ========================================
   // OBTENER (GET)
@@ -29,10 +53,10 @@ export class RutaService {
   }
 
   obtenerClientesDisponibles(diaRutaId?: number): Observable<any[]> {
-    const url = diaRutaId 
+    const url = diaRutaId
       ? `${this.url}/rutas/clientes-disponibles/${diaRutaId}`
       : `${this.url}/rutas/clientes-disponibles`;
-    
+
     return this.http.get<any[]>(url);
   }
 
@@ -47,7 +71,7 @@ export class RutaService {
   // ========================================
 
   crearRutaConDia(data: {
-    representante: string;
+    nombre: string;
     supervisorId: number | null;
     repartidorId: number | null;
     diaSemana: string;
@@ -94,7 +118,7 @@ export class RutaService {
   }
 
   marcarClienteVisitado(
-    clienteRutaId: number, 
+    clienteRutaId: number,
     visitado: boolean,
     garrafonesVendidos?: number
   ): Observable<any> {

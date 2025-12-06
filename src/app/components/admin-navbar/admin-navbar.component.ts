@@ -4,7 +4,7 @@ import { IonicModule, PopoverController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { PerfilPopoverComponent } from '../perfil-popover/perfil-popover.component';
 import { addIcons } from 'ionicons';
-import { home, compass, people, settings } from 'ionicons/icons';
+import { home, compass, people, settings, person } from 'ionicons/icons';
 
 @Component({
   selector: 'app-admin-navbar',
@@ -14,39 +14,48 @@ import { home, compass, people, settings } from 'ionicons/icons';
   imports: [IonicModule, CommonModule]
 })
 export class AdminNavbarComponent {
-  
+
   @Input() paginaActual: string = 'inicio';
 
   constructor(
     private router: Router,
     private popoverController: PopoverController
   ) {
-    addIcons({ home, compass, people, settings });
+    addIcons({ home, compass, people, settings, person });
   }
 
   navegar(pagina: string) {
-    if (pagina === this.paginaActual) return; 
+    if (pagina === this.paginaActual) return;
 
     switch (pagina) {
       case 'inicio':
-        this.router.navigate(['/usuario/admin']); 
+        this.router.navigate(['/usuario/admin']);
         break;
       case 'rutas':
-        this.router.navigate(['/gestion-rutas']); 
+        this.router.navigate(['/gestion-rutas']);
         break;
       case 'usuarios':
-        this.router.navigate(['/conductores']); 
+        this.router.navigate(['/conductores']);
+        break;
+      case 'precios':
+        this.router.navigate(['/admin/precios']);
+        break;
+      case 'clientes':
+        this.router.navigate(['/admin/clientes']);
         break;
     }
   }
 
-  async abrirMenu(ev: any) {
+async abrirMenu(ev: any) {
     const popover = await this.popoverController.create({
       component: PerfilPopoverComponent,
       event: ev,
       translucent: true,
       alignment: 'end',
-      showBackdrop: false
+      side: 'top', 
+      showBackdrop: true,
+      backdropDismiss: true,
+      cssClass: 'perfil-popover' 
     });
     await popover.present();
   }

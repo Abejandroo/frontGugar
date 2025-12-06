@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true" class="bg-light">
 
+  <!-- HEADER -->
   <div class="main-header">
     <div class="header-content">
       <div class="top-bar">
@@ -7,16 +8,20 @@
       </div>
 
       <div class="text-container">
-        <h2>CARTERA</h2>
-        <p>Gestiona tus clientes activos</p>
-        <h1 class="big-number">{{ clientes.length }}</h1>
+        <h2>MIS RUTAS ASIGNADAS</h2>
+        <p>{{ supervisorNombre }}</p>
+        @if (datosAgrupados) {
+          <h1 class="big-number">{{ datosAgrupados.totalAsignados }}</h1>
+          <span class="subtitle">clientes totales</span>
+        }
       </div>
 
+      <!-- BARRA DE BÚSQUEDA -->
       <div class="search-wrapper">
         <ion-searchbar 
-          placeholder="Buscar por nombre..." 
-          [debounce]="500" 
-          (ionInput)="buscarCliente($event)"
+          [placeholder]="rutaSeleccionada ? 'Buscar cliente...' : 'Buscar ruta...'"
+          [debounce]="300" 
+          (ionInput)="buscar($event)"
           mode="ios"
           class="custom-searchbar">
         </ion-searchbar>
@@ -26,9 +31,10 @@
 
   <div class="white-container">
 
+    <!-- LOADING -->
     @if (cargando) {
       <div class="lista-container">
-        @for (item of [1,2,3,4,5]; track item) {
+        @for (item of [1,2,3,4]; track item) {
           <div class="clean-card skeleton-card">
             <ion-skeleton-text animated style="width: 50px; height: 50px; border-radius: 12px; margin-right: 15px;"></ion-skeleton-text>
             <div style="flex: 1">
@@ -39,57 +45,173 @@
         }
       </div>
     } 
-    
-    @else {
-      <div class="lista-container">
-        
-        @for (cliente of clientesFiltrados; track cliente.id) {
-          <div class="clean-card">
-            
-            <div class="initials-box">
-              {{ obtenerIniciales(cliente.representante) }}
-            </div>
 
-            <div class="card-info">
-              <h3 class="cliente-name">{{ cliente.representante }}</h3>
+    @else {
+
+      <!-- ==================== LISTA DE RUTAS ==================== -->
+      @if (!rutaSeleccionada) {
+        <div class="lista-container">
+          @for (ruta of rutasFiltradas; track ruta.id) {
+            <div class="ruta-card" (click)="seleccionarRuta(ruta)">
               
-              <div class="detail-row">
-                <ion-icon name="call-outline"></ion-icon>
-                <span>{{ cliente.telefono }}</span>
+              <div class="ruta-header">
+                <div class="ruta-icon">
+                  <ion-icon name="map-outline"></ion-icon>
+                </div>
+                
+                <div class="ruta-info">
+                  <h3>{{ ruta.nombre }}</h3>
+                  <p class="ruta-numero">{{ ruta.numeroRuta }}</p>
+                  
+                  @if (ruta.repartidor) {
+                    <div class="detail-row mini">
+                      <ion-icon name="person-outline"></ion-icon>
+                      <span>{{ ruta.repartidor.nombre }}</span>
+                    </div>
+                  } @else {
+                    <div class="detail-row mini">
+                      <ion-icon name="alert-circle-outline"></ion-icon>
+                      <span>Sin repartidor asignado</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="ruta-badge">
+                  <span class="badge-number">{{ ruta.totalClientes }}</span>
+                  <span class="badge-label">clientes</span>
+                </div>
               </div>
 
-              <div class="price-badge">
-                @if (cliente.tipoPrecio) {
-                  {{ cliente.tipoPrecio.tipoCompra }}
-                } @else {
-                  Normal
+              <!-- Días con cantidad de clientes -->
+              <div class="dias-chips">
+                @for (dia of ruta.diasRuta; track dia.id) {
+                  <ion-chip [color]="getColorDia(dia.diaSemana)" size="small">
+                    <ion-label>{{ dia.diaSemana }}: {{ dia.cantidadClientes }}</ion-label>
+                  </ion-chip>
                 }
               </div>
+
             </div>
-
-            <div class="actions-container">
-              <ion-button fill="clear" size="small" color="warning" (click)="abrirModalEditar(cliente)">
-                <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(cliente)">
-                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-              </ion-button>
+          } @empty {
+            <div class="empty-state">
+              <ion-icon name="map-outline" size="large"></ion-icon>
+              <p>No tienes rutas asignadas</p>
             </div>
+          }
+        </div>
+      }
 
+      <!-- ==================== DETALLE DE RUTA ==================== -->
+      @if (rutaSeleccionada) {
+        <div class="ruta-detalle-container">
+          
+          <!-- Botón volver -->
+          <div class="back-button" (click)="volverARutas()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+            <span>Volver a mis rutas</span>
           </div>
-        } @empty {
-          <div class="empty-state">
-            <ion-icon name="people-outline" size="large"></ion-icon>
-            <p>No se encontraron clientes</p>
-          </div>
-        }
 
-      </div>
+          <!-- Info de la ruta -->
+          <div class="ruta-info-card">
+            <h2>{{ rutaSeleccionada.nombre }}</h2>
+            <p class="numero-ruta">{{ rutaSeleccionada.numeroRuta }}</p>
+            
+            @if (rutaSeleccionada.repartidor) {
+              <div class="detail-row">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>{{ rutaSeleccionada.repartidor.nombre }}</span>
+              </div>
+            }
+
+            <div class="total-badge">
+              Total: <strong>{{ rutaSeleccionada.totalClientes }}</strong> clientes
+            </div>
+          </div>
+
+          <!-- Segmento de días -->
+          <ion-segment 
+            [value]="diaSeleccionado" 
+            (ionChange)="cambiarDia($event)"
+            mode="ios"
+            class="dias-segment">
+            @for (dia of rutaSeleccionada.diasRuta; track dia.id) {
+              <ion-segment-button [value]="dia.diaSemana">
+                <ion-label class="dia-label">
+                  <div>{{ dia.diaSemana }}</div>
+                  <small>({{ dia.cantidadClientes }})</small>
+                </ion-label>
+              </ion-segment-button>
+            }
+          </ion-segment>
+
+          <!-- BUSCADOR DE CLIENTES DENTRO DE LA RUTA -->
+          <div class="search-clientes-ruta">
+            <ion-searchbar 
+              placeholder="Buscar cliente en esta ruta..."
+              [debounce]="300" 
+              (ionInput)="buscarClienteEnRuta($event)"
+              mode="ios"
+              class="search-bar-ruta">
+            </ion-searchbar>
+          </div>
+
+          <!-- Lista de clientes del día -->
+          <div class="lista-container">
+            @for (cliente of clientesDelDiaSeleccionado; track cliente.id) {
+              <div class="clean-card">
+                
+                <div class="initials-box">
+                  {{ obtenerIniciales(cliente.nombre) }}
+                </div>
+
+                <div class="card-info">
+                  <h3 class="cliente-name">{{ cliente.nombre }}</h3>
+                  
+                  @if (cliente.negocio) {
+                    <p class="negocio-name">{{ cliente.negocio }}</p>
+                  }
+                  
+                  <div class="detail-row">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <span>{{ cliente.telefono }}</span>
+                  </div>
+
+                  <div class="price-badge">
+                    @if (cliente.tipoPrecio) {
+                      {{ cliente.tipoPrecio.tipoCompra }}
+                    } @else {
+                      Normal
+                    }
+                  </div>
+                </div>
+
+                <div class="actions-container">
+                  <ion-button fill="clear" size="small" color="warning" (click)="abrirModalEditar(cliente)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(cliente)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+
+              </div>
+            } @empty {
+              <div class="empty-state">
+                <ion-icon name="calendar-outline" size="large"></ion-icon>
+                <p>No hay clientes para este día</p>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
     }
 
     <div style="height: 100px;"></div>
   </div>
 
+  <!-- FAB BUTTON PARA AGREGAR CLIENTE -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="custom-fab">
     <ion-fab-button (click)="abrirModalCrear()">
       <ion-icon name="add"></ion-icon>
