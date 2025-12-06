@@ -38,7 +38,7 @@ ion-toolbar {
 }
 
 ion-menu[menuId="admin-menu"] {
-  z-index: 9999 !important;
+  //z-index: 9999 !important;
 }
 
 // ========================================
@@ -87,7 +87,7 @@ ion-menu[menuId="admin-menu"] {
   position: absolute;
   top: 10px;
   right: 10px;
-  z-index: 1000;
+  //z-index: 1000;
   background: rgba(56, 128, 255, 0.9);
   color: white;
   padding: 5px 10px;
@@ -103,7 +103,7 @@ ion-menu[menuId="admin-menu"] {
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  //z-index: 1000;
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 10px 20px;
@@ -133,64 +133,64 @@ ion-backdrop {
   pointer-events: none !important; // ✅ CAMBIO CRÍTICO: none en lugar de auto
 }
 
-// Z-INDEX JERARQUÍA CLARA
+// //z-index JERARQUÍA CLARA
 ion-modal {
-  z-index: 20000 !important;
+  //z-index: 20000 !important;
   pointer-events: auto !important; // ✅ El modal SÍ captura eventos
   
   &::part(backdrop) {
-    z-index: 19999 !important;
+    //z-index: 19999 !important;
     pointer-events: none !important; // ✅ El backdrop NO captura eventos
   }
   
   .modal-wrapper {
-    z-index: 20001 !important;
+    //z-index: 20001 !important;
     pointer-events: auto !important; // ✅ El contenido SÍ captura eventos
   }
 }
 
 ion-alert {
-  z-index: 21000 !important;
+  ////z-index: 21000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-    z-index: 20999 !important;
+  //  //z-index: 20999 !important;
     pointer-events: none !important; // ✅ El backdrop NO captura eventos
   }
   
   .alert-wrapper {
-    z-index: 21001 !important;
+  //  //z-index: 21001 !important;
     pointer-events: auto !important;
   }
 }
 
 ion-action-sheet {
-  z-index: 21000 !important;
+//  //z-index: 21000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-    z-index: 20999 !important;
+  //  //z-index: 20999 !important;
     pointer-events: none !important; // ✅ El backdrop NO captura eventos
   }
   
   .action-sheet-wrapper {
-    z-index: 21001 !important;
+  //  //z-index: 21001 !important;
     pointer-events: auto !important;
   }
 }
 
 ion-loading {
-  z-index: 22000 !important;
+//  //z-index: 22000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-    z-index: 21999 !important;
+    //z-index: 21999 !important;
     pointer-events: none !important;
   }
 }
 
 ion-toast {
-  z-index: 23000 !important;
+//  //z-index: 23000 !important;
   pointer-events: auto !important;
 }
 

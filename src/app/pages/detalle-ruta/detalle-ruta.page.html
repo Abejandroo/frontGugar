@@ -201,7 +201,9 @@
               <div class="orden-numero">{{ clienteSeleccionado.ordenVisita }}</div>
 
               <div class="cliente-datos">
-                <h4>{{ clienteSeleccionado.cliente.nombre || clienteSeleccionado.cliente.representante }}</h4>
+               <h3>
+  {{ clienteSeleccionado.cliente.nombre || clienteSeleccionado.cliente.name || clienteSeleccionado.cliente.representante || 'Sin Nombre' }}
+</h3>
 
                 <p class="direccion">
                   <ion-icon name="location-outline"></ion-icon>
