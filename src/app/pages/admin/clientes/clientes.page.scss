@@ -9,27 +9,28 @@
 
 // ========== HEADER AZUL ==========
 .main-header {
-  background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
-  padding: 20px 20px 0 20px;
+   background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
+  padding: 20px 20px 60px 20px;
   color: white;
   position: relative;
   z-index: 1;
-
+  .top-bar {
+    display: flex; justify-content: center; margin-bottom: 20px;
+    .mini-logo { height: 35px; opacity: 0.9; }
+  }
   .header-content {
-    // Top Bar con logo a la derecha
-    .top-bar {
-      display: flex;
-      justify-content: flex-end; // Logo a la derecha
-      align-items: center;
-      margin-bottom: 15px;
+  .top-bar {
+    display: flex; justify-content: center; margin-bottom: 20px;
+    .mini-logo { height: 35px; opacity: 0.9; }
+  }
 
-      .mini-logo {
-        height: 45px; // Un poco más grande
-        opacity: 0.95;
-      }
-    }
 
     .text-container {
+       text-align: center; // Centramos texto para esta vista
+    margin-bottom: 20px;
+    h2 { margin: 0; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; }
+    p { margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; font-weight: 300; }
+    .big-number { margin: 10px 0 0 0; font-size: 2.5rem; font-weight: 700; line-height: 1; }
       margin-bottom: 20px;
 
       h2 {
