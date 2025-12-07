@@ -1,19 +1,21 @@
 // src/app/modal/resultado-division-modal/resultado-division-modal.component.ts
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, AlertController, LoadingController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close, trendingUpOutline, timeOutline, mapOutline, peopleOutline } from 'ionicons/icons';
 import { DividirRutaResponse, SubRutaResult } from '../../models/clientes-agrupados.interface';
 import { RutaService } from 'src/app/service/ruta.service';
+import { Auth } from 'src/app/service/auth';
+import { FormsModule } from '@angular/forms';
 
 addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
 
 @Component({
   selector: 'app-resultado-division-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, FormsModule],
   template: `
     <ion-header>
       <ion-toolbar color="success">
@@ -54,6 +56,18 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
               <ion-card-subtitle>{{ resultado.subRutaA.totalClientes }} Clientes</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
+              <ion-item lines="none">
+            <ion-label position="stacked">Asignar Repartidor (A)</ion-label>
+            <ion-select 
+                placeholder="Ninguno"
+                [(ngModel)]="idRepartidorASeleccionado"
+            >
+                <ion-select-option [value]="null">Sin asignar</ion-select-option>
+                <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
+                    {{ rep.nombre }}
+                </ion-select-option>
+            </ion-select>
+        </ion-item>
               <div class="metric-item">
                 <ion-icon name="map-outline"></ion-icon>
                 <span>Distancia: <strong>{{ resultado.subRutaA.distanciaKm }} km</strong></span>
@@ -77,6 +91,18 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
               <ion-card-subtitle>{{ resultado.subRutaB.totalClientes }} Clientes</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
+              <ion-item lines="none">
+            <ion-label position="stacked">Asignar Repartidor (B)</ion-label>
+            <ion-select 
+                placeholder="Ninguno"
+                [(ngModel)]="idRepartidorBSeleccionado"
+            >
+                <ion-select-option [value]="null">Sin asignar</ion-select-option>
+                <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
+                    {{ rep.nombre }}
+                </ion-select-option>
+            </ion-select>
+        </ion-item>
               <div class="metric-item">
                 <ion-icon name="map-outline"></ion-icon>
                 <span>Distancia: <strong>{{ resultado.subRutaB.distanciaKm }} km</strong></span>
@@ -191,17 +217,31 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
     }
   `]
 })
-export class ResultadoDivisionModalComponent {
+export class ResultadoDivisionModalComponent implements OnInit {
   @Input() resultado!: DividirRutaResponse;
   @Input() datosOriginales!: any; // 🆕 Recibir los datos originales
+
+  repartidores: any[] = []; // Lista de repartidores disponibles
+  idRepartidorASeleccionado: number | null = null;
+  idRepartidorBSeleccionado: number | null = null;
 
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
     private loadingController: LoadingController, // 🆕 Agregar
-    private rutaService: RutaService // 🆕 Agregar
+    private rutaService: RutaService, // 🆕 Agregar
+    private authService: Auth,
+    
   ) { }
 
+  ngOnInit() {
+
+        this.authService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.repartidores = usuarios.filter(u => u.role === 'repartidor');
+      }
+    });
+  }
   async mostrarDetalle(subRuta: SubRutaResult, titulo: string) {
     const listaClientes = subRuta.clientes
       .map((c, i) => `${i + 1}. ${c.nombre}<br><small>${c.direccion}</small>`)
@@ -223,61 +263,77 @@ export class ResultadoDivisionModalComponent {
     await alert.present();
   }
 
-  // ========================================
-  // 🆕 MÉTODO MODIFICADO: Ahora SÍ guarda
-  // ========================================
-  async aceptarYGuardar() {
+ async aceptarYGuardar() {
+    // 💡 PASO 1: Validación de repartidores
+    if (this.idRepartidorASeleccionado === null || this.idRepartidorBSeleccionado === null) {
+        const alert = await this.alertController.create({
+            header: 'Asignación Requerida',
+            message: 'Debes asignar un repartidor a la Sub-Ruta A y a la Sub-Ruta B antes de guardar.',
+            buttons: ['Entendido']
+        });
+        await alert.present();
+        return; // Detiene la ejecución si falta un repartidor
+    }
+
     const loading = await this.loadingController.create({
-      message: 'Guardando sub-rutas...',
+        message: 'Guardando sub-rutas...',
     });
     await loading.present();
 
-    // Llamar al endpoint de confirmación
-    this.rutaService.confirmarDivisionRuta(this.datosOriginales).subscribe({
-      next: async (resultado) => {
-        await loading.dismiss();
+    // 💡 PASO 2: Enviar los datos correctos (CORRECCIÓN DE ERROR ANTERIOR)
+    const datosFinales = {
+        ...this.datosOriginales,
+        idRepartidorA: this.idRepartidorASeleccionado,
+        idRepartidorB: this.idRepartidorBSeleccionado,
+    };
 
-        const alert = await this.alertController.create({
-          header: '✅ Sub-Rutas Guardadas',
-          message: `
-            <strong>Las sub-rutas han sido creadas exitosamente:</strong><br><br>
-            📍 ${resultado.subRutaA.nombre} (${resultado.subRutaA.totalClientes} clientes)<br>
-            📍 ${resultado.subRutaB.nombre} (${resultado.subRutaB.totalClientes} clientes)<br><br>
-            La ruta original "${resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida" y sus clientes fueron reasignados.<br><br>
-            <strong>Ahora puedes asignar estas sub-rutas a diferentes repartidores.</strong>
-          `,
-          buttons: [
-            {
-              text: 'Entendido',
-              handler: () => {
-                // 🆕 Cerrar AMBOS modales
-                this.modalController.dismiss({
-                  recargar: true,
-                  cerrarTodos: true, // 🆕 Flag para cerrar todos
-                  subRutaAId: resultado.subRutaA.id,
-                  subRutaBId: resultado.subRutaB.id,
-                });
-              }
-            }
-          ]
-        });
+    // Llamar al endpoint de confirmación, usando datosFinales
+    this.rutaService.confirmarDivisionRuta(datosFinales).subscribe({ // <-- USAR datosFinales
+        next: async (resultado) => {
+            await loading.dismiss();
+            
+            // ... (Lógica de alerta de éxito)
+            const alert = await this.alertController.create({
+                header: '✅ Sub-Rutas Guardadas',
+                message: `
+                    <strong>Las sub-rutas han sido creadas exitosamente:</strong><br><br>
+                    📍 ${resultado.subRutaA.nombre} (${resultado.subRutaA.totalClientes} clientes)<br>
+                    📍 ${resultado.subRutaB.nombre} (${resultado.subRutaB.totalClientes} clientes)<br><br>
+                    La ruta original "${resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida" y sus clientes fueron reasignados.<br><br>
+                    <strong>Ahora puedes asignar estas sub-rutas a diferentes repartidores.</strong>
+                `,
+                buttons: [
+                    {
+                        text: 'Entendido',
+                        handler: () => {
+                            // 🆕 Cerrar AMBOS modales
+                            this.modalController.dismiss({
+                                recargar: true,
+                                cerrarTodos: true, // 🆕 Flag para cerrar todos
+                                subRutaAId: resultado.subRutaA.id,
+                                subRutaBId: resultado.subRutaB.id,
+                            });
+                        }
+                    }
+                ]
+            });
 
-        await alert.present();
-      },
-      error: async (err) => {
-        await loading.dismiss();
-        console.error('Error confirmando división:', err);
+            await alert.present();
+        },
+        error: async (err) => {
+            await loading.dismiss();
+            console.error('Error confirmando división:', err);
 
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: err.error?.message || 'Ocurrió un error al guardar las sub-rutas',
-          buttons: ['OK']
-        });
+            const alert = await this.alertController.create({
+                header: 'Error',
+                message: err.error?.message || 'Ocurrió un error al guardar las sub-rutas',
+                buttons: ['OK']
+            });
 
-        await alert.present();
-      }
+            await alert.present();
+        }
     });
-  }
+}
 
   /**
    * Cerrar modal sin guardar (cancelar)

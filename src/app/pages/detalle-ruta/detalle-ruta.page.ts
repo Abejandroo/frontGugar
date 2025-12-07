@@ -160,7 +160,18 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 
   cargarDiasDisponibles() {
     if (this.ruta.diasRuta && this.ruta.diasRuta.length > 0) {
-      this.diasDisponibles = this.ruta.diasRuta;
+      this.diasDisponibles = this.ruta.diasRuta.filter((dia: any) => {
+        // Asumimos que 'dividida' puede ser un booleano (false) o un número (0)
+        return dia.dividida === false || dia.dividida === 0;
+      });
+
+      // 💡 PASO 2: Verificar si quedan días disponibles después del filtro
+      if (this.diasDisponibles.length === 0) {
+        this.diaSeleccionado = '';
+        this.mostrarToast('Todos los días de esta ruta han sido divididos.', 'warning');
+        this.clientesDia = []; // Limpiar la lista si no hay días
+        return;
+      }
 
       // Seleccionar día actual o el primero
       const hoy = new Date().getDay();
@@ -402,61 +413,61 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // DIVIDIR RUTA
   // ========================================
 
-async dividirRuta() {
-  if (this.clientesDia.length < 4) {
-    this.mostrarToast('Se necesitan al menos 4 clientes para dividir', 'warning');
-    return;
-  }
-
-  // Obtener el objeto completo del día de ruta
-  const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-
-  if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
-    this.mostrarToast('Error: No se encontró el ID del Día de Ruta seleccionado.', 'danger');
-    return;
-  }
-
-  const puntoMedio = Math.floor(this.clientesDia.length / 2);
-
-  try {
-    const modal = await this.modalController.create({
-      component: DividirRutaModalComponent,
-      componentProps: {
-        rutaId: this.rutaId,
-        diaRutaId: diaRutaSeleccionado.id,
-        totalClientes: this.clientesDia.length,
-        puntoCorteDefault: puntoMedio,
-        diaSemana: this.diaSeleccionado
-      },
-      cssClass: 'modal-dividir-ruta',
-      backdropDismiss: true,
-      mode: 'ios'
-    });
-
-    await modal.present();
-    console.log('✅ Modal dividir ruta presentado');
-
-    // ========================================
-    // 🆕 AGREGAR ESTO: Esperar a que se cierre
-    // ========================================
-    const { data } = await modal.onWillDismiss();
-
-    // Si se confirmó la división, recargar
-    if (data?.recargar) {
-      console.log('✅ Sub-rutas creadas:', data.subRutaAId, data.subRutaBId);
-      
-      // Mostrar toast de éxito
-      await this.mostrarToast('Sub-rutas creadas exitosamente', 'success');
-      
-      // Recargar los datos de la ruta
-      this.cargarRuta();
+  async dividirRuta() {
+    if (this.clientesDia.length < 4) {
+      this.mostrarToast('Se necesitan al menos 4 clientes para dividir', 'warning');
+      return;
     }
 
-  } catch (error) {
-    console.error('❌ Error abriendo modal dividir:', error);
-    this.mostrarToast('Error al abrir el modal', 'danger');
+    // Obtener el objeto completo del día de ruta
+    const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+    if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
+      this.mostrarToast('Error: No se encontró el ID del Día de Ruta seleccionado.', 'danger');
+      return;
+    }
+
+    const puntoMedio = Math.floor(this.clientesDia.length / 2);
+
+    try {
+      const modal = await this.modalController.create({
+        component: DividirRutaModalComponent,
+        componentProps: {
+          rutaId: this.rutaId,
+          diaRutaId: diaRutaSeleccionado.id,
+          totalClientes: this.clientesDia.length,
+          puntoCorteDefault: puntoMedio,
+          diaSemana: this.diaSeleccionado
+        },
+        cssClass: 'modal-dividir-ruta',
+        backdropDismiss: true,
+        mode: 'ios'
+      });
+
+      await modal.present();
+      console.log('✅ Modal dividir ruta presentado');
+
+      // ========================================
+      // 🆕 AGREGAR ESTO: Esperar a que se cierre
+      // ========================================
+      const { data } = await modal.onWillDismiss();
+
+      // Si se confirmó la división, recargar
+      if (data?.recargar) {
+        console.log('✅ Sub-rutas creadas:', data.subRutaAId, data.subRutaBId);
+
+        // Mostrar toast de éxito
+        await this.mostrarToast('Sub-rutas creadas exitosamente', 'success');
+
+        // Recargar los datos de la ruta
+        this.cargarRuta();
+      }
+
+    } catch (error) {
+      console.error('❌ Error abriendo modal dividir:', error);
+      this.mostrarToast('Error al abrir el modal', 'danger');
+    }
   }
-}
 
 
   async calcularRutaOptimizada(clientes: any[]) {

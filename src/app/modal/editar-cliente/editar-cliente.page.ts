@@ -130,12 +130,15 @@ export class EditarClientePage implements OnInit {
         rutas.forEach(ruta => {
           if (ruta.diasRuta && ruta.diasRuta.length > 0) {
             ruta.diasRuta.forEach((dia: any) => {
-              this.rutasDisponibles.push({
-                diaRutaId: dia.id,
-                label: `${ruta.nombre} - ${dia.diaSemana}`,
-                ruta: ruta.nombre,
-                dia: dia.diaSemana
-              });
+
+              if (dia.dividida === false || dia.dividida === 0) {
+                this.rutasDisponibles.push({
+                  diaRutaId: dia.id,
+                  label: `${ruta.nombre} - ${dia.diaSemana}`,
+                  ruta: ruta.nombre,
+                  dia: dia.diaSemana
+                });
+              }
             });
           }
         });

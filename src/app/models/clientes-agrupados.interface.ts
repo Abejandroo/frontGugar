@@ -23,6 +23,7 @@ export interface ClienteConRuta {
 export interface DiaRutaConClientes {
   id: number;
   diaSemana: string;
+  dividida: boolean | number;
   cantidadClientes: number;
   clientes: ClienteConRuta[];
 }

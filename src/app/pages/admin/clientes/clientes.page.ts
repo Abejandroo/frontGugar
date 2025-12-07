@@ -5,18 +5,18 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ActionSheetController, ToastController } from '@ionic/angular';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
-import { 
-  add, searchOutline, peopleOutline, callOutline, 
-  ellipsisVertical, trashOutline, createOutline, close, 
+import {
+  add, searchOutline, peopleOutline, callOutline,
+  ellipsisVertical, trashOutline, createOutline, close,
   trash, create, pricetagOutline, mapOutline, personOutline,
   calendarOutline, listOutline
 } from 'ionicons/icons';
 import { AgregarClientePage } from 'src/app/modal/agregar-cliente/agregar-cliente.page';
 import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
-import { 
-  ClientesAgrupados, 
-  RutaConClientes, 
+import {
+  ClientesAgrupados,
+  RutaConClientes,
   ClienteConRuta,
   DiaRutaConClientes
 } from '../../../models/clientes-agrupados.interface';
@@ -32,20 +32,20 @@ export class ClientesPage implements OnInit {
 
   // Segmento principal
   segmentoActivo: 'asignados' | 'noAsignados' = 'asignados';
-  
+
   // Datos agrupados
   datosAgrupados: ClientesAgrupados | null = null;
-  
+
   // Para filtrado
   terminoBusqueda: string = '';
-  
+
   // Ruta seleccionada para mostrar detalles
   rutaSeleccionada: RutaConClientes | null = null;
   diaSeleccionado: string = 'Lunes-Jueves';
-  
+
   // Búsqueda de clientes dentro de la ruta
   busquedaClientesRuta: string = '';
-  
+
   cargando: boolean = true;
 
   constructor(
@@ -54,9 +54,9 @@ export class ClientesPage implements OnInit {
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController
   ) {
-    addIcons({ 
-      add, searchOutline, peopleOutline, callOutline, 
-      ellipsisVertical, trashOutline, createOutline, close, 
+    addIcons({
+      add, searchOutline, peopleOutline, callOutline,
+      ellipsisVertical, trashOutline, createOutline, close,
       trash, create, pricetagOutline, mapOutline, personOutline,
       calendarOutline, listOutline
     });
@@ -90,9 +90,20 @@ export class ClientesPage implements OnInit {
   // Seleccionar una ruta para ver sus clientes
   seleccionarRuta(ruta: RutaConClientes) {
     this.rutaSeleccionada = ruta;
-    // Seleccionar el primer día disponible
-    if (ruta.diasRuta.length > 0) {
-      this.diaSeleccionado = ruta.diasRuta[0].diaSemana;
+
+    // 💡 Filtrar los días antes de seleccionar el día por defecto
+    const diasNoDivididos = ruta.diasRuta.filter(dia => dia.dividida === false || dia.dividida === 0);
+    
+
+    // Reemplazar la lista de días de la ruta seleccionada con la lista filtrada
+    this.rutaSeleccionada.diasRuta = diasNoDivididos as DiaRutaConClientes[];
+
+    // Seleccionar el primer día disponible (que ahora es uno no dividido)
+    if (diasNoDivididos.length > 0) {
+      this.diaSeleccionado = diasNoDivididos[0].diaSemana;
+    } else {
+      this.diaSeleccionado = '';
+      this.mostrarToast('Esta ruta no tiene días disponibles (todos han sido divididos).', 'warning');
     }
   }
 
@@ -118,17 +129,17 @@ export class ClientesPage implements OnInit {
   get clientesDelDiaSeleccionado(): ClienteConRuta[] {
     if (!this.rutaSeleccionada) return [];
     const dia = this.rutaSeleccionada.diasRuta.find(d => d.diaSemana === this.diaSeleccionado);
-    
+
     if (!dia) return [];
-    
+
     // Aplicar filtro de búsqueda
     if (!this.busquedaClientesRuta) {
       return dia.clientes;
     }
 
     const termino = this.busquedaClientesRuta.toLowerCase();
-    return dia.clientes.filter(c => 
-      c.nombre.toLowerCase().includes(termino) || 
+    return dia.clientes.filter(c =>
+      c.nombre.toLowerCase().includes(termino) ||
       (c.negocio && c.negocio.toLowerCase().includes(termino)) ||
       (c.telefono && c.telefono.includes(termino))
     );
@@ -137,14 +148,14 @@ export class ClientesPage implements OnInit {
   // Obtener clientes no asignados filtrados
   get clientesNoAsignadosFiltrados(): ClienteConRuta[] {
     if (!this.datosAgrupados) return [];
-    
+
     if (!this.terminoBusqueda) {
       return this.datosAgrupados.noAsignados;
     }
 
     const termino = this.terminoBusqueda.toLowerCase();
-    return this.datosAgrupados.noAsignados.filter(c => 
-      c.nombre.toLowerCase().includes(termino) || 
+    return this.datosAgrupados.noAsignados.filter(c =>
+      c.nombre.toLowerCase().includes(termino) ||
       (c.telefono && c.telefono.includes(termino)) ||
       (c.negocio && c.negocio.toLowerCase().includes(termino))
     );
@@ -153,13 +164,13 @@ export class ClientesPage implements OnInit {
   // Obtener rutas filtradas
   get rutasFiltradas(): RutaConClientes[] {
     if (!this.datosAgrupados) return [];
-    
+
     if (!this.terminoBusqueda) {
       return this.datosAgrupados.asignados;
     }
 
     const termino = this.terminoBusqueda.toLowerCase();
-    return this.datosAgrupados.asignados.filter(r => 
+    return this.datosAgrupados.asignados.filter(r =>
       r.nombre.toLowerCase().includes(termino) ||
       r.numeroRuta.toLowerCase().includes(termino)
     );
@@ -174,8 +185,8 @@ export class ClientesPage implements OnInit {
   obtenerIniciales(nombre: string): string {
     if (!nombre) return '';
     const partes = nombre.split(' ');
-    return partes.length >= 2 
-      ? (partes[0][0] + partes[1][0]).toUpperCase() 
+    return partes.length >= 2
+      ? (partes[0][0] + partes[1][0]).toUpperCase()
       : nombre.substring(0, 2).toUpperCase();
   }
 
@@ -266,4 +277,14 @@ export class ClientesPage implements OnInit {
     };
     return colores[dia] || 'medium';
   }
+
+  async mostrarToast(msg: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 2500,
+      color,
+      position: 'top' // o 'bottom'
+    });
+    toast.present();
+  }
 }
