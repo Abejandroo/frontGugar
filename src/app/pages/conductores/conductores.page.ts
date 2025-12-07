@@ -18,6 +18,7 @@ import {
   personAddOutline,
   personCircleOutline,
   shieldCheckmarkOutline,
+  personOutline,
 } from 'ionicons/icons';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 
@@ -44,6 +45,7 @@ export class ConductoresPage  {
       personAddOutline,
       personCircleOutline,
       shieldCheckmarkOutline,
+      personOutline,
     });
      this.obtenerUsuarios();
   }

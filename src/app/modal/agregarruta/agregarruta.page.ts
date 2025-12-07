@@ -39,7 +39,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     const busqueda = this.busquedaCliente.toLowerCase();
     return this.clientesDisponibles.filter(c => 
       // Buscamos por representante (representante es un representante viejo, mejor usa 'representante')
-      (c.representante || c.representante || '').toLowerCase().includes(busqueda) ||
+      (c.nombre || c.representante || '').toLowerCase().includes(busqueda) ||
       // Buscamos por calle directa
       (c.calle || '').toLowerCase().includes(busqueda)
     );
@@ -143,7 +143,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     this.agregarMarcadorCliente(cliente);
 
     // CORRECCIÓN AQUÍ: Usamos 'representante' en lugar de 'representante'
-    this.mostrarToast(`${cliente.representante} agregado`, 'success');
+    this.mostrarToast(`${cliente.nombre} agregado`, 'success');
   }
 
 // 3. CORREGIR EL MAPA (LEAFLET)
