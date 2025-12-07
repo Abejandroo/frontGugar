@@ -2,10 +2,11 @@
 
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, AlertController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController, LoadingController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close, trendingUpOutline, timeOutline, mapOutline, peopleOutline } from 'ionicons/icons';
 import { DividirRutaResponse, SubRutaResult } from '../../models/clientes-agrupados.interface';
+import { RutaService } from 'src/app/service/ruta.service';
 
 addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
 
@@ -192,15 +193,15 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
 })
 export class ResultadoDivisionModalComponent {
   @Input() resultado!: DividirRutaResponse;
+  @Input() datosOriginales!: any; // 🆕 Recibir los datos originales
 
   constructor(
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private loadingController: LoadingController, // 🆕 Agregar
+    private rutaService: RutaService // 🆕 Agregar
   ) { }
 
-  /**
-   * Mostrar detalle de clientes de una sub-ruta
-   */
   async mostrarDetalle(subRuta: SubRutaResult, titulo: string) {
     const listaClientes = subRuta.clientes
       .map((c, i) => `${i + 1}. ${c.nombre}<br><small>${c.direccion}</small>`)
@@ -222,32 +223,60 @@ export class ResultadoDivisionModalComponent {
     await alert.present();
   }
 
+  // ========================================
+  // 🆕 MÉTODO MODIFICADO: Ahora SÍ guarda
+  // ========================================
   async aceptarYGuardar() {
-    const alert = await this.alertController.create({
-      header: '✅ Sub-Rutas Creadas',
-      message: `
-      <strong>Las sub-rutas han sido guardadas correctamente:</strong><br><br>
-      📍 ${this.resultado.subRutaA.nombre} (${this.resultado.subRutaA.totalClientes} clientes)<br>
-      📍 ${this.resultado.subRutaB.nombre} (${this.resultado.subRutaB.totalClientes} clientes)<br><br>
-      La ruta original "${this.resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida".<br><br>
-      Ahora puedes asignar estas sub-rutas a diferentes repartidores.
-    `,
-      buttons: [
-        {
-          text: 'Entendido',
-          handler: () => {
-            // Cerrar el modal y notificar al componente padre que debe recargar
-            this.modalController.dismiss({
-              recargar: true,
-              subRutaAId: this.resultado.subRutaA.id,
-              subRutaBId: this.resultado.subRutaB.id
-            });
-          }
-        }
-      ]
+    const loading = await this.loadingController.create({
+      message: 'Guardando sub-rutas...',
     });
+    await loading.present();
 
-    await alert.present();
+    // Llamar al endpoint de confirmación
+    this.rutaService.confirmarDivisionRuta(this.datosOriginales).subscribe({
+      next: async (resultado) => {
+        await loading.dismiss();
+
+        const alert = await this.alertController.create({
+          header: '✅ Sub-Rutas Guardadas',
+          message: `
+            <strong>Las sub-rutas han sido creadas exitosamente:</strong><br><br>
+            📍 ${resultado.subRutaA.nombre} (${resultado.subRutaA.totalClientes} clientes)<br>
+            📍 ${resultado.subRutaB.nombre} (${resultado.subRutaB.totalClientes} clientes)<br><br>
+            La ruta original "${resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida" y sus clientes fueron reasignados.<br><br>
+            <strong>Ahora puedes asignar estas sub-rutas a diferentes repartidores.</strong>
+          `,
+          buttons: [
+            {
+              text: 'Entendido',
+              handler: () => {
+                // 🆕 Cerrar AMBOS modales
+                this.modalController.dismiss({
+                  recargar: true,
+                  cerrarTodos: true, // 🆕 Flag para cerrar todos
+                  subRutaAId: resultado.subRutaA.id,
+                  subRutaBId: resultado.subRutaB.id,
+                });
+              }
+            }
+          ]
+        });
+
+        await alert.present();
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        console.error('Error confirmando división:', err);
+
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: err.error?.message || 'Ocurrió un error al guardar las sub-rutas',
+          buttons: ['OK']
+        });
+
+        await alert.present();
+      }
+    });
   }
 
   /**

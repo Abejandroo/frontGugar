@@ -157,6 +157,15 @@ export class RutaService {
     return this.http.post(`${this.url}/rutas/dividir`, datos);
   }
 
+  confirmarDivisionRuta(datos: {
+    rutaId: number;
+    diaRutaId: number;
+    puntoCorte: number;
+    diaSemana: string;
+  }): Observable<any> {
+    return this.http.post(`${this.url}/rutas/dividir/confirmar`, datos);
+  }
+
   obtenerSubRutasDe(diaRutaId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}/rutas/dia-ruta/${diaRutaId}/sub-rutas`);
   }

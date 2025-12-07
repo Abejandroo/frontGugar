@@ -52,7 +52,7 @@ export interface ClientesAgrupados {
 
 
 export interface SubRutaResult {
-  id: number;              
+  id: number | null;              
   nombre: string;          
   totalClientes: number;
   distanciaKm: string;
