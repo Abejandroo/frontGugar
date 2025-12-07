@@ -232,7 +232,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
           // Anunciar primer cliente
           if (this.clienteActual) {
             await this.ttsService.anunciarCliente(
-              this.clienteActual.cliente.representante,
+              this.clienteActual.cliente.nombre,
               `${this.clienteActual.cliente.calle}, ${this.clienteActual.cliente.colonia}`
             );
           }
@@ -426,7 +426,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       }).addTo(this.map!);
 
       marker.bindPopup(`
-        <strong>${idx + 1}. ${cr.cliente.representante}</strong><br>
+        <strong>${idx + 1}. ${cr.cliente.nombre}</strong><br>
         ${cr.cliente.calle}<br>
         ${cr.cliente.colonia}
       `);
@@ -474,7 +474,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       }).addTo(this.map!);
 
       marker.bindPopup(`
-        <strong>${idx + 1}. ${cr.cliente.representante}</strong><br>
+        <strong>${idx + 1}. ${cr.cliente.nombre}</strong><br>
         ${cr.cliente.calle}<br>
         ${cr.cliente.colonia}
       `);
@@ -573,7 +573,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     // Anunciar cuando llegue (menos de 50m)
     if (distanciaMetros < 50 && this.ultimaDistanciaAnunciada >= 50) {
-      await this.ttsService.anunciarLlegada(this.clienteActual.cliente.representante);
+      await this.ttsService.anunciarLlegada(this.clienteActual.cliente.nombre);
     }
     // Anunciar cuando esté cerca (menos de 200m)
     else if (distanciaMetros < 200 && this.ultimaDistanciaAnunciada >= 200) {
@@ -638,7 +638,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
         
         if (this.clienteActual) {
           await this.ttsService.anunciarCliente(
-            this.clienteActual.cliente.representante,
+            this.clienteActual.cliente.nombre,
             `${this.clienteActual.cliente.calle}, ${this.clienteActual.cliente.colonia}`
           );
         }
@@ -671,7 +671,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
         
         if (this.clienteActual) {
           await this.ttsService.anunciarCliente(
-            this.clienteActual.cliente.representante,
+            this.clienteActual.cliente.nombre,
             `${this.clienteActual.cliente.calle}, ${this.clienteActual.cliente.colonia}`
           );
         }

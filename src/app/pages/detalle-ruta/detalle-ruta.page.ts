@@ -402,98 +402,62 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // DIVIDIR RUTA
   // ========================================
 
-  async dividirRuta() {
-    if (this.clientesDia.length < 4) {
-      this.mostrarToast('Se necesitan al menos 4 clientes para dividir', 'warning');
-      return;
-    }
-
-    // 🛑 Obtener el objeto completo del día de ruta
-    const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-
-    if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
-      this.mostrarToast('Error: No se encontró el ID del Día de Ruta seleccionado.', 'danger');
-      return;
-    }
-
-    const puntoMedio = Math.floor(this.clientesDia.length / 2);
-
-    try {
-      const modal = await this.modalController.create({
-        component: DividirRutaModalComponent,
-        componentProps: {
-          // 💡 CORRECCIÓN: Pasar los IDs
-          rutaId: this.rutaId,
-          diaRutaId: diaRutaSeleccionado.id, // ID del día de ruta
-
-          totalClientes: this.clientesDia.length,
-          puntoCorteDefault: puntoMedio,
-          diaSemana: this.diaSeleccionado
-        },
-        cssClass: 'modal-dividir-ruta',
-        backdropDismiss: true,
-        mode: 'ios'
-      });
-
-      await modal.present();
-      console.log('✅ Modal dividir ruta presentado');
-
-      const { data } = await modal.onWillDismiss();
-
-      if (data?.confirmar) {
-        await this.ejecutarDivision(data.puntoCorte);
-      }
-    } catch (error) {
-      console.error('❌ Error abriendo modal dividir:', error);
-      this.mostrarToast('Error al abrir el modal', 'danger');
-    }
+async dividirRuta() {
+  if (this.clientesDia.length < 4) {
+    this.mostrarToast('Se necesitan al menos 4 clientes para dividir', 'warning');
+    return;
   }
 
-  async ejecutarDivision(puntoCorte: number) {
-    const loading = await this.toastController.create({
-      message: 'Dividiendo ruta...',
-      duration: 0
+  // Obtener el objeto completo del día de ruta
+  const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
+
+  if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
+    this.mostrarToast('Error: No se encontró el ID del Día de Ruta seleccionado.', 'danger');
+    return;
+  }
+
+  const puntoMedio = Math.floor(this.clientesDia.length / 2);
+
+  try {
+    const modal = await this.modalController.create({
+      component: DividirRutaModalComponent,
+      componentProps: {
+        rutaId: this.rutaId,
+        diaRutaId: diaRutaSeleccionado.id,
+        totalClientes: this.clientesDia.length,
+        puntoCorteDefault: puntoMedio,
+        diaSemana: this.diaSeleccionado
+      },
+      cssClass: 'modal-dividir-ruta',
+      backdropDismiss: true,
+      mode: 'ios'
     });
-    await loading.present();
 
-    try {
-      const grupo1 = this.clientesDia.slice(0, puntoCorte);
-      const grupo2 = this.clientesDia.slice(puntoCorte);
+    await modal.present();
+    console.log('✅ Modal dividir ruta presentado');
 
-      const rutaOptimizada1 = await this.calcularRutaOptimizada(grupo1);
-      const rutaOptimizada2 = await this.calcularRutaOptimizada(grupo2);
+    // ========================================
+    // 🆕 AGREGAR ESTO: Esperar a que se cierre
+    // ========================================
+    const { data } = await modal.onWillDismiss();
 
-      await loading.dismiss();
-
-      const confirmAlert = await this.alertController.create({
-        header: 'División Completada',
-        message: `
-          <strong>Sub-ruta A:</strong> ${grupo1.length} clientes<br>
-          Distancia: ${(rutaOptimizada1.totalDistance / 1000).toFixed(1)} km<br>
-          Tiempo: ${Math.floor(rutaOptimizada1.totalDuration / 60)} min<br><br>
-          <strong>Sub-ruta B:</strong> ${grupo2.length} clientes<br>
-          Distancia: ${(rutaOptimizada2.totalDistance / 1000).toFixed(1)} km<br>
-          Tiempo: ${Math.floor(rutaOptimizada2.totalDuration / 60)} min
-        `,
-        buttons: [
-          { text: 'Cancelar', role: 'cancel' },
-          {
-            text: 'Crear Sub-rutas',
-            handler: () => {
-              this.mostrarToast('Sub-rutas creadas (función en desarrollo)', 'success');
-            }
-          }
-        ]
-      });
-
-      await confirmAlert.present();
-
-    } catch (error) {
-      await loading.dismiss();
-      console.error('Error dividiendo ruta:', error);
-      this.mostrarToast('Error al dividir ruta', 'danger');
+    // Si se confirmó la división, recargar
+    if (data?.recargar) {
+      console.log('✅ Sub-rutas creadas:', data.subRutaAId, data.subRutaBId);
+      
+      // Mostrar toast de éxito
+      await this.mostrarToast('Sub-rutas creadas exitosamente', 'success');
+      
+      // Recargar los datos de la ruta
+      this.cargarRuta();
     }
+
+  } catch (error) {
+    console.error('❌ Error abriendo modal dividir:', error);
+    this.mostrarToast('Error al abrir el modal', 'danger');
   }
+}
+
 
   async calcularRutaOptimizada(clientes: any[]) {
     if (clientes.length === 0) {

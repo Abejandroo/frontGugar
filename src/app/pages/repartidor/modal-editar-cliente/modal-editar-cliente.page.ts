@@ -37,7 +37,7 @@ export class ModalEditarClientePage implements OnInit {
   ngOnInit() {
     // Acceder directamente a los campos del cliente (sin direcciones[0])
     this.formCliente = this.fb.group({
-      representante: [this.cliente.representante, Validators.required],
+      nombre: [this.cliente.nombre, Validators.required],
       negocio: [this.cliente.negocio || ''],
       telefono: [this.cliente.telefono || ''],
       calle: [this.cliente.calle || '', Validators.required],
@@ -92,7 +92,7 @@ export class ModalEditarClientePage implements OnInit {
 
     // Construir objeto con los datos actualizados
     const clienteActualizado = {
-      representante: this.formCliente.value.representante,
+      nombre: this.formCliente.value.nombre,
       negocio: this.formCliente.value.negocio,
       telefono: this.formCliente.value.telefono,
       calle: this.formCliente.value.calle,

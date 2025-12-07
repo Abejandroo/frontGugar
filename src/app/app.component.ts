@@ -70,7 +70,8 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   list,
-  calculatorOutline
+  calculatorOutline,
+  informationCircle
 } from 'ionicons/icons';
 
 @Component({
@@ -147,7 +148,8 @@ export class AppComponent {
   'location': location,
   'alert-circle-outline': alertCircleOutline,
   'list': list,
-  'calculator-outline': calculatorOutline
+  'calculator-outline': calculatorOutline,
+  'information-circle': informationCircle,
 });
  }
   isAdmin() {

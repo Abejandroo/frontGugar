@@ -104,7 +104,7 @@
       <div class="cliente-header">
         <div>
           <ion-badge color="warning">Cliente Actual</ion-badge>
-          <ion-card-title>{{ clienteActual.cliente.representante }}</ion-card-title>
+          <ion-card-title>{{ clienteActual.cliente.nombre }}</ion-card-title>
         </div>
         <ion-button fill="clear" (click)="editarCliente()">
           <ion-icon name="create-outline" color="primary"></ion-icon>
@@ -171,7 +171,7 @@
           {{ getOrdenCliente(cliente) }}
         </ion-badge>
         <ion-label>
-          <h3>{{ cliente.cliente.representante }}</h3>
+          <h3>{{ cliente.cliente.nombre }}</h3>
           <p>{{ cliente.cliente.colonia }}</p>
         </ion-label>
       </ion-item>

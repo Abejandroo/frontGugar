@@ -52,16 +52,21 @@ export interface ClientesAgrupados {
 
 
 export interface SubRutaResult {
+  id: number;              
+  nombre: string;          
   totalClientes: number;
-  distanciaKm: string; // Lo tienes como string con 2 decimales en el backend
+  distanciaKm: string;
   tiempoMinutos: number;
   clientes: { id: number; nombre: string; direccion: string }[];
 }
 
 export interface RutaOriginalResult {
+  id: number;              
   nombre: string;
   diaSemana: string;
   totalClientes: number;
+  estado: string;          
+  dividida: boolean;       
 }
 
 export interface DividirRutaResponse {
