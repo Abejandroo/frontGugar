@@ -28,13 +28,15 @@ import { DividirRutaModalComponent } from '../../modal/dividir-ruta-modal/dividi
 import { DetalleClienteModalComponent } from '../../modal/detalle-cliente-modal/detalle-cliente-modal.component';
 import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-detalle-ruta',
   templateUrl: './detalle-ruta.page.html',
   styleUrls: ['./detalle-ruta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, ...IonicSharedComponents]
+  imports: [ CommonModule, FormsModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaLeaflet', { static: false }) mapaElement!: ElementRef;

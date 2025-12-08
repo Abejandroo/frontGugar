@@ -17,6 +17,7 @@ import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { AgregarconductorPage } from 'src/app/modal/agregarconductor/agregarconductor.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-admin',
@@ -24,7 +25,7 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
   styleUrls: ['./admin.page.scss'],
   standalone: true,
   imports: [CommonModule, AdminNavbarComponent, ...IonicSharedComponents],
-  providers:[ModalController, PopoverController]
+  providers:[ModalController, PopoverController,...IonicControllers]
 })
 export class AdminPage  { 
 

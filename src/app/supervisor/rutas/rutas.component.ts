@@ -13,13 +13,15 @@ import {
 import { MonitoreoRutaPage } from 'src/app/modal/monitoreo-ruta/monitoreo-ruta.page';
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-rutas',
   templateUrl: './rutas.component.html',
   styleUrls: ['./rutas.component.scss'],
   standalone: true,
-  imports: [ CommonModule, SupervisorNavbarComponent,...IonicSharedComponents]
+  imports: [ CommonModule, SupervisorNavbarComponent,...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class RutasComponent implements OnInit {
 

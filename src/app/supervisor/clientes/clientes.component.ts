@@ -18,13 +18,15 @@ import {
   DiaRutaConClientes
 } from '../../models/clientes-agrupados.interface';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.scss'],
   standalone: true,
-  imports: [CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents]
+  imports: [CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class ClientesComponent implements OnInit {
 

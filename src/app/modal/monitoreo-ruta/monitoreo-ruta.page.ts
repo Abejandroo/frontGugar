@@ -7,13 +7,15 @@ import { addIcons } from 'ionicons';
 import { close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle } from 'ionicons/icons';
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-monitoreo-ruta',
   templateUrl: './monitoreo-ruta.page.html',
   styleUrls: ['./monitoreo-ruta.page.scss'],
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule]
+  imports: [...IonicSharedComponents, CommonModule],
+  providers: [...IonicControllers]
 })
 export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaMonitoreo', { static: false }) mapaElement!: ElementRef;

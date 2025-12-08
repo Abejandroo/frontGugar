@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {  ModalController } from '@ionic/angular';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-modal-todos-clientes',
   templateUrl: './modal-todos-clientes.page.html',
   styleUrls: ['./modal-todos-clientes.page.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, ...IonicSharedComponents]
+  imports: [ CommonModule, FormsModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class ModalTodosClientesPage {
   

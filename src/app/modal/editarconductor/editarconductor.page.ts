@@ -16,6 +16,7 @@ import { Auth } from 'src/app/service/auth';
 import { addIcons } from 'ionicons';
 import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-editarconductor',
@@ -23,6 +24,7 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
   styleUrls: ['./editarconductor.page.scss'],
   standalone: true,
   imports: [...IonicSharedComponents, ReactiveFormsModule, CommonModule, FormsModule],
+  providers: [...IonicControllers]
 })
 export class EditarconductorPage {
   formUsuario!: FormGroup;

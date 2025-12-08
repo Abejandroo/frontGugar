@@ -138,16 +138,16 @@
       }
 
       <!-- REFERENCIA (opcional) -->
-      <ion-item lines="none">
-        <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
-        <ion-textarea 
-          label="Referencia" 
-          labelPlacement="floating" 
-          formControlName="referencia" 
-          rows="2"
-          placeholder="Cerca de... (opcional)">
-        </ion-textarea>
-      </ion-item>
+    <ion-item lines="none" class="input-rounded">
+  <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
+  <ion-input 
+    label="Referencia" 
+    labelPlacement="floating" 
+    formControlName="referencia" 
+    type="text"
+    placeholder="Cerca de... (opcional)">
+  </ion-input>
+</ion-item>
 
       <!-- ASIGNACIÓN A RUTA (opcional) -->
       <h3 class="section-title ion-margin-top">Asignación a Ruta (Opcional)</h3>

@@ -6,13 +6,15 @@ import { ClienteService } from 'src/app/service/cliente.service';
 import { GeolocationService } from 'src/app/service/geolocation.service';
 import { ModalEditarVentaPage } from '../modal-editar-venta/modal-editar-venta.page';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-modal-editar-cliente',
   templateUrl: './modal-editar-cliente.page.html',
   styleUrls: ['./modal-editar-cliente.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents]
+  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class ModalEditarClientePage implements OnInit {
   

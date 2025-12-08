@@ -12,6 +12,7 @@ import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Auth } from 'src/app/service/auth';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-agregarconductor',
@@ -19,6 +20,7 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
   styleUrls: ['./agregarconductor.page.scss'],
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule],
+  providers: [...IonicControllers]
 })
 export class AgregarconductorPage {
   formUsuario!: FormGroup;

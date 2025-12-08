@@ -161,3 +161,27 @@ ion-button {
     --color: #0099ff;
   }
 }
+/* 1. OBLIGAR a que los inputs reciban clics y texto */
+ion-input, ion-textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important; /* Vital para Chrome/Android */
+  
+  /* Asegura que estén encima de cualquier "fantasma" del mapa */
+  position: relative; 
+  z-index: 100 !important; 
+}
+
+/* 2. Hack para el Shadow DOM de Ionic */
+ion-input::part(native), 
+ion-textarea::part(native) {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* 3. Asegura que el icono no tape el área de escritura */
+ion-item ion-icon {
+  pointer-events: none; /* Los clicks atraviesan el icono */
+  z-index: 101;
+}

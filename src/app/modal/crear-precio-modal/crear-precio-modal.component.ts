@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { ImportService } from '../../service/import';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-crear-precio-modal',
@@ -56,7 +57,8 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
     </ion-footer>
   `,
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule, FormsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule],
+  providers: [...IonicControllers]
 })
 export class CrearPrecioModalComponent {
   @Input() precio: number = 0;

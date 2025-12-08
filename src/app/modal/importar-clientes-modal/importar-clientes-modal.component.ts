@@ -10,6 +10,7 @@ import { ClienteImport, ImportResult } from '../../models/excel-import.model';
 import { CrearPrecioModalComponent } from '../crear-precio-modal/crear-precio-modal.component';
 import { GeocodingService } from 'src/app/service/geocoding.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 interface MapaRuta {
   dias: string;
@@ -24,6 +25,7 @@ interface MapaRuta {
   styleUrls: ['./importar-clientes-modal.component.scss'],
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, FormsModule],
+  providers: [...IonicControllers],
   animations: [
     trigger('slideIn', [
       transition(':enter', [

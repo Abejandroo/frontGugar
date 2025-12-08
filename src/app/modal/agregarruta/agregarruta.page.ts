@@ -8,6 +8,7 @@ import { Auth } from 'src/app/service/auth';
 import { RutaService } from 'src/app/service/ruta.service';
 import * as L from 'leaflet';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-agregarruta',
@@ -15,6 +16,7 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
   styleUrls: ['./agregarruta.page.scss'],
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, ReactiveFormsModule, FormsModule],
+  providers: [...IonicControllers]
 })
 export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
 
@@ -60,13 +62,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     private authService: Auth,
     private rutasService: RutaService
   ) {
-    addIcons({
-      close, 'close-outline': close,
-      trash,
-      'arrow-undo': arrowUndo,
-      'save-outline': saveOutline,
-      'search-outline': searchOutline
-    });
+    addIcons({close,trash,saveOutline,'closeOutline':close,'arrowUndo':arrowUndo,'searchOutline':searchOutline});
 
     this.formRuta = this.fb.group({
       rutaExistenteId: [null],

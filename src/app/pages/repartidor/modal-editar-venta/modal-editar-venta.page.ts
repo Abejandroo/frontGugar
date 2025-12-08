@@ -4,13 +4,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import {  ModalController, ToastController } from '@ionic/angular';
 import { VentaService } from 'src/app/service/venta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-modal-editar-venta',
   templateUrl: './modal-editar-venta.page.html',
   styleUrls: ['./modal-editar-venta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents]
+  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class ModalEditarVentaPage implements OnInit {
   

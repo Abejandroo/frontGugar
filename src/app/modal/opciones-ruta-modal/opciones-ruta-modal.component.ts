@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalController } from '@ionic/angular';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-opciones-ruta-modal',
@@ -37,7 +38,8 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
     }
   `],
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule]
+  imports: [...IonicSharedComponents, CommonModule],
+  providers: [...IonicControllers],
 })
 export class OpcionesRutaModalComponent {
   @Input() ruta: any;

@@ -8,6 +8,7 @@ import { addIcons } from 'ionicons';
 import { circle } from 'leaflet';
 import { logOutOutline, person, personCircle } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 interface DiaRuta {
   id: number;
@@ -30,7 +31,8 @@ interface DiaRuta {
   templateUrl: './repartidor-rutas.page.html',
   styleUrls: ['./repartidor-rutas.page.scss'],
   standalone: true,
-  imports: [CommonModule, ...IonicSharedComponents]
+  imports: [CommonModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class RepartidorRutasPage implements OnInit {
 

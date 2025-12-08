@@ -67,30 +67,35 @@
 
       <!-- OPCIÓN B: Agregar día a ruta existente -->
       @if (modoCreacion === 'agregar') {
-        <ion-item>
-          <ion-select 
-            label="SELECCIONA RUTA" 
-            labelPlacement="floating" 
-            formControlName="rutaExistenteId" 
-            placeholder="Elige una ruta" 
-            interface="action-sheet"
-            (ionChange)="onRutaExistenteChange($event)">
-            @for (ruta of rutasConDiasFaltantes; track ruta.id) {
-              <ion-select-option [value]="ruta.id">
-                {{ ruta.nombre }} (Le faltan: {{ ruta.diasFaltantes.join(', ') }})
-              </ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-
-        @if (formRuta.get('rutaExistenteId')?.value) {
-          <ion-note class="ion-padding-start" color="primary">
-            <small>
-              💡 Días disponibles: {{ getDiasFaltantes(formRuta.get('rutaExistenteId')?.value).join(', ') }}
-            </small>
-          </ion-note>
-        }
+  <ion-item>
+    <ion-select 
+      label="SELECCIONA RUTA" 
+      labelPlacement="floating" 
+      formControlName="rutaExistenteId" 
+      placeholder="Elige una ruta" 
+      interface="popover"
+      (ionChange)="onRutaExistenteChange($event)">
+      
+      @for (ruta of rutasConDiasFaltantes; track ruta.id) {
+        <ion-select-option [value]="ruta.id">
+          {{ ruta.nombre }} (Faltan: {{ ruta.diasFaltantes.join(', ') }})
+        </ion-select-option>
       }
+      
+      @empty {
+        <ion-select-option [disabled]="true">No hay rutas disponibles</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  @if (formRuta.get('rutaExistenteId')?.value) {
+    <ion-note class="ion-padding-start" color="primary">
+      <small>
+        💡 Días disponibles: {{ getDiasFaltantes(formRuta.get('rutaExistenteId')?.value).join(', ') }}
+      </small>
+    </ion-note>
+  }
+}
 
       <!-- DÍA DE VISITA (Obligatorio) -->
       <ion-item>

@@ -6,13 +6,13 @@ import { addIcons } from 'ionicons';
 import {
   close, personOutline, callOutline, mailOutline, pricetagOutline,
   saveOutline, mapOutline, homeOutline, locationOutline, businessOutline,
-  calendarOutline
-} from 'ionicons/icons';
+  calendarOutline, checkmarkCircle } from 'ionicons/icons';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
 import { RutaService } from 'src/app/service/ruta.service';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 // ✅ FIX: Declarar google como variable global
 declare var google: any;
@@ -22,7 +22,8 @@ declare var google: any;
   templateUrl: './agregar-cliente.page.html',
   styleUrls: ['./agregar-cliente.page.scss'],
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule],
+providers: [...IonicControllers]
 })
 export class AgregarClientePage implements OnInit {
 
@@ -57,11 +58,7 @@ export class AgregarClientePage implements OnInit {
     private rutaService: RutaService,
     private toastCtrl: ToastController
   ) {
-    addIcons({
-      close, personOutline, callOutline, mailOutline, pricetagOutline,
-      saveOutline, mapOutline, homeOutline, locationOutline, businessOutline,
-      calendarOutline
-    });
+    addIcons({close,personOutline,businessOutline,callOutline,mailOutline,pricetagOutline,mapOutline,homeOutline,locationOutline,calendarOutline,checkmarkCircle,saveOutline});
 
     this.formCliente = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],

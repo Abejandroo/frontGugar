@@ -6,13 +6,15 @@ import { addIcons } from 'ionicons';
 import { close, pricetagOutline, cashOutline, saveOutline } from 'ionicons/icons';
 import { PrecioService } from 'src/app/service/precio';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-editarprecio',
   templateUrl: './editarprecio.page.html',
   styleUrls: ['./editarprecio.page.scss'],
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule],
+  providers: [...IonicControllers]
 })
 export class EditarprecioPage  {
 

@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { Auth } from 'src/app/service/auth';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 // ✅ FIX: Declarar google como variable global
 declare var google: any;
@@ -17,6 +18,7 @@ declare var google: any;
   styleUrls: ['./modificarruta.page.scss'],
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, GoogleMapsModule, ReactiveFormsModule],
+  providers: [...IonicControllers]
 })
 export class ModificarrutaPage  {
   

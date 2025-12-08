@@ -5,11 +5,13 @@ import { ModalController, LoadingController, AlertController } from '@ionic/angu
 import { ResultadoDivisionModalComponent } from '../resultado-division-modal/resultado-division-modal.component';
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-dividir-ruta-modal',
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, FormsModule],
+  providers: [...IonicControllers],
   template: `
     <ion-header>
       <ion-toolbar color="warning">

@@ -8,6 +8,7 @@ import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { FormsModule } from '@angular/forms';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
 
@@ -15,6 +16,7 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
   selector: 'app-resultado-division-modal',
   standalone: true,
   imports: [CommonModule, FormsModule, ...IonicSharedComponents],
+  providers: [...IonicControllers],
   templateUrl: './resultado-division-modal.component.html',
   styles: [`
     ion-content {

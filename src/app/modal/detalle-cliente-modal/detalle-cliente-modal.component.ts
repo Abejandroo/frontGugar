@@ -9,11 +9,13 @@ import {
   create, warning, card, documentText, person, listOutline
 } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-detalle-cliente-modal',
   standalone: true,
   imports: [...IonicSharedComponents, CommonModule, FormsModule],
+  providers: [...IonicControllers],
   template: `
     <ion-header>
       <ion-toolbar>

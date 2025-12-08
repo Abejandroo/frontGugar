@@ -13,13 +13,15 @@ import { ModalEditarClientePage } from '../modal-editar-cliente/modal-editar-cli
 import { ModalSaltarClientePage } from '../modal-saltar-cliente/modal-saltar-cliente.page';
 import * as L from 'leaflet';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-repartidor-detalle-ruta',
   templateUrl: './repartidor-detalle-ruta.page.html',
   styleUrls: ['./repartidor-detalle-ruta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ...IonicSharedComponents]
+  imports: [ CommonModule, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 

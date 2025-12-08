@@ -13,6 +13,7 @@ import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 // ✅ FIX: Declarar google como variable global
 declare var google: any;
@@ -22,7 +23,8 @@ declare var google: any;
   templateUrl: './editar-cliente.page.html',
   styleUrls: ['./editar-cliente.page.scss'],
   standalone: true,
-  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule],
+  providers: [...IonicControllers]
 })
 export class EditarClientePage implements OnInit {
 
