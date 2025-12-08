@@ -57,6 +57,10 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   diaSeleccionado: string = '';
   diasDisponibles: any[] = [];
   clientesDia: any[] = [];
+  repartidorDiaId: number | null = null;
+  diaRutaIdActual: number | null = null;
+  estadoDiaRuta: string = '';
+  esHoyDiaDeVisita: boolean = false;
 
   // Búsqueda
   textoBusqueda: string = '';
@@ -69,6 +73,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   monitoreando: boolean = false;
   watchId: string | null = null;
   markerRepartidor: L.Marker | null = null;
+  private monitoreoInterval: any = null;
 
   // Mapa Leaflet
   private mapa: L.Map | null = null;
@@ -121,14 +126,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }, 500);
   }
 
-  ngOnDestroy() {
-    if (this.watchId) {
-      Geolocation.clearWatch({ id: this.watchId });
-    }
-    if (this.mapa) {
-      this.mapa.remove();
-    }
-  }
+
 
   cargarPersonal() {
     this.authService.getUsuarios().subscribe({
@@ -142,7 +140,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   cargarRuta() {
     this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
       next: (data) => {
-        // Mapear IDs correctamente
         this.ruta = {
           ...data,
           supervisorId: data.supervisor?.id || data.supervisorId,
@@ -161,23 +158,19 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   cargarDiasDisponibles() {
     if (this.ruta.diasRuta && this.ruta.diasRuta.length > 0) {
       this.diasDisponibles = this.ruta.diasRuta.filter((dia: any) => {
-        // Asumimos que 'dividida' puede ser un booleano (false) o un número (0)
         return dia.dividida === false || dia.dividida === 0;
       });
 
-      // 💡 PASO 2: Verificar si quedan días disponibles después del filtro
       if (this.diasDisponibles.length === 0) {
         this.diaSeleccionado = '';
         this.mostrarToast('Todos los días de esta ruta han sido divididos.', 'warning');
-        this.clientesDia = []; // Limpiar la lista si no hay días
+        this.clientesDia = []; 
         return;
       }
 
-      // Seleccionar día actual o el primero
       const hoy = new Date().getDay();
       let diaDefault = this.diasDisponibles[0];
 
-      // Mapeo simple de días
       if ([1, 4].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Lunes')) || diaDefault;
       if ([2, 5].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Martes')) || diaDefault;
       if ([3, 6].includes(hoy)) diaDefault = this.diasDisponibles.find(d => d.diaSemana.includes('Miércoles')) || diaDefault;
@@ -187,15 +180,100 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  cambiarRepartidorDia(event: any) {
+    const nuevoRepartidorId = event.detail.value;
+
+    if (!this.diaRutaIdActual) {
+      this.mostrarToast('Error: No hay día seleccionado', 'danger');
+      return;
+    }
+
+    this.repartidorDiaId = nuevoRepartidorId;
+
+    this.rutasService.actualizarRepartidorDia(this.diaRutaIdActual, nuevoRepartidorId).subscribe({
+      next: (response) => {
+        this.mostrarToast('Repartidor actualizado', 'success');
+
+        // Actualizar el día en el array local también
+        const dia = this.diasDisponibles.find(d => d.id === this.diaRutaIdActual);
+        if (dia) {
+          dia.idRepartidor = nuevoRepartidorId;
+          dia.repartidor = this.repartidores.find(r => r.id === nuevoRepartidorId) || null;
+        }
+      },
+      error: (err) => {
+        this.mostrarToast('Error al actualizar repartidor', 'danger');
+        this.cambiarDia();
+      }
+    });
+  }
+
+  verificarSiEsHoyDiaVisita(diaSemana: string): boolean {
+    const hoy = new Date().getDay(); 
+    const diaLower = diaSemana.toLowerCase();
+    const mapaDias: { [key: number]: string[] } = {
+      0: ['domingo'],
+      1: ['lunes', 'lunes-jueves'],
+      2: ['martes', 'martes-viernes'],
+      3: ['miércoles', 'miercoles', 'miércoles-sábado', 'miercoles-sabado'],
+      4: ['jueves', 'lunes-jueves'],
+      5: ['viernes', 'martes-viernes'],
+      6: ['sábado', 'sabado', 'miércoles-sábado', 'miercoles-sabado']
+    };
+
+    const diasValidos = mapaDias[hoy] || [];
+
+    return diasValidos.some(d => diaLower.includes(d));
+  }
+
+  puedeMonitorear(): boolean {
+    return (
+      this.repartidorDiaId !== null &&
+      this.esHoyDiaDeVisita &&
+      this.estadoDiaRuta === 'en_curso'
+    );
+  }
+
+  getMensajeMonitoreo(): string {
+    if (!this.repartidorDiaId) {
+      return 'No hay repartidor asignado';
+    }
+    if (!this.esHoyDiaDeVisita) {
+      return 'No es el día de visita';
+    }
+    if (this.estadoDiaRuta !== 'en_curso') {
+      return 'El repartidor no ha iniciado la ruta';
+    }
+    return 'Monitorear ubicación del repartidor';
+  }
+
+
+
   cambiarDia() {
     const dia = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
-
     if (dia) {
+      this.diaRutaIdActual = dia.id;
+
+      this.estadoDiaRuta = dia.estado || 'pendiente';
+      this.esHoyDiaDeVisita = this.verificarSiEsHoyDiaVisita(dia.diaSemana);
+
+      if (!dia.dividida || dia.dividida === false) {
+        if (dia.idRepartidor || dia.repartidor?.id) {
+          this.repartidorDiaId = dia.idRepartidor || dia.repartidor?.id;
+        } else {
+          this.repartidorDiaId = this.ruta.idRepartidor || this.ruta.repartidor?.id || null;
+        }
+      } else {
+        this.repartidorDiaId = null;
+      }
+
       let listaCruda: any[] = [];
 
-      // Adaptador de datos para diferentes estructuras
       if (dia.clientesRuta && dia.clientesRuta.length > 0) {
-        listaCruda = dia.clientesRuta;
+        listaCruda = dia.clientesRuta.map((cr: any) => ({
+          ...cr,
+          visitado: cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado'),
+        }));
       } else if (dia.clientes && dia.clientes.length > 0) {
         listaCruda = dia.clientes.map((c: any, i: number) => ({
           id: c.id,
@@ -217,6 +295,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.clientesDia = [];
       this.clientesFiltrados = [];
+      this.repartidorDiaId = null;
     }
   }
 
@@ -225,6 +304,13 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     this.visitados = this.clientesDia.filter(c => c.visitado).length;
     this.pendientes = this.totalClientes - this.visitados;
   }
+
+  getNombreRepartidorDia(): string {
+    if (!this.repartidorDiaId) return 'Sin asignar';
+    const rep = this.repartidores.find(r => r.id === this.repartidorDiaId);
+    return rep?.name || 'Sin asignar';
+  }
+
 
   // ========================================
   // MAPA LEAFLET
@@ -246,7 +332,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   actualizarMapa() {
     if (!this.mapa) return;
 
-    // Limpiar markers anteriores
     this.markers.forEach(m => m.remove());
     this.markers.clear();
 
@@ -319,63 +404,58 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   // MONITOREO EN TIEMPO REAL
   // ========================================
 
-  async iniciarMonitoreo() {
+ async iniciarMonitoreo() {
     if (this.monitoreando) {
-      this.detenerMonitoreo();
-      return;
+        this.detenerMonitoreo();
+        return;
     }
 
-    try {
-      const permisos = await Geolocation.checkPermissions();
-      if (permisos.location !== 'granted') {
-        await Geolocation.requestPermissions();
-      }
-
-      this.monitoreando = true;
-      this.mostrarToast('Monitoreando repartidor...', 'success');
-
-      this.watchId = await Geolocation.watchPosition(
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        },
-        (position, err) => {
-          if (err) {
-            console.error('Error GPS:', err);
-            return;
-          }
-
-          if (position) {
-            this.actualizarPosicionRepartidor({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
-          }
-        }
-      );
-
-    } catch (error) {
-      console.error('Error iniciando monitoreo:', error);
-      this.mostrarToast('Error al acceder al GPS', 'danger');
+    if (!this.repartidorDiaId) {
+        this.mostrarToast('Asigna un repartidor para monitorear', 'warning');
+        return;
     }
-  }
+
+    this.monitoreando = true;
+    this.mostrarToast('Monitoreando repartidor... (Actualizando cada 10s)', 'success');
+
+    this.monitoreoInterval = setInterval(() => {
+        this.rutasService.obtenerUbicacionRepartidor(this.repartidorDiaId!).subscribe({
+            next: (posicion: { lat: number, lng: number }) => {
+                if (posicion && posicion.lat && posicion.lng) {
+                    this.actualizarPosicionRepartidor(posicion);
+                    this.mapa?.setView([posicion.lat, posicion.lng], 15);
+                }
+            },
+            error: (err) => {
+                console.warn('No se pudo obtener la ubicación del repartidor:', err);
+            }
+        });
+    }, 10000); 
+
+}
 
   detenerMonitoreo() {
     this.monitoreando = false;
 
-    if (this.watchId) {
-      Geolocation.clearWatch({ id: this.watchId });
-      this.watchId = null;
+    if (this.monitoreoInterval) {
+        clearInterval(this.monitoreoInterval);
+        this.monitoreoInterval = null;
     }
 
     if (this.markerRepartidor) {
-      this.markerRepartidor.remove();
-      this.markerRepartidor = null;
+        this.markerRepartidor.remove();
+        this.markerRepartidor = null;
     }
 
     this.mostrarToast('Monitoreo detenido', 'medium');
-  }
+}
+
+ngOnDestroy() {
+    this.detenerMonitoreo();
+    if (this.mapa) {
+        this.mapa.remove();
+    }
+}
 
   actualizarPosicionRepartidor(posicion: { lat: number; lng: number }) {
     if (!this.mapa) return;
@@ -419,7 +499,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // Obtener el objeto completo del día de ruta
     const diaRutaSeleccionado = this.diasDisponibles.find(d => d.diaSemana === this.diaSeleccionado);
 
     if (!diaRutaSeleccionado || !diaRutaSeleccionado.id) {
@@ -445,21 +524,10 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       });
 
       await modal.present();
-      console.log('✅ Modal dividir ruta presentado');
-
-      // ========================================
-      // 🆕 AGREGAR ESTO: Esperar a que se cierre
-      // ========================================
       const { data } = await modal.onWillDismiss();
 
-      // Si se confirmó la división, recargar
       if (data?.recargar) {
-        console.log('✅ Sub-rutas creadas:', data.subRutaAId, data.subRutaBId);
-
-        // Mostrar toast de éxito
         await this.mostrarToast('Sub-rutas creadas exitosamente', 'success');
-
-        // Recargar los datos de la ruta
         this.cargarRuta();
       }
 
@@ -589,7 +657,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       });
 
       await modal.present();
-      console.log('✅ Modal detalle cliente presentado');
 
       const { data } = await modal.onWillDismiss();
 
@@ -602,7 +669,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
     } catch (error) {
-      console.error('❌ Error abriendo modal detalle cliente:', error);
       this.mostrarToast('Error al abrir el modal', 'danger');
     }
   }
@@ -619,7 +685,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       });
 
       await modal.present();
-      console.log('✅ Modal editar cliente presentado');
 
       const { data } = await modal.onWillDismiss();
 
@@ -628,7 +693,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
         this.cargarRuta();
       }
     } catch (error) {
-      console.error('❌ Error abriendo editor completo:', error);
       this.mostrarToast('Error al abrir el editor', 'danger');
     }
   }

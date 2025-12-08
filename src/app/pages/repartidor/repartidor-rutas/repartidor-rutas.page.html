@@ -8,11 +8,11 @@
   <!-- 1. ENCABEZADO AZUL -->
   <div class="main-header">
     <div class="header-content">
-      
+
       <!-- TOP BAR -->
-     <div class="top-bar">
+      <div class="top-bar">
         <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
-        
+
         <ion-button fill="clear" class="settings-btn" id="click-trigger">
           <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
         </ion-button>
@@ -20,7 +20,7 @@
         <ion-popover #popover trigger="click-trigger" triggerAction="click" class="custom-popover">
           <ng-template>
             <div class="popover-content">
-              
+
               <div class="profile-section">
                 <div class="avatar-circle">
                   <ion-icon name="person"></ion-icon>
@@ -44,95 +44,79 @@
         <h2>👋 HOLA, {{ usuarioActual?.name || 'Repartidor' }}</h2>
         <p>{{ fechaHoy }}</p>
         <p class="fecha"> Dias de reparto: {{ getDiaActual() }}</p>
-        
         <div class="big-counter-box">
-          <h1 class="big-number">{{ rutasAsignadas.length }}</h1>
-          <span class="counter-label">Rutas Asignadas Hoy</span>
+          <h1 class="big-number">{{ rutasDelDia.length }}</h1>
+                    <span class="counter-label">Rutas Asignadas Hoy</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. CONTENEDOR BLANCO -->
   <div class="white-container">
 
     @if (cargando) {
-      <div class="lista-container">
-        @for (item of [1,2,3]; track item) {
-          <div class="clean-card skeleton-card">
-            <div class="card-icon-box skeleton-box"></div>
-            <div style="flex: 1">
-              <ion-skeleton-text animated style="width: 60%; height: 20px; border-radius: 5px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 40%; height: 15px; margin-top: 5px;"></ion-skeleton-text>
-            </div>
-          </div>
-        }
-      </div>
-    } 
+    }
     @else {
-      <div class="lista-container">
-        
-        @if (rutasAsignadas.length === 0) {
-          <div class="empty-state">
-            <ion-icon name="map-outline" size="large"></ion-icon>
-            <h3>No tienes rutas asignadas</h3>
-            <p>Contacta a tu supervisor para que te asigne rutas</p>
-          </div>
-        } @else {
-          
-          @for (ruta of rutasAsignadas; track ruta.id) {
-            
-            <div class="clean-card" (click)="abrirRuta(ruta)">
-              
-              <div class="status-strip" [ngClass]="getColorEstado(ruta.diasRuta[0]?.estado)"></div>
-
-              <div class="card-icon-box">
-                <ion-icon name="map-outline"></ion-icon>
-              </div>
-
-              <div class="card-info">
-                <div class="card-header-row">
-                  <h3 class="ruta-title">{{ ruta.nombre }}</h3>
-                  
-                  <ion-badge mode="ios" [color]="getColorEstado(ruta.diasRuta[0]?.estado)" class="mini-badge">
-                    <ion-icon [name]="getIconoEstado(ruta.diasRuta[0]?.estado)" style="margin-right: 4px; font-size: 0.8rem;"></ion-icon>
-                    {{ ruta.diasRuta[0]?.estado || 'PENDIENTE' | uppercase }}
-                  </ion-badge>
-                </div>
-                
-                <div class="meta-row">
-                  <ion-icon name="person-circle-outline"></ion-icon>
-                  <span>Sup: {{ ruta.supervisor?.name || 'Sin asignar' }}</span>
-                </div>
-
-                <div class="progress-section">
-                  <div class="stats-text">
-                    <span>
-                      <ion-icon name="people-outline"></ion-icon> 
-                      {{ getClientesTotales(ruta.diasRuta) }} clientes
-                    </span>
-                    <span style="margin-left: auto;">
-                      <ion-icon name="checkmark-done-outline" color="success"></ion-icon> 
-                      {{ getClientesCompletados(ruta.diasRuta) }} visitados
-                    </span>
-                  </div>
-                  <ion-progress-bar 
-                    [value]="getClientesCompletados(ruta.diasRuta) / getClientesTotales(ruta.diasRuta)"
-                    [color]="getColorEstado(ruta.diasRuta[0]?.estado)">
-                  </ion-progress-bar>
-                </div>
-              </div>
-
-              <div class="arrow-container">
-                 <ion-icon name="chevron-forward-outline"></ion-icon>
-              </div>
-
-            </div>
-          }
-        }
+    <div class="lista-container">
+      @if (rutasDelDia.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="map-outline" size="large"></ion-icon>
+        <h3>No tienes rutas asignadas para hoy</h3>
+        <p>Contacta a tu supervisor o revisa otro día</p>
       </div>
+      } @else {
+      @for (diaRuta of rutasDelDia; track diaRuta.id) {
+      <div class="clean-card" (click)="abrirRuta(diaRuta)">
+        <div class="status-strip" [ngClass]="getColorEstado(diaRuta.estado)"></div>
+
+        <div class="card-icon-box">
+          <ion-icon name="map-outline"></ion-icon>
+        </div>
+
+        <div class="card-info">
+          <div class="card-header-row">
+            <h3 class="ruta-title">{{ diaRuta.ruta.nombre}} </h3>
+            <ion-badge mode="ios" [color]="getColorEstado(diaRuta.estado)" class="mini-badge">
+              <ion-icon [name]="getIconoEstado(diaRuta.estado)"
+                style="margin-right: 4px; font-size: 0.8rem;"></ion-icon>
+              {{ diaRuta.estado || 'PENDIENTE' | uppercase }}
+            </ion-badge>
+          </div>
+          <div class="meta-row">
+          </div>
+          <div class="meta-row">
+            <span>Ruta {{ diaRuta.ruta.id}} * {{diaRuta.diaSemana}}</span>
+          </div>
+          <div class="meta-row">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <span>Sup: {{ diaRuta.ruta.supervisor?.name || 'Sin asignar' }}</span>
+          </div>
+
+          <div class="progress-section">
+            <div class="stats-text">
+              <span>
+                <ion-icon name="people-outline"></ion-icon>
+                {{ getClientesTotales(diaRuta) }} clientes
+              </span>
+              <span style="margin-left: auto;">
+                <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+                {{ getClientesCompletados(diaRuta) }} visitados
+              </span>
+            </div>
+            <ion-progress-bar [value]="getClientesCompletados(diaRuta) / getClientesTotales(diaRuta)"
+              [color]="getColorEstado(diaRuta.estado)">
+            </ion-progress-bar>
+          </div>
+        </div>
+
+        <div class="arrow-container">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+
+      </div>
+      }
+      }
+    </div>
     }
     <div style="height: 100px;"></div>
   </div>
-
-</ion-content>

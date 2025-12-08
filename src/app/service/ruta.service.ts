@@ -33,6 +33,11 @@ export class RutaService {
     return this.http.delete(`${this.url}/rutas/desasignar-cliente/${clienteId}/${diaRutaId}`);
   }
 
+  actualizarRepartidorDia(diaRutaId: number, repartidorId: number | null): Observable<any> {
+    return this.http.patch(`${this.url}/rutas/dia-ruta/${diaRutaId}/repartidor`, {
+      repartidorId
+    });
+  }
 
   // ========================================
   // OBTENER (GET)
@@ -42,10 +47,21 @@ export class RutaService {
     return this.http.get<any[]>(`${this.url}/rutas`);
   }
 
+  obtenerDiaRutaConClientes(diaRutaId: number): Observable<any> {
+    return this.http.get(`${this.url}/rutas/dia-ruta/${diaRutaId}`);
+  }
+
   obtenerRutaPorId(id: number): Observable<any> {
     return this.http.get<any>(`${this.url}/rutas/${id}`);
   }
 
+  obtenerUbicacionRepartidor(repartidorId: number): Observable<{ lat: number, lng: number }> {
+  return this.http.get<{ lat: number, lng: number }>(`${this.url}/ubicacion/repartidor/${repartidorId}`);
+}
+
+  obtenerDiasrutasRepartidor(repartidorId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/rutas/dias-ruta/repartidor/${repartidorId}`);
+  }
 
 
   obtenerRutasRepartidor(repartidorId: number): Observable<any[]> {

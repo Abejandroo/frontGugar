@@ -20,17 +20,12 @@
           mode="ios"
           class="custom-searchbar">
         </ion-searchbar>
-        
-        <ion-button fill="clear" class="filter-btn" (click)="toggleFiltros()">
-          <ion-icon name="filter-outline" [color]="mostrarFiltros ? 'warning' : 'light'"></ion-icon>
-        </ion-button>
       </div>
     </div>
   </div>
 
   <div class="white-container">
 
-    @if (mostrarFiltros) {
       <div class="tabs-container">
         <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()" mode="ios" class="custom-segment" scrollable>
           <ion-segment-button value="todos">
@@ -47,7 +42,6 @@
           </ion-segment-button>
         </ion-segment>
       </div>
-    }
 
     <div class="actions-row">
       <ion-button fill="outline" shape="round" size="small" (click)="abrirImportador()">

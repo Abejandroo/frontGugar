@@ -71,7 +71,8 @@ import {
   alertCircleOutline,
   list,
   calculatorOutline,
-  informationCircle
+  informationCircle,
+  personOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -106,6 +107,7 @@ export class AppComponent {
   'arrow-back':arrowBack,
   'play-circle':playCircle,
   'navigate':navigate,
+  'person-outline':personOutline,
   'navigate-circle':navigateCircle,
   'time':time,
   'storefront-outline':storefrontOutline,

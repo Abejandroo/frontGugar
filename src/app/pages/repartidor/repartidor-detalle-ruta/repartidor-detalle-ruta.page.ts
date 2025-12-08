@@ -23,14 +23,14 @@ import * as L from 'leaflet';
   imports: [IonicModule, CommonModule]
 })
 export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
-  
+
   rutaId: number = 0;
   diaRuta: any;
   clientesOrdenados: any[] = [];
   clienteActual: any = null;
   ventaActual: any = null;
   proximosClientes: any[] = [];
-  
+
   rutaIniciada: boolean = false;
   ubicacionActual: any = null;
   watchId: string | null = null;
@@ -59,14 +59,14 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     private modalController: ModalController,
     private toastController: ToastController,
     private alertController: AlertController
-  ) {}
+  ) { }
 
   // ========================================
   // CONTADORES BASADOS EN VENTAS
   // ========================================
 
   get clientesVisitadosCount(): number {
-    return this.clientesOrdenados.filter(c => 
+    return this.clientesOrdenados.filter(c =>
       c.venta && (c.venta.estado === 'realizado' || c.venta.estado === 'saltado')
     ).length;
   }
@@ -80,7 +80,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   }
 
   get clientesPendientesCount(): number {
-    return this.clientesOrdenados.filter(c => 
+    return this.clientesOrdenados.filter(c =>
       !c.venta || c.venta.estado === 'pendiente'
     ).length;
   }
@@ -122,27 +122,36 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   // ========================================
 
   async cargarRuta() {
-    this.rutasService.obtenerRutaPorId(this.rutaId).subscribe({
-      next: async (ruta) => {
-        this.diaRuta = this.obtenerDiaRutaActual(ruta.diasRuta);
-        
+    this.rutasService.obtenerDiaRutaConClientes(this.rutaId).subscribe({
+      next: async (diaRuta: any) => {
+        this.diaRuta = diaRuta;
+
         if (this.diaRuta) {
           this.clientesOrdenados = [...this.diaRuta.clientesRuta];
-          
+
           await this.cargarVentas();
-          
+
           this.rutaIniciada = this.diaRuta.estado === 'en_curso';
-          
+
+          this.dibujarClientesEnMapa();
+
           if (this.rutaIniciada) {
             this.actualizarClienteActual();
-            this.dibujarClientesEnMapa();
             this.iniciarSeguimiento();
           }
+          if (this.map && this.markers.length > 0) {
+            const group = new L.FeatureGroup(this.markers);
+            this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+          } else if (this.map) {
+            // Si no hay clientes, centrar en la vista por defecto
+            this.map.setView([17.0732, -96.7266], 14);
+          }
+
         }
       },
       error: (err) => {
-        console.error('Error al cargar ruta:', err);
-        this.mostrarToast('Error al cargar la ruta', 'danger');
+        console.error('Error al cargar DiaRuta:', err);
+        this.mostrarToast('Error al cargar la ruta (DiaRuta)', 'danger');
       }
     });
   }
@@ -164,16 +173,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     });
   }
 
-  obtenerDiaRutaActual(diasRuta: any[]): any {
-    const hoy = new Date().getDay();
-    let diaBuscado = '';
-    
-    if (hoy === 1 || hoy === 4) diaBuscado = 'Lunes - Jueves';
-    else if (hoy === 2 || hoy === 5) diaBuscado = 'Martes - Viernes';
-    else if (hoy === 3 || hoy === 6) diaBuscado = 'Miercoles - Sábado';
-    
-    return diasRuta.find(dr => dr.diaSemana === diaBuscado) || diasRuta[0];
-  }
 
   // ========================================
   // MAPA
@@ -209,7 +208,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     this.mostrarToast('Obteniendo ubicación...', 'primary');
 
     this.ubicacionActual = await this.geolocationService.getCurrentPosition();
-    
+
     if (!this.ubicacionActual) {
       this.mostrarToast('No se pudo obtener la ubicación', 'danger');
       return;
@@ -228,7 +227,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
         // Anunciar inicio de ruta por voz
         if (this.vozHabilitada) {
           await this.ttsService.anunciarInicioRuta(this.clientesOrdenados.length);
-          
+
           // Anunciar primer cliente
           if (this.clienteActual) {
             await this.ttsService.anunciarCliente(
@@ -251,8 +250,8 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       message: `¿Deseas pausar la ruta? Quedan ${this.clientesPendientesCount} clientes por visitar.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Pausar', 
+        {
+          text: 'Pausar',
           handler: async () => {
             this.rutasService.pausarDiaRuta(this.diaRuta.id).subscribe({
               next: () => {
@@ -291,8 +290,8 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       `,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Finalizar', 
+        {
+          text: 'Finalizar',
           cssClass: 'alert-button-confirm',
           handler: async () => {
             this.rutasService.finalizarDiaRuta(this.diaRuta.id).subscribe({
@@ -343,7 +342,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     };
 
     // Filtrar clientes que tengan ubicación válida
-    const clientesConUbicacion = this.clientesOrdenados.filter(cr => 
+    const clientesConUbicacion = this.clientesOrdenados.filter(cr =>
       cr.cliente?.latitud && cr.cliente?.longitud
     );
 
@@ -366,19 +365,19 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     try {
       const rutaOptimizada = await this.optimizacionService.optimizarRuta(origen, destinos);
-      
+
       if (rutaOptimizada && rutaOptimizada.orden) {
         const nuevoOrden = rutaOptimizada.orden.map((idx: number) => clientesConUbicacion[idx]);
-        
+
         // Agregar al final los clientes sin ubicación (si los hay)
-        const clientesSinDir = this.clientesOrdenados.filter(cr => 
+        const clientesSinDir = this.clientesOrdenados.filter(cr =>
           !cr.cliente?.latitud || !cr.cliente?.longitud
         );
-        
+
         this.clientesOrdenados = [...nuevoOrden, ...clientesSinDir];
         this.dibujarRutaEnMapa(rutaOptimizada.polyline);
         this.actualizarClienteActual();
-        
+
         if (rutaOptimizada.segmentos > 1) {
           this.mostrarToast(`Ruta optimizada (${rutaOptimizada.segmentos} segmentos)`, 'success');
         } else {
@@ -417,7 +416,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     this.clientesOrdenados.forEach((cr, idx) => {
       const lat = cr.cliente.latitud;
       const lng = cr.cliente.longitud;
-      
+
       if (!lat || !lng) return; // Saltar clientes sin ubicación
 
       const completado = cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado');
@@ -446,7 +445,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     if (this.clienteActual && this.clienteActual.cliente.latitud && this.clienteActual.cliente.longitud) {
       this.marcadorClienteActual = L.circle(
-        [this.clienteActual.cliente.latitud, this.clienteActual.cliente.longitud], 
+        [this.clienteActual.cliente.latitud, this.clienteActual.cliente.longitud],
         {
           color: '#10dc60',
           fillColor: '#10dc60',
@@ -465,7 +464,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
     this.clientesOrdenados.forEach((cr, idx) => {
       const lat = cr.cliente.latitud;
       const lng = cr.cliente.longitud;
-      
+
       if (!lat || !lng) return; // Saltar clientes sin ubicación
 
       const completado = cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado');
@@ -507,7 +506,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   limpiarMapa() {
     this.markers.forEach(m => this.map?.removeLayer(m));
     this.markers = [];
-    
+
     if (this.polyline) {
       this.map?.removeLayer(this.polyline);
       this.polyline = null;
@@ -531,13 +530,13 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   iniciarSeguimiento() {
     this.watchId = this.geolocationService.watchPosition((position: any) => {
       this.ubicacionActual = position;
-      
+
       if (this.marcadorUsuario && this.map) {
         this.marcadorUsuario.setLatLng([position.latitude, position.longitude]);
       }
 
       this.calcularDistanciaYTiempo();
-      
+
       // Anunciar distancia por voz cuando se acerca
       this.verificarProximidadYAnunciar();
     });
@@ -548,7 +547,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     const lat = this.clienteActual.cliente.latitud;
     const lng = this.clienteActual.cliente.longitud;
-    
+
     if (!lat || !lng) {
       this.distanciaAlCliente = 0;
       this.tiempoEstimado = 0;
@@ -592,12 +591,12 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   // ========================================
 
   actualizarClienteActual() {
-    const noCompletado = this.clientesOrdenados.find(cr => 
+    const noCompletado = this.clientesOrdenados.find(cr =>
       !cr.venta || cr.venta.estado === 'pendiente'
     );
     this.clienteActual = noCompletado || null;
     this.ventaActual = this.clienteActual?.venta || null;
-    
+
     if (this.clienteActual) {
       const idx = this.clientesOrdenados.indexOf(this.clienteActual);
       this.proximosClientes = this.clientesOrdenados.slice(idx + 1, idx + 4);
@@ -635,7 +634,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       // Anunciar venta y siguiente cliente
       if (this.vozHabilitada) {
         await this.ttsService.anunciarVentaRegistrada(data.cantidad || 0);
-        
+
         if (this.clienteActual) {
           await this.ttsService.anunciarCliente(
             this.clienteActual.cliente.nombre,
@@ -668,7 +667,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       // Anunciar siguiente cliente
       if (this.vozHabilitada) {
         await this.ttsService.anunciarClienteSaltado();
-        
+
         if (this.clienteActual) {
           await this.ttsService.anunciarCliente(
             this.clienteActual.cliente.nombre,
@@ -688,7 +687,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     const lat = this.clienteActual.cliente.latitud;
     const lng = this.clienteActual.cliente.longitud;
-    
+
     if (!lat || !lng) {
       this.mostrarToast('Este cliente no tiene ubicación registrada', 'warning');
       return;
@@ -696,7 +695,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     const destino = `${lat},${lng}`;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${destino}&travelmode=driving`;
-    
+
     window.open(url, '_blank');
   }
 

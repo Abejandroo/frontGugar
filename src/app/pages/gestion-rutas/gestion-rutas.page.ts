@@ -185,12 +185,20 @@ export class GestionRutasPage implements OnInit {
     return diaActual?.clientesRuta?.length || 0;
   }
 
-  getClientesVisitados(ruta: any): number {
+getClientesVisitados(ruta: any): number {
     const diaActual = this.getDiaRutaActual(ruta);
-    // TODO: Implementar cuando tengas el campo de "visitado" en clienteRuta
-    // Por ahora retorna 0
-    return 0;
-  }
+
+    if (!diaActual || !diaActual.clientesRuta) {
+        return 0;
+    }
+
+    const visitados = diaActual.clientesRuta.filter((clienteRuta: any) => {
+        return clienteRuta.venta && 
+               (clienteRuta.venta.estado === 'realizado' || clienteRuta.venta.estado === 'saltado');
+    }).length;
+
+    return visitados;
+}
 
   getProgresoRuta(ruta: any): number {
     const total = this.getClientesTotalesDia(ruta);

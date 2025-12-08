@@ -8,6 +8,21 @@ import { addIcons } from 'ionicons';
 import { circle } from 'leaflet';
 import { logOutOutline, person, personCircle } from 'ionicons/icons';
 
+interface DiaRuta {
+  id: number;
+  diaSemana: string;
+  estado: string;
+  dividida: boolean;
+  idRepartidor?: number | null; // Puede ser null si no está dividido y se usa la referencia de Ruta
+  clientesRuta: any[]; // Contiene la info de clientes asignados a este día
+  ruta: { // Asumimos que la relación 'ruta' viene cargada
+    id: number;
+    nombre: string;
+    idRepartidor?: number | null; // Repartidor asignado a la RUTA (general)
+    supervisor: { name: string } // Asumimos esta estructura
+  }
+}
+
 
 @Component({
   selector: 'app-repartidor-rutas',
@@ -17,8 +32,10 @@ import { logOutOutline, person, personCircle } from 'ionicons/icons';
   imports: [IonicModule, CommonModule]
 })
 export class RepartidorRutasPage implements OnInit {
-  
+
   rutasAsignadas: any[] = [];
+  rutasDelDia: DiaRuta[] = [];
+  diasRutaAsignados: DiaRuta[] = [];
   usuarioActual: any = null;
   cargando: boolean = false;
   fechaHoy: string = '';
@@ -31,8 +48,8 @@ export class RepartidorRutasPage implements OnInit {
     private toastController: ToastController,
     private authService: Auth,
   ) {
-      addIcons({ personCircle, logOutOutline, person });
-      this.generarFechaActual();
+    addIcons({ personCircle, logOutOutline, person });
+    this.generarFechaActual();
   }
 
   ngOnInit() {
@@ -45,16 +62,37 @@ export class RepartidorRutasPage implements OnInit {
 
   async cargarUsuarioYRutas() {
     this.cargando = true;
-    
     const userData = localStorage.getItem('usuario');
     if (userData) {
       this.usuarioActual = JSON.parse(userData);
-      this.cargarRutasAsignadas();
+      this.cargarDiasRutaAsignados();
     } else {
       console.error('No hay usuario en sesión');
       this.router.navigate(['/auth/login']);
       this.cargando = false;
     }
+  }
+
+  cargarDiasRutaAsignados() {
+    if (!this.usuarioActual) {
+      console.error('No hay usuarioActual');
+      return;
+    }
+
+    // ⭐ CAMBIA ESTA LLAMADA para usar el nuevo endpoint que trae los DiaRuta
+    this.rutasService.obtenerDiasrutasRepartidor(this.usuarioActual.id).subscribe({
+      next: (diasRuta: any[]) => {
+        this.diasRutaAsignados = diasRuta;
+        this.filtrarRutasPorDia(); // ⭐ Filtramos inmediatamente
+        this.cargando = false;
+        console.log('diasRuta:', this.diasRutaAsignados, 'id usuario:', this.usuarioActual.id);
+      },
+      error: (err: any) => {
+        console.error('Error al cargar días ruta:', err);
+        this.mostrarToast('Error al cargar rutas asignadas', 'danger');
+        this.cargando = false;
+      }
+    });
   }
 
   cargarRutasAsignadas() {
@@ -66,9 +104,10 @@ export class RepartidorRutasPage implements OnInit {
     this.rutasService.obtenerRutasRepartidor(this.usuarioActual.id).subscribe({
       next: (rutas) => {
         this.rutasAsignadas = rutas;
+        this.filtrarRutasPorDia();
         this.cargando = false;
-        console.log('rutas:',this.rutasAsignadas,'id usuario:',this.usuarioActual.id);
-        
+        console.log('rutas:', this.rutasAsignadas, 'id usuario:', this.usuarioActual.id);
+
       },
       error: (err: any) => {
         console.error('Error al cargar rutas:', err);
@@ -78,27 +117,67 @@ export class RepartidorRutasPage implements OnInit {
     });
   }
 
-  // ⭐ MÉTODOS QUE FALTABAN
-  
+filtrarRutasPorDia() {
+    // 1. Solo filtramos por el día actual, ya que el backend maneja la lógica de asignación y división.
+    this.rutasDelDia = this.diasRutaAsignados.filter((diaRuta: DiaRuta) => {
+      return this.verificarSiEsHoyDiaVisita(diaRuta.diaSemana);
+    });
+    
+    // Nota: La variable this.diasRutaAsignados ahora contiene los DiaRuta completos
+    // que cumplen con las condiciones de asignación, listos para ser filtrados por el día de visita.
+}
+
+  verificarSiEsHoyDiaVisita(diaSemana: string): boolean {
+    const hoy = new Date().getDay();
+    const diaLower = diaSemana.toLowerCase();
+    const mapaDias: { [key: number]: string[] } = {
+      0: ['domingo'],
+      1: ['lunes', 'lunes-jueves'],
+      2: ['martes', 'martes-viernes'],
+      3: ['miércoles', 'miercoles', 'miércoles-sábado', 'miercoles-sabado'],
+      4: ['jueves', 'lunes-jueves'],
+      5: ['viernes', 'martes-viernes'],
+      6: ['sábado', 'sabado', 'miércoles-sábado', 'miercoles-sabado']
+    };
+
+    const diasValidos = mapaDias[hoy] || [];
+    return diasValidos.some(d => diaLower.includes(d));
+  }
+
   getDiaActual(): string {
     const hoy = new Date().getDay();
-    if (hoy === 1 || hoy === 4) return 'Lunes - Jueves';
-    if (hoy === 2 || hoy === 5) return 'Martes - Viernes';
-    if (hoy === 3 || hoy === 6) return 'Miércoles - Sábado';
+    if (hoy === 1) return 'Lunes y Jueves';
+    if (hoy === 2) return 'Martes y Viernes';
+    if (hoy === 3) return 'Miércoles y Sábado';
+    if (hoy === 4) return 'Jueves y Lunes';
+    if (hoy === 5) return 'Viernes y Martes';
+    if (hoy === 6) return 'Sábado y Miércoles';
     return 'Domingo';
   }
 
-generarFechaActual() {
+  generarFechaActual() {
     const fecha = new Date();
-    const opciones: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+    const opciones: Intl.DateTimeFormatOptions = {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     };
     this.fechaHoy = fecha.toLocaleDateString('es-ES', opciones);
     this.fechaHoy = this.fechaHoy.charAt(0).toUpperCase() + this.fechaHoy.slice(1);
   }
-  abrirRuta(ruta: any) {
-    this.router.navigate([`/repartidor/ruta/${ruta.id}`]);
+
+  abrirRuta(diaRuta: DiaRuta) {
+    this.router.navigate([`/repartidor/ruta/${diaRuta.id}`]);
   }
+
+  getClientesTotales(diaRuta: DiaRuta): number {
+    return diaRuta?.clientesRuta?.length || 0;
+  }
+
+  getClientesCompletados(diaRuta: DiaRuta): number {
+    if (!diaRuta || !diaRuta.clientesRuta) return 0;
+
+    return diaRuta.clientesRuta.filter((clienteRuta: any) => clienteRuta.visitado).length;
+  }
+
 
   getColorEstado(estado: string): string {
     if (!estado) return 'medium';
@@ -116,17 +195,6 @@ generarFechaActual() {
     return 'ellipse-outline';
   }
 
-  getClientesTotales(diasRuta: any[]): number {
-    if (!diasRuta || diasRuta.length === 0) return 0;
-    const diaActual = diasRuta.find(dr => dr.diaSemana === this.getDiaActual());
-    return diaActual?.clientesRuta?.length || 0;
-  }
-
-  getClientesCompletados(diasRuta: any[]): number {
-    // Este método requeriría cargar las ventas, pero para la lista solo mostramos info básica
-    // Si quieres mostrar ventas aquí, deberías cargarlas antes
-    return 0;
-  }
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({
