@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } 
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { close, trash, arrowUndo, saveOutline, searchOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { Auth } from 'src/app/service/auth'; 
+import { Auth } from 'src/app/service/auth';
 import { RutaService } from 'src/app/service/ruta.service';
 import * as L from 'leaflet';
 
@@ -16,7 +16,7 @@ import * as L from 'leaflet';
   imports: [IonicModule, CommonModule, ReactiveFormsModule, FormsModule],
 })
 export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
-  
+
   formRuta!: FormGroup;
   supervisores: any[] = [];
   repartidores: any[] = [];
@@ -30,17 +30,13 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
   clientesDisponibles: any[] = [];
   clientesSeleccionados: any[] = [];
   busquedaCliente: string = '';
-  
- // 2. CORREGIR EL BUSCADOR (Getter)
   get clientesFiltrados() {
     if (!this.busquedaCliente.trim()) {
       return this.clientesDisponibles;
     }
     const busqueda = this.busquedaCliente.toLowerCase();
-    return this.clientesDisponibles.filter(c => 
-      // Buscamos por representante (representante es un representante viejo, mejor usa 'representante')
+    return this.clientesDisponibles.filter(c =>
       (c.nombre || c.representante || '').toLowerCase().includes(busqueda) ||
-      // Buscamos por calle directa
       (c.calle || '').toLowerCase().includes(busqueda)
     );
   }
@@ -63,14 +59,14 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     private authService: Auth,
     private rutasService: RutaService
   ) {
-    addIcons({ 
-      close, 'close-outline': close, 
-      trash, 
+    addIcons({
+      close, 'close-outline': close,
+      trash,
       'arrow-undo': arrowUndo,
       'save-outline': saveOutline,
       'search-outline': searchOutline
     });
-    
+
     this.formRuta = this.fb.group({
       rutaExistenteId: [null],
       nombre: [''],
@@ -83,7 +79,7 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.cargarUsuarios();
     this.cargarRutasExistentes();
-    this.cargarClientesDisponibles(); // NUEVO
+    this.cargarClientesDisponibles();
   }
 
   ngAfterViewInit() {
@@ -103,22 +99,17 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
-
-    // YA NO escuchamos clicks en el mapa
-    // Los puntos vienen de seleccionar clientes
   }
 
   // ========================================
   // NUEVO: GESTIÓN DE CLIENTES
   // ========================================
 
- // 1. CORREGIR EL FILTRO DE CARGA
   cargarClientesDisponibles() {
     this.rutasService.obtenerClientesDisponibles().subscribe({
       next: (clientes) => {
-        // AHORA VERIFICAMOS LOS CAMPOS DIRECTOS
-        this.clientesDisponibles = clientes.filter(c => 
-          c.latitud && c.longitud // Verificamos que tenga coordenadas directas
+        this.clientesDisponibles = clientes.filter(c =>
+          c.latitud && c.longitud
         );
         console.log('Clientes cargados:', this.clientesDisponibles);
       },
@@ -129,49 +120,31 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
- seleccionarCliente(cliente: any) {
-    // Verificar que no esté ya seleccionado
+  seleccionarCliente(cliente: any) {
     if (this.clientesSeleccionados.find(c => c.id === cliente.id)) {
       this.mostrarToast('Cliente ya está en la ruta', 'warning');
       return;
     }
-
-    // Agregar a seleccionados
     this.clientesSeleccionados.push(cliente);
-
-    // Agregar marcador al mapa
     this.agregarMarcadorCliente(cliente);
-
-    // CORRECCIÓN AQUÍ: Usamos 'representante' en lugar de 'representante'
     this.mostrarToast(`${cliente.nombre} agregado`, 'success');
   }
 
-// 3. CORREGIR EL MAPA (LEAFLET)
-agregarMarcadorCliente(cliente: any) {
+  agregarMarcadorCliente(cliente: any) {
     if (!this.map) return;
-
-    // CORRECCIÓN: Usamos coordenadas directas del cliente
-    // (Asegúrate de que latitud/longitud sean números)
     const lat = Number(cliente.latitud);
     const lng = Number(cliente.longitud);
-    
-    // Si no tiene coordenadas válidas, no hacemos nada o mostramos error
     if (!lat || !lng) {
       this.mostrarToast(`El cliente ${cliente.representante} no tiene ubicación en el mapa`, 'warning');
       return;
     }
 
     const latlng = L.latLng(lat, lng);
-
-    // Obtener letra según orden
     const letra = this.obtenerLetraMarcador(this.clientesSeleccionados.length - 1);
-
-    // Crear marcador
     const marker = L.marker(latlng, {
       icon: this.crearIconoLetra(letra)
     }).addTo(this.map);
 
-    // CORRECCIÓN DEL POPUP: Usamos 'representante', 'calle', 'colonia'
     marker.bindPopup(`
       <div style="text-align: center;">
         <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
@@ -181,39 +154,27 @@ agregarMarcadorCliente(cliente: any) {
     `);
 
     this.markers.push(marker);
-
-    // Actualizar polyline
     this.actualizarPolyline();
-
-    // Centrar mapa en el nuevo marcador
     this.map.setView(latlng, this.map.getZoom());
   }
 
   quitarCliente(index: number) {
     if (!this.map) return;
-
-    // Quitar de array
     const clienteQuitado = this.clientesSeleccionados.splice(index, 1)[0];
-
-    // Limpiar mapa y redibujar todo
     this.limpiarMapa();
-
-    // Re-agregar todos los clientes restantes
     this.clientesSeleccionados.forEach(cliente => {
       this.agregarMarcadorClienteSinMensaje(cliente);
     });
 
-    // CORRECCIÓN AQUÍ: Usamos 'representante'
     this.mostrarToast(`${clienteQuitado.representante} quitado`, 'warning');
   }
 
- private agregarMarcadorClienteSinMensaje(cliente: any) {
+  private agregarMarcadorClienteSinMensaje(cliente: any) {
     if (!this.map) return;
 
-    // CORRECCIÓN IGUAL QUE ARRIBA
     const lat = Number(cliente.latitud);
     const lng = Number(cliente.longitud);
-    
+
     if (!lat || !lng) return;
 
     const latlng = L.latLng(lat, lng);
@@ -225,7 +186,6 @@ agregarMarcadorCliente(cliente: any) {
       icon: this.crearIconoLetra(letra)
     }).addTo(this.map);
 
-    // CORRECCIÓN DEL POPUP
     marker.bindPopup(`
       <div style="text-align: center;">
         <strong style="font-size: 14px;">${letra}. ${cliente.representante}</strong><br>
@@ -240,14 +200,10 @@ agregarMarcadorCliente(cliente: any) {
 
   limpiarMapa() {
     if (!this.map) return;
-
-    // Eliminar marcadores
     this.markers.forEach(marker => {
       this.map?.removeLayer(marker);
     });
     this.markers = [];
-
-    // Eliminar polyline
     if (this.polyline) {
       this.map.removeLayer(this.polyline);
       this.polyline = null;
@@ -285,17 +241,13 @@ agregarMarcadorCliente(cliente: any) {
     });
   }
 
- // 4. CORREGIR LA LÍNEA DEL MAPA (POLYLINE)
- actualizarPolyline() {
+  actualizarPolyline() {
     if (!this.map) return;
-
     if (this.polyline) {
       this.map.removeLayer(this.polyline);
     }
-
     if (this.clientesSeleccionados.length > 1) {
       const latlngs = this.clientesSeleccionados.map(cliente => {
-        // CORRECCIÓN: Usar datos directos
         return L.latLng(Number(cliente.latitud), Number(cliente.longitud));
       });
 
@@ -329,7 +281,7 @@ agregarMarcadorCliente(cliente: any) {
     this.rutasService.obtenerTodasLasRutas().subscribe({
       next: (rutas) => {
         this.rutasExistentes = rutas;
-        
+
         this.rutasConDiasFaltantes = rutas.filter(ruta => {
           const diasExistentes = ruta.diasRuta?.map((dr: any) => dr.diaSemana) || [];
           return diasExistentes.length < 3;
@@ -337,7 +289,7 @@ agregarMarcadorCliente(cliente: any) {
           const diasExistentes = ruta.diasRuta?.map((dr: any) => dr.diaSemana) || [];
           const todosDias = ['Lunes - Jueves', 'Martes - Viernes', 'Miercoles - Sábado'];
           const diasFaltantes = todosDias.filter(dia => !diasExistentes.includes(dia));
-          
+
           return {
             ...ruta,
             diasFaltantes: diasFaltantes
@@ -363,10 +315,10 @@ agregarMarcadorCliente(cliente: any) {
   onRutaExistenteChange(event: any) {
     const rutaId = event.detail.value;
     const rutaSeleccionada = this.rutasConDiasFaltantes.find(r => r.id === rutaId);
-    
+
     if (rutaSeleccionada) {
       this.mostrarToast(
-        `Días disponibles: ${rutaSeleccionada.diasFaltantes.join(', ')}`, 
+        `Días disponibles: ${rutaSeleccionada.diasFaltantes.join(', ')}`,
         'primary'
       );
     }
@@ -387,22 +339,17 @@ agregarMarcadorCliente(cliente: any) {
       this.formRuta.markAllAsTouched();
       return;
     }
-    
+
     if (this.clientesSeleccionados.length === 0) {
       this.mostrarToast('Selecciona al menos un cliente', 'warning');
       return;
     }
 
     const formValues = this.formRuta.value;
-
-    // Array de IDs de clientes en orden
     const clientesIds = this.clientesSeleccionados.map(c => c.id);
-
-    // Caso 1: Agregar día a ruta existente
     if (this.modoCreacion === 'agregar' && formValues.rutaExistenteId) {
       await this.agregarDiaARutaExistente(formValues, clientesIds);
-    } 
-    // Caso 2: Crear nueva ruta con su primer día
+    }
     else {
       await this.crearNuevaRuta(formValues, clientesIds);
     }
@@ -411,9 +358,9 @@ agregarMarcadorCliente(cliente: any) {
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({
-      message: mensaje, 
-      duration: 2000, 
-      position: 'top', 
+      message: mensaje,
+      duration: 2000,
+      position: 'top',
       color: color
     });
     toast.present();
@@ -428,7 +375,6 @@ agregarMarcadorCliente(cliente: any) {
       this.map.remove();
     }
   }
-  // En agregarruta.page.ts
 
   private async agregarDiaARutaExistente(formValues: any, clientesIds: number[]) {
     const diaRutaData = {
@@ -439,13 +385,11 @@ agregarMarcadorCliente(cliente: any) {
 
     this.rutasService.agregarDiaARuta(diaRutaData).subscribe({
       next: () => {
-        // QUITAMOS EL TOAST DE AQUÍ ❌
-        // Solo cerramos y enviamos 'true' (éxito)
-        this.modalController.dismiss(true); 
+        this.modalController.dismiss(true);
       },
       error: (err) => {
         console.error(err);
-        this.mostrarToast('Error al agregar día de ruta', 'danger'); // El de error sí lo dejamos
+        this.mostrarToast('Error al agregar día de ruta', 'danger');
       }
     });
   }
@@ -461,8 +405,6 @@ agregarMarcadorCliente(cliente: any) {
 
     this.rutasService.crearRutaConDia(rutaData).subscribe({
       next: () => {
-        // QUITAMOS EL TOAST DE AQUÍ ❌
-        // Solo cerramos y enviamos 'true' (éxito)
         this.modalController.dismiss(true);
       },
       error: (err) => {

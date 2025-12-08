@@ -10,14 +10,6 @@ export class RutaService {
 
   constructor(private http: HttpClient) { }
 
-
-  // ========================================
-  // ASIGNACIÓN Y DESASIGNACIÓN DE CLIENTES
-  // ========================================
-
-  /**
-   * Asignar un cliente a una ruta (día específico)
-   */
   asignarClienteARuta(data: {
     clienteId: number;
     diaRutaId: number;
@@ -26,9 +18,6 @@ export class RutaService {
     return this.http.post(`${this.url}/rutas/asignar-cliente`, data);
   }
 
-  /**
-   * Desasignar un cliente de una ruta
-   */
   desasignarClienteDeRuta(clienteId: number, diaRutaId: number): Observable<any> {
     return this.http.delete(`${this.url}/rutas/desasignar-cliente/${clienteId}/${diaRutaId}`);
   }
@@ -56,8 +45,8 @@ export class RutaService {
   }
 
   obtenerUbicacionRepartidor(repartidorId: number): Observable<{ lat: number, lng: number }> {
-  return this.http.get<{ lat: number, lng: number }>(`${this.url}/ubicacion/repartidor/${repartidorId}`);
-}
+    return this.http.get<{ lat: number, lng: number }>(`${this.url}/ubicacion/repartidor/${repartidorId}`);
+  }
 
   obtenerDiasrutasRepartidor(repartidorId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}/rutas/dias-ruta/repartidor/${repartidorId}`);
@@ -76,11 +65,6 @@ export class RutaService {
     return this.http.get<any[]>(url);
   }
 
-  // // Cambiamos la URL para apuntar al controlador de Clientes
-  // obtenerClientesDisponibles(): Observable<any[]> {
-  //   // Usamos el endpoint que ya probamos ayer
-  //   return this.http.get<any[]>(`${this.url}/clientes/all`);
-  // }
 
   // ========================================
   // CREAR (POST)

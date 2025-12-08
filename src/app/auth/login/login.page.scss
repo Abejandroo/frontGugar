@@ -10,7 +10,7 @@
 // --- HEADER AZUL ---
 .main-header {
   background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
-  padding: 40px 20px 80px 20px; // Alto para el overlap
+  padding: 40px 20px 80px 20px;
   color: white;
   position: relative;
   z-index: 1;
@@ -21,7 +21,6 @@
     align-items: center;
     margin-bottom: 30px;
 
-    // Estilo para el botón de atrás blanco
     .white-back-btn {
       --color: white;
       --icon-font-size: 24px;
@@ -29,21 +28,33 @@
 
     .header-logo {
       height: 40px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
   }
 
   .text-container {
     text-align: center;
-    h2 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.5px; }
-    p { margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.9; font-weight: 300; }
+
+    h2 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 5px 0 0 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
   }
 }
 
 // --- CONTENEDOR BLANCO ---
 .white-container {
-  background: white; // Fondo blanco puro para el form
-  margin-top: -50px; // Overlap
+  background: white;
+  margin-top: -50px;
   border-top-left-radius: 35px;
   border-top-right-radius: 35px;
   min-height: 100vh;
@@ -68,16 +79,16 @@
 
     // INPUT PERSONALIZADO (Estilo Caja)
     .custom-input {
-      --background: #f4f6fa; // Gris muy clarito
+      --background: #f4f6fa;
       --border-radius: 14px;
       --padding-start: 15px;
       --inner-padding-end: 10px;
-      --highlight-height: 0; // Quita la línea de abajo animada
+      --highlight-height: 0;
       width: 100%;
       box-shadow: none;
 
       ion-icon {
-        color: #0099ff; // Icono azul
+        color: #0099ff;
         margin-right: 10px;
       }
 
@@ -94,7 +105,9 @@
     }
   }
 
-  .spacer { height: 20px; }
+  .spacer {
+    height: 20px;
+  }
 
   // BOTÓN PRINCIPAL
   .main-button {
@@ -114,9 +127,11 @@
 .footer-link {
   text-align: center;
   margin-top: 30px;
+
   p {
     font-size: 0.9rem;
     color: #888;
+
     span {
       color: #0099ff;
       font-weight: 700;

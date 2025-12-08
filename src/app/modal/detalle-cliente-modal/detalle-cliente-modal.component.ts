@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController, AlertController, ToastController } from '@ionic/angular';
 import * as L from 'leaflet';
 import { addIcons } from 'ionicons';
-import { 
-  close, location, business, calendar, cash, document, trash, 
-  create, warning, card, documentText, person, listOutline 
+import {
+  close, location, business, calendar, cash, document, trash,
+  create, warning, card, documentText, person, listOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -344,7 +344,7 @@ import {
 })
 export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
   @ViewChild('miniMapa', { static: false }) miniMapaElement!: ElementRef;
-  
+
   @Input() clienteRuta: any;
   @Input() diaSemana: string = '';
   @Input() diaRutaId: number = 0;
@@ -357,16 +357,16 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
     private alertController: AlertController,
     private toastController: ToastController
   ) {
-    addIcons({ 
-      close, location, business, calendar, cash, document, trash, 
-      create, warning, card, documentText, person, listOutline 
+    addIcons({
+      close, location, business, calendar, cash, document, trash,
+      create, warning, card, documentText, person, listOutline
     });
   }
 
   ngOnInit() {
     const lat = this.clienteRuta.cliente.latitud;
     const lng = this.clienteRuta.cliente.longitud;
-    
+
     this.tieneUbicacion = !!(lat && lng);
   }
 
@@ -386,19 +386,16 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
   inicializarMapa() {
     const lat = Number(this.clienteRuta.cliente.latitud);
     const lng = Number(this.clienteRuta.cliente.longitud);
-    
+
     if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
       console.warn('Coordenadas inválidas para el mapa');
       return;
     }
-
-    // Limpiar instancia previa
     if (this.mapa) {
       this.mapa.remove();
       this.mapa = null;
     }
 
-    // Inicializar mapa
     this.mapa = L.map(this.miniMapaElement.nativeElement, {
       center: [lat, lng],
       zoom: 16,
@@ -433,7 +430,7 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
         "></ion-icon>
       </div>
     `;
-    
+
     const customIcon = L.divIcon({
       html: iconHtml,
       className: '',
@@ -443,7 +440,6 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
 
     L.marker([lat, lng], { icon: customIcon }).addTo(this.mapa);
 
-    // FIX: Forzar recalculo de tamaño
     setTimeout(() => {
       this.mapa?.invalidateSize();
     }, 100);
@@ -451,11 +447,9 @@ export class DetalleClienteModalComponent implements OnInit, AfterViewInit {
 
   // =====================================
   // ABRIR EDITOR COMPLETO
-  // ✅ CAMBIO CRÍTICO: Cerrar este modal ANTES de abrir el editor
   // =====================================
   async abrirEditorCompleto() {
-    // Cerrar el modal actual y señalizar que queremos abrir el editor
-    await this.modalController.dismiss({ 
+    await this.modalController.dismiss({
       abrirEditor: true,
       clienteRuta: this.clienteRuta
     });

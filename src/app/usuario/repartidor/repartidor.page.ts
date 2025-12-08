@@ -15,8 +15,6 @@ import { menu } from 'ionicons/icons';
 })
 export class RepartidorPage {
    constructor(private readonly router: Router,
-  //private readonly authService: AuthService,
-  //private readonly menu: MenuController,
 
   ) { 
    addIcons({
@@ -24,11 +22,9 @@ export class RepartidorPage {
 });
   }
   logout() {
-  //  this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
   toggleMenu() {
-   // this.menu.toggle();
   }
 
   irATutores() {

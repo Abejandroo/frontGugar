@@ -2,52 +2,47 @@
   height: 40px;
   width: auto;
 }
-/* Pega esto en tu archivo login.page.scss */
 
 ion-content {
-  // Esta es la forma correcta y más segura de poner una imagen de fondo
   --background: url('/assets/bg.png') no-repeat center center / cover;
 }
 
 ion-toolbar {
-  // Esto fuerza a la barra de navegación a ser transparente, siempre
   --background: transparent;
 }
-/* Pega esto en tu archivo login.page.scss */
 
 ion-item {
   --background: transparent;
-  --color: #ffffff; // Color del texto del input y los íconos
-  --border-color: rgba(255, 255, 255, 0.5); // Color de la línea de abajo
-  --highlight-color-focused: #ffffff; // Color de la línea al hacer clic
+  --color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.5);
+  --highlight-color-focused: #ffffff;
 }
 
-// Esto es para asegurar que el label también sea blanco
 ion-item .item-native ion-label {
   color: #ffffff !important;
 }
-// Mantenemos el fondo y la barra transparente que ya conocemos
+
 ion-content {
   --background: url('/assets/bg.png') no-repeat center center / cover;
 }
+
 ion-toolbar {
   --background: transparent;
 }
 
-// 1. Estilo para el mensaje de bienvenida
 .welcome-message {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 40px;
-  
-  h2, p {
-    color: #ffffff; // Hacemos el texto blanco para que sea legible
+
+  h2,
+  p {
+    color: #ffffff;
   }
 
   h2 {
     font-size: 2rem;
     font-weight: bold;
-    // Un truquito para que el texto resalte sobre el fondo
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   }
 
@@ -57,40 +52,35 @@ ion-toolbar {
   }
 }
 
-// 2. ¡La magia! El nuevo estilo de "cristal" para las tarjetas
 .opcion-card {
-  // El efecto "Glassmorphism"
-  background: rgba(255, 255, 255, 0.15); // Fondo blanco muy sutil y transparente
-  backdrop-filter: blur(10px);          // ¡Este es el desenfoque mágico!
-  -webkit-backdrop-filter: blur(10px);  // (para que funcione en Safari)
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
-  // Otros estilos para que se vea genial
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
-  
-  // Quitamos el fondo sólido que tenía el header de la tarjeta
+
   ion-card-header {
     background-color: transparent;
   }
 
-  // Hacemos que todo el texto dentro de la tarjeta sea blanco
-  ion-card-title, ion-card-content {
+  ion-card-title,
+  ion-card-content {
     color: #ffffff;
   }
-  
+
   ion-card-title {
-      font-weight: bold;
-      font-size: 1.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
   }
 
   ion-card-content {
-      font-size: 0.9rem;
-      opacity: 0.85; // Un poquito transparente para que no compita con el título
+    font-size: 0.9rem;
+    opacity: 0.85;
   }
 
-  // Un efecto bonito cuando pasas el mouse por encima
   &:hover {
     transform: translateY(-5px);
   }

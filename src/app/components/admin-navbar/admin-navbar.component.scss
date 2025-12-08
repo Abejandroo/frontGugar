@@ -10,51 +10,51 @@
   background-color: #cceeff;
   border-radius: 40px;
   height: 65px;
-  width: 95%; // Aumentado para más espacio
-  max-width: 480px; // Aumentado para tablets
-  
+  width: 95%;
+  max-width: 480px;
+
   display: flex;
-  justify-content: space-around; // Cambiado de space-between a space-around para mejor distribución
+  justify-content: space-around;
   align-items: center;
-  padding: 0 12px; // Reducido el padding
-  
+  padding: 0 12px;
+
   box-shadow: 0 10px 25px rgba(144, 194, 255, 0.3);
-  overflow: hidden; // Evitar desbordamiento
+  overflow: hidden;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333; 
-  padding: 8px; // Reducido para ajustar más botones
+  color: #333;
+  padding: 8px;
   border-radius: 30px;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  min-width: 40px; // Ancho mínimo para cada botón
-  flex-shrink: 0; // No permitir que se contraigan
+  min-width: 40px;
+  flex-shrink: 0;
 
   ion-icon {
-    font-size: 1.4rem; // Reducido ligeramente
+    font-size: 1.4rem;
     color: #444;
   }
 
   // Estado ACTIVO
   &.active {
     background-color: #8cbbf1;
-    color: #0044aa; 
-    padding: 8px 16px; // Reducido el padding horizontal
-    gap: 6px; // Reducido el gap
-    
+    color: #0044aa;
+    padding: 8px 16px;
+    gap: 6px;
+
     ion-icon {
       color: #003380;
-      font-size: 1.3rem; // Ligeramente más pequeño cuando activo
+      font-size: 1.3rem;
     }
 
     span {
       font-weight: 700;
-      font-size: 0.85rem; // Reducido el tamaño del texto
+      font-size: 0.85rem;
       color: #003380;
       animation: slideIn 0.3s ease;
       white-space: nowrap;
@@ -69,8 +69,17 @@
 }
 
 @keyframes slideIn {
-  from { opacity: 0; width: 0; transform: translateX(-10px); }
-  to { opacity: 1; width: auto; transform: translateX(0); }
+  from {
+    opacity: 0;
+    width: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    width: auto;
+    transform: translateX(0);
+  }
 }
 
 // Ajustes para pantallas pequeñas
@@ -90,7 +99,7 @@
 
     &.active {
       padding: 6px 12px;
-      
+
       ion-icon {
         font-size: 1.1rem;
       }

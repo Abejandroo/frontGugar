@@ -38,15 +38,12 @@ export class DirectionsService {
     this.directionsService = new google.maps.DirectionsService();
   }
 
-  /**
-   * Calcula ruta optimizada entre múltiples puntos
-   */
   async calcularRuta(
     origen: { lat: number; lng: number },
     destino: { lat: number; lng: number },
     waypoints: Array<{ lat: number; lng: number }> = []
   ): Promise<Route | null> {
-    
+
     if (!this.directionsService) {
       await this.initDirectionsService();
     }
@@ -83,9 +80,7 @@ export class DirectionsService {
     }
   }
 
-  /**
-   * Procesa el resultado de Google Directions
-   */
+
   private procesarResultado(result: any): Route {
     const route = result.routes[0];
 
@@ -93,7 +88,6 @@ export class DirectionsService {
     let totalDuration = 0;
     const steps: Step[] = [];
 
-    // Procesar cada leg (tramo entre waypoints)
     route.legs.forEach((leg: any) => {
       totalDistance += leg.distance.value;
       totalDuration += leg.duration.value;
@@ -126,34 +120,30 @@ export class DirectionsService {
     };
   }
 
-  /**
-   * Limpia las instrucciones HTML
-   */
+
   private limpiarInstrucciones(html: string): string {
     const temp = document.createElement('div');
     temp.innerHTML = html;
     return temp.textContent || temp.innerText || '';
   }
 
-  /**
-   * Calcula distancia entre dos puntos (Haversine)
-   */
+
   calcularDistancia(
     punto1: { lat: number; lng: number },
     punto2: { lat: number; lng: number }
   ): number {
-    const R = 6371e3; // Radio de la Tierra en metros
+    const R = 6371e3;
     const φ1 = punto1.lat * Math.PI / 180;
     const φ2 = punto2.lat * Math.PI / 180;
     const Δφ = (punto2.lat - punto1.lat) * Math.PI / 180;
     const Δλ = (punto2.lng - punto1.lng) * Math.PI / 180;
 
     const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c; // Distancia en metros
+    return R * c;
   }
 }

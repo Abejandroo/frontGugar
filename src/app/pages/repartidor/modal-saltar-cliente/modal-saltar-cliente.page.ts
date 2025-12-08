@@ -56,7 +56,6 @@ export class ModalSaltarClientePage implements OnInit {
       ? `${motivoTexto} - ${this.formSaltar.value.observaciones}`
       : motivoTexto;
 
-    // Crear venta con estado='saltado'
     const venta = {
       clienteRutaId: this.clienteRuta.id,
       precioId: this.clienteRuta.precio?.id,

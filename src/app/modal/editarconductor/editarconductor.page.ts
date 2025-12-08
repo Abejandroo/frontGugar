@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; 
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -25,8 +25,8 @@ import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
   imports: [IonicModule, ReactiveFormsModule, CommonModule, FormsModule],
 })
 export class EditarconductorPage {
-  formUsuario!: FormGroup; 
-  usuario: any; 
+  formUsuario!: FormGroup;
+  usuario: any;
   showPassword: boolean = false;
 
   constructor(
@@ -34,7 +34,7 @@ export class EditarconductorPage {
     private toastController: ToastController,
     private modalController: ModalController,
     private navParams: NavParams,
-    private authService: Auth, 
+    private authService: Auth,
   ) {
     this.usuario = this.navParams.get('maestroSeleccionado');
     this.formUsuario = this.fb.group({
@@ -49,7 +49,6 @@ export class EditarconductorPage {
         name: this.usuario.name,
         email: this.usuario.email,
         role: this.usuario.role,
-        // Dejamos la contraseña en blanco
       });
     }
   }
@@ -68,7 +67,7 @@ export class EditarconductorPage {
     this.authService.actualizarUsuario(this.usuario.id, usuarioData).subscribe({
       next: async () => {
         this.mostrarToast('Usuario actualizado correctamente', 'success');
-        this.modalController.dismiss(true); 
+        this.modalController.dismiss(true);
       },
       error: async (err) => {
         const mensaje =

@@ -3,44 +3,44 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { 
-  close, personOutline, callOutline, mailOutline, pricetagOutline, 
+import {
+  close, personOutline, callOutline, mailOutline, pricetagOutline,
   saveOutline, mapOutline, homeOutline, locationOutline, businessOutline,
-   calendarOutline 
+  calendarOutline
 } from 'ionicons/icons';
-import { ClienteService } from 'src/app/service/cliente.service'; 
+import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
 import { RutaService } from 'src/app/service/ruta.service';
-import { GoogleMapsModule } from '@angular/google-maps'; 
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @Component({
   selector: 'app-agregar-cliente',
   templateUrl: './agregar-cliente.page.html',
   styleUrls: ['./agregar-cliente.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule] 
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
 })
 export class AgregarClientePage implements OnInit {
 
-  @Input() supervisorId?: number; // Opcional: si viene, filtra solo rutas de este supervisor
+  @Input() supervisorId?: number;
 
   formCliente: FormGroup;
   cargando: boolean = false;
   listaPrecios: any[] = [];
   rutasDisponibles: any[] = [];
 
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 }; 
+  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 15;
-  markerPosition: google.maps.LatLngLiteral | undefined; 
-  
+  markerPosition: google.maps.LatLngLiteral | undefined;
+
   mapOptions: google.maps.MapOptions = {
-    disableDefaultUI: true, 
+    disableDefaultUI: true,
     zoomControl: true,
     streetViewControl: false
   };
   pinOptions: google.maps.MarkerOptions = {
     draggable: false,
-    animation: google.maps.Animation.DROP, 
+    animation: google.maps.Animation.DROP,
   };
 
   constructor(
@@ -51,29 +51,27 @@ export class AgregarClientePage implements OnInit {
     private rutaService: RutaService,
     private toastCtrl: ToastController
   ) {
-    addIcons({ 
-      close, personOutline, callOutline, mailOutline, pricetagOutline, 
+    addIcons({
+      close, personOutline, callOutline, mailOutline, pricetagOutline,
       saveOutline, mapOutline, homeOutline, locationOutline, businessOutline,
-       calendarOutline
+      calendarOutline
     });
 
-    // ✅ FORMULARIO AJUSTADO AL DTO
     this.formCliente = this.fb.group({
-      // CAMPOS REQUERIDOS
-      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]], // ← Cambio: "representante" → "nombre"
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       telefono: ['', [Validators.required, Validators.maxLength(15)]],
-      correo: ['', [Validators.email]], // ← Opcional pero con validación de email
+      correo: ['', [Validators.email]],
       tipoPrecioId: [null, [Validators.required]],
       calle: ['', [Validators.required]],
       colonia: ['', [Validators.required]],
-      
+
       // CAMPOS OPCIONALES
-      referencia: [''], // ← Opcional
-      latitud: [null], // ← Opcional (aunque en el mapa lo marcamos como requerido)
-      longitud: [null], // ← Opcional
-      cte: [null], // ← Opcional
-      negocio: [''], // ← Opcional
-      diaRutaId: [null] // ← Opcional (para asignar a ruta)
+      referencia: [''],
+      latitud: [null],
+      longitud: [null],
+      cte: [null],
+      negocio: [''],
+      diaRutaId: [null]
     });
   }
 
@@ -93,13 +91,11 @@ export class AgregarClientePage implements OnInit {
   cargarRutas() {
     this.rutaService.obtenerTodasLasRutas().subscribe({
       next: (rutas) => {
-        // Aplanar todas las rutas con sus días
         this.rutasDisponibles = [];
-        
+
         rutas.forEach(ruta => {
-          // Si hay supervisorId, filtrar solo las rutas de ese supervisor
           if (this.supervisorId && ruta.supervisor?.id !== this.supervisorId) {
-            return; // Skip esta ruta
+            return;
           }
 
           if (ruta.diasRuta && ruta.diasRuta.length > 0) {
@@ -122,9 +118,9 @@ export class AgregarClientePage implements OnInit {
     if (event.latLng) {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();
-      
+
       this.markerPosition = { lat, lng };
-      
+
       this.formCliente.patchValue({
         latitud: lat,
         longitud: lng
@@ -154,7 +150,6 @@ export class AgregarClientePage implements OnInit {
       return;
     }
 
-    // ✅ Validar que tenga ubicación (aunque sea opcional en el DTO)
     if (!this.formCliente.value.latitud || !this.formCliente.value.longitud) {
       this.mostrarToast('Por favor, selecciona la ubicación en el mapa.', 'warning');
       return;
@@ -162,16 +157,14 @@ export class AgregarClientePage implements OnInit {
 
     this.cargando = true;
 
-    // ✅ PREPARAR DATOS SEGÚN EL DTO
     const datos: any = {
-      nombre: this.formCliente.value.nombre, // ← Campo requerido
-      telefono: this.formCliente.value.telefono, // ← Campo requerido
-      tipoPrecioId: this.formCliente.value.tipoPrecioId, // ← Campo requerido
-      calle: this.formCliente.value.calle, // ← Campo requerido
-      colonia: this.formCliente.value.colonia, // ← Campo requerido
+      nombre: this.formCliente.value.nombre,
+      telefono: this.formCliente.value.telefono,
+      tipoPrecioId: this.formCliente.value.tipoPrecioId,
+      calle: this.formCliente.value.calle,
+      colonia: this.formCliente.value.colonia,
     };
 
-    // ✅ Agregar campos opcionales solo si tienen valor
     if (this.formCliente.value.correo) {
       datos.correo = this.formCliente.value.correo;
     }
@@ -202,7 +195,6 @@ export class AgregarClientePage implements OnInit {
 
     this.clienteService.crearCliente(datos).subscribe({
       next: async (clienteCreado) => {
-        // Si se seleccionó una ruta, asignar el cliente
         if (datos.diaRutaId) {
           await this.asignarClienteARuta(clienteCreado.id, datos.diaRutaId, datos.tipoPrecioId);
         } else {
@@ -241,11 +233,11 @@ export class AgregarClientePage implements OnInit {
   }
 
   async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastCtrl.create({ 
-      message: mensaje, 
-      duration: 2000, 
-      color, 
-      position: 'bottom' 
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 2000,
+      color,
+      position: 'bottom'
     });
     toast.present();
   }

@@ -1,4 +1,3 @@
-// FUENTE GENERAL
 * {
   font-family: 'Poppins', sans-serif;
 }
@@ -7,7 +6,6 @@
   --background: #f4f6fa;
 }
 
-// --- HEADER AZUL ---
 .main-header {
   background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
   padding: 20px 20px 60px 20px;
@@ -16,22 +14,43 @@
   z-index: 1;
 
   .top-bar {
-    display: flex; justify-content: center; margin-bottom: 15px;
-    .mini-logo { height: 35px; opacity: 0.9; }
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+
+    .mini-logo {
+      height: 35px;
+      opacity: 0.9;
+    }
   }
 
   .text-container {
     text-align: center;
-    h2 { margin: 0; font-size: 1.4rem; font-weight: 700; }
-    .fecha { margin: 2px 0 0 0; font-size: 0.8rem; opacity: 0.8; }
-    .subtitle { margin: 5px 0 0 0; font-size: 0.9rem; font-weight: 300; opacity: 0.95; }
+
+    h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .fecha {
+      margin: 2px 0 0 0;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .subtitle {
+      margin: 5px 0 0 0;
+      font-size: 0.9rem;
+      font-weight: 300;
+      opacity: 0.95;
+    }
   }
 }
 
-// --- CONTENEDOR BLANCO ---
 .white-container {
   background: #f4f6fa;
-  margin-top: -40px; 
+  margin-top: -40px;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
   min-height: 100vh;
@@ -46,92 +65,133 @@
   color: #333;
   margin: 10px 0 15px 5px;
 }
-// --- TARJETAS DE ESTADÍSTICA (KPIs) ---
+
 .stat-card {
   background: white;
   border-radius: 20px;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  height: 180px; // Un pelín más alta para acomodar la nueva imagen
+  height: 180px;
   justify-content: center;
   transition: transform 0.2s;
 
-  &:active { transform: scale(0.97); }
+  &:active {
+    transform: scale(0.97);
+  }
 
-  // CAJITA DE ICONO (Ahora es RECTANGULAR y ANCHA)
   .icon-box {
-    width: 140px;  // ✨ AQUÍ ESTÁ EL CAMBIO: Mucho más ancha
-    height: 90px;  // Altura controlada para dar forma rectangular
+    width: 140px;
+    height: 90px;
     border-radius: 20px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 15px;
-    padding: 6px; // Muy poquito padding para aprovechar todo el ancho
+    padding: 6px;
 
-    &.blue { background: #e3f2fd; }
-    &.green { background: #e8f5e9; }
-    &.purple { background: #f3e5f5; }
-    &.orange { background: #fff3e0; }
+    &.blue {
+      background: #e3f2fd;
+    }
 
-    img { 
-      width: 100%; 
-      height: 100%; 
-      // 'contain' permitirá que el camión y el mapa usen todo el ancho disponible
-      object-fit: contain; 
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
+    &.green {
+      background: #e8f5e9;
+    }
+
+    &.purple {
+      background: #f3e5f5;
+    }
+
+    &.orange {
+      background: #fff3e0;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     }
   }
 
   .stat-info {
-    h1 { 
-      margin: 0; 
-      font-size: 2.2rem; // Número grande
-      font-weight: 800; 
-      color: #333; 
-      line-height: 1; 
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #333;
+      line-height: 1;
     }
-    p { 
-      margin: 5px 0 0 0; 
-      font-size: 0.9rem; 
-      color: #888; 
-      font-weight: 500; 
+
+    p {
+      margin: 5px 0 0 0;
+      font-size: 0.9rem;
+      color: #888;
+      font-weight: 500;
     }
   }
 }
+
 // --- TARJETAS DE ATAJOS ---
 .shortcuts-list {
-  display: flex; flex-direction: column; gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .shortcut-card {
   background: white;
   border-radius: 16px;
   padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  display: flex; align-items: center; gap: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 15px;
   transition: background 0.2s;
   cursor: pointer;
 
-  &:active { background: #f9f9f9; }
+  &:active {
+    background: #f9f9f9;
+  }
 
   .shortcut-icon {
     background: #f0f0f0;
-    width: 45px; height: 45px;
+    width: 45px;
+    height: 45px;
     border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    
-    ion-icon { font-size: 1.5rem; color: #555; }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.5rem;
+      color: #555;
+    }
   }
 
   .shortcut-text {
     flex: 1;
-    h4 { margin: 0; font-size: 1rem; font-weight: 700; color: #333; }
-    p { margin: 2px 0 0 0; font-size: 0.8rem; color: #888; }
+
+    h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    p {
+      margin: 2px 0 0 0;
+      font-size: 0.8rem;
+      color: #888;
+    }
   }
 
-  .arrow { color: #ccc; font-size: 1.2rem; }
+  .arrow {
+    color: #ccc;
+    font-size: 1.2rem;
+  }
 }

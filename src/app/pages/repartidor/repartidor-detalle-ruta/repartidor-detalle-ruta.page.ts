@@ -1,5 +1,3 @@
-// src/app/pages/repartidor/repartidor-detalle-ruta/repartidor-detalle-ruta.page.ts
-
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
@@ -38,7 +36,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   distanciaAlCliente: number = 0;
   tiempoEstimado: number = 0;
 
-  // Control de navegación por voz
   vozHabilitada: boolean = true;
   private ultimaDistanciaAnunciada: number = 0;
 
@@ -143,7 +140,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
             const group = new L.FeatureGroup(this.markers);
             this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
           } else if (this.map) {
-            // Si no hay clientes, centrar en la vista por defecto
             this.map.setView([17.0732, -96.7266], 14);
           }
 
@@ -224,11 +220,9 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
         this.calcularDistanciaYTiempo();
         this.mostrarToast('Ruta iniciada', 'success');
 
-        // Anunciar inicio de ruta por voz
         if (this.vozHabilitada) {
           await this.ttsService.anunciarInicioRuta(this.clientesOrdenados.length);
 
-          // Anunciar primer cliente
           if (this.clienteActual) {
             await this.ttsService.anunciarCliente(
               this.clienteActual.cliente.nombre,
@@ -300,7 +294,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
                 this.mostrarToast('¡Ruta completada!', 'success');
                 this.detenerSeguimiento();
 
-                // Anunciar fin de ruta
                 if (this.vozHabilitada) {
                   await this.ttsService.anunciarFinRuta(visitados, total);
                 }
@@ -341,7 +334,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       lng: this.ubicacionActual.longitude
     };
 
-    // Filtrar clientes que tengan ubicación válida
     const clientesConUbicacion = this.clientesOrdenados.filter(cr =>
       cr.cliente?.latitud && cr.cliente?.longitud
     );
@@ -357,7 +349,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       return;
     }
 
-    // Acceder directamente a cliente.latitud/longitud
     const destinos = clientesConUbicacion.map(cr => ({
       lat: cr.cliente.latitud,
       lng: cr.cliente.longitud
@@ -369,7 +360,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       if (rutaOptimizada && rutaOptimizada.orden) {
         const nuevoOrden = rutaOptimizada.orden.map((idx: number) => clientesConUbicacion[idx]);
 
-        // Agregar al final los clientes sin ubicación (si los hay)
         const clientesSinDir = this.clientesOrdenados.filter(cr =>
           !cr.cliente?.latitud || !cr.cliente?.longitud
         );
@@ -417,7 +407,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       const lat = cr.cliente.latitud;
       const lng = cr.cliente.longitud;
 
-      if (!lat || !lng) return; // Saltar clientes sin ubicación
+      if (!lat || !lng) return;
 
       const completado = cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado');
       const marker = L.marker([lat, lng], {
@@ -465,7 +455,7 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       const lat = cr.cliente.latitud;
       const lng = cr.cliente.longitud;
 
-      if (!lat || !lng) return; // Saltar clientes sin ubicación
+      if (!lat || !lng) return;
 
       const completado = cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado');
       const marker = L.marker([lat, lng], {
@@ -537,7 +527,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
       this.calcularDistanciaYTiempo();
 
-      // Anunciar distancia por voz cuando se acerca
       this.verificarProximidadYAnunciar();
     });
   }
@@ -561,7 +550,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       lng
     );
 
-    // Tiempo estimado en minutos (asumiendo 40 km/h promedio)
     this.tiempoEstimado = (this.distanciaAlCliente / 40) * 60;
   }
 
@@ -570,15 +558,12 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
 
     const distanciaMetros = this.distanciaAlCliente * 1000;
 
-    // Anunciar cuando llegue (menos de 50m)
     if (distanciaMetros < 50 && this.ultimaDistanciaAnunciada >= 50) {
       await this.ttsService.anunciarLlegada(this.clienteActual.cliente.nombre);
     }
-    // Anunciar cuando esté cerca (menos de 200m)
     else if (distanciaMetros < 200 && this.ultimaDistanciaAnunciada >= 200) {
       await this.ttsService.anunciarDistancia(distanciaMetros);
     }
-    // Anunciar cuando esté a 500m
     else if (distanciaMetros < 500 && this.ultimaDistanciaAnunciada >= 500) {
       await this.ttsService.anunciarDistancia(distanciaMetros);
     }
@@ -631,7 +616,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.dibujarClientesEnMapa();
       this.mostrarToast('Venta registrada', 'success');
 
-      // Anunciar venta y siguiente cliente
       if (this.vozHabilitada) {
         await this.ttsService.anunciarVentaRegistrada(data.cantidad || 0);
 
@@ -664,7 +648,6 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
       this.dibujarClientesEnMapa();
       this.mostrarToast('Cliente saltado', 'warning');
 
-      // Anunciar siguiente cliente
       if (this.vozHabilitada) {
         await this.ttsService.anunciarClienteSaltado();
 

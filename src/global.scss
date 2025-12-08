@@ -20,11 +20,6 @@
 
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* ========================================
-   ⭐ NO USAR IMPORT PARA LEAFLET
-   El CSS de Leaflet se carga desde index.html
-   ======================================== */
-
 // ========================================
 // ESTILOS GENERALES
 // ========================================
@@ -124,73 +119,55 @@ ion-menu[menuId="admin-menu"] {
   color: #10dc60;
 }
 
-/* ========================================
-   🔥 FIX CRÍTICO: BACKDROP NO DEBE BLOQUEAR
-   ======================================== */
-
-// El backdrop debe permitir clicks a través de él hacia el contenido
 ion-backdrop {
-  pointer-events: none !important; // ✅ CAMBIO CRÍTICO: none en lugar de auto
+  pointer-events: none !important; 
 }
 
-// //z-index JERARQUÍA CLARA
 ion-modal {
-  //z-index: 20000 !important;
-  pointer-events: auto !important; // ✅ El modal SÍ captura eventos
+  pointer-events: auto !important;
   
   &::part(backdrop) {
-    //z-index: 19999 !important;
-    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+    pointer-events: none !important; 
   }
   
   .modal-wrapper {
-    //z-index: 20001 !important;
-    pointer-events: auto !important; // ✅ El contenido SÍ captura eventos
+    pointer-events: auto !important; 
   }
 }
 
 ion-alert {
-  ////z-index: 21000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-  //  //z-index: 20999 !important;
-    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+    pointer-events: none !important; 
   }
   
   .alert-wrapper {
-  //  //z-index: 21001 !important;
     pointer-events: auto !important;
   }
 }
 
 ion-action-sheet {
-//  //z-index: 21000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-  //  //z-index: 20999 !important;
-    pointer-events: none !important; // ✅ El backdrop NO captura eventos
+    pointer-events: none !important; 
   }
   
   .action-sheet-wrapper {
-  //  //z-index: 21001 !important;
     pointer-events: auto !important;
   }
 }
 
 ion-loading {
-//  //z-index: 22000 !important;
   pointer-events: auto !important;
   
   &::part(backdrop) {
-    //z-index: 21999 !important;
     pointer-events: none !important;
   }
 }
 
 ion-toast {
-//  //z-index: 23000 !important;
   pointer-events: auto !important;
 }
 
@@ -202,7 +179,6 @@ ion-toast {
   --background: #f4f6fa;
   pointer-events: auto !important;
   
-  // Móvil: Sheet desde abajo
   align-items: flex-end;
   
   --border-radius: 16px 16px 0 0;
@@ -221,7 +197,6 @@ ion-toast {
     pointer-events: auto !important;
   }
 
-  // Desktop: Centrado con ancho fijo
   @media (min-width: 768px) {
     align-items: center;
     
@@ -297,7 +272,6 @@ ion-toast {
   --background: #f4f6fa;
   pointer-events: auto !important;
   
-  // Móvil: Pantalla completa
   align-items: flex-end;
   
   &::part(backdrop) {
@@ -311,7 +285,6 @@ ion-toast {
     pointer-events: auto !important;
   }
 
-  // Desktop: Centrado con ancho fijo
   @media (min-width: 768px) {
     align-items: center;
     
@@ -391,7 +364,6 @@ ion-toast {
 // ALERTS MEJORADOS
 // ============================================
 
-// Alert general
 ion-alert {
   --backdrop-opacity: 0.5;
   pointer-events: auto !important;
@@ -469,7 +441,6 @@ ion-alert {
   }
 }
 
-// Alert específico para eliminar cliente
 .alert-eliminar-cliente {
   .alert-wrapper {
     max-width: 340px;
@@ -482,7 +453,6 @@ ion-alert {
   }
 }
 
-// Alert específico para eliminar ruta
 .alert-eliminar-ruta {
   .alert-wrapper {
     max-width: 400px;
@@ -510,7 +480,6 @@ ion-alert {
   }
 }
 
-// Alert personalizado genérico
 .custom-alert {
   --backdrop-opacity: 0.6;
   pointer-events: auto !important;
