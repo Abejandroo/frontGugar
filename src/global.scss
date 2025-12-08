@@ -119,56 +119,94 @@ ion-toolbar {
   color: #10dc60;
 }
 
-ion-backdrop {
-  pointer-events: none !important; 
+// ion-backdrop {
+//   pointer-events: none !important; 
+// }
+
+// ion-modal {
+//   pointer-events: auto !important;
+
+//   &::part(backdrop) {
+//     pointer-events: none !important; 
+//   }
+
+//   .modal-wrapper {
+//     pointer-events: auto !important; 
+//   }
+// }
+
+// ion-alert {
+//   pointer-events: auto !important;
+
+//   &::part(backdrop) {
+//     pointer-events: none !important; 
+//   }
+
+//   .alert-wrapper {
+//     pointer-events: auto !important;
+//   }
+// }
+
+// ion-action-sheet {
+//   pointer-events: auto !important;
+
+//   &::part(backdrop) {
+//     pointer-events: none !important; 
+//   }
+
+//   .action-sheet-wrapper {
+//     pointer-events: auto !important;
+//   }
+// }
+
+// ion-loading {
+//   pointer-events: auto !important;
+
+//   &::part(backdrop) {
+//     pointer-events: none !important;
+//   }
+// }
+
+// ion-toast {
+//   pointer-events: auto !important;
+// }
+
+
+// ========================================
+// ESTILOS GENERALES
+// ========================================
+
+// 🚨 SOLUCIÓN PARA OVERLAYS EN ANDROID APK 🚨
+
+// Asegurar que el botón flotante (FAB) esté encima de todo
+ion-fab {
+  z-index: 9999 !important;
 }
 
-ion-modal {
-  pointer-events: auto !important;
-  
-  &::part(backdrop) {
-    pointer-events: none !important; 
-  }
-  
-  .modal-wrapper {
-    pointer-events: auto !important; 
-  }
+// Asegurar que la barra de navegación inferior esté siempre interactiva
+ion-tab-bar {
+  z-index: 9998 !important; // Un poco menos para no tapar el FAB
 }
 
-ion-alert {
-  pointer-events: auto !important;
-  
-  &::part(backdrop) {
-    pointer-events: none !important; 
-  }
-  
-  .alert-wrapper {
-    pointer-events: auto !important;
-  }
-}
-
-ion-action-sheet {
-  pointer-events: auto !important;
-  
-  &::part(backdrop) {
-    pointer-events: none !important; 
-  }
-  
-  .action-sheet-wrapper {
-    pointer-events: auto !important;
-  }
-}
-
-ion-loading {
-  pointer-events: auto !important;
-  
-  &::part(backdrop) {
-    pointer-events: none !important;
-  }
-}
-
+// Ya manejas los modales con pointer-events, pero un z-index alto no está de más
+ion-menu,
+ion-modal,
+ion-backdrop,
+ion-alert,
+ion-loading,
+ion-action-sheet,
 ion-toast {
-  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+// ... (El resto de tus estilos generales)
+
+ion-item ion-icon {
+  color: rgb(68, 68, 68) !important;
+}
+
+ion-toolbar {
+  --background: transparent !important;
 }
 
 // ============================================
@@ -178,11 +216,11 @@ ion-toast {
 .modal-detalle-cliente {
   --background: #f4f6fa;
   pointer-events: auto !important;
-  
+
   align-items: flex-end;
-  
+
   --border-radius: 16px 16px 0 0;
-  --box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  --box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
 
   &::part(backdrop) {
     pointer-events: none !important;
@@ -199,14 +237,14 @@ ion-toast {
 
   @media (min-width: 768px) {
     align-items: center;
-    
+
     .modal-wrapper {
       width: 500px;
       max-width: 90%;
       height: auto;
       max-height: 80vh;
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
   }
 
@@ -239,11 +277,11 @@ ion-toast {
   align-items: center;
   justify-content: center;
   pointer-events: auto !important;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
-  
+
   .modal-wrapper {
     width: 90%;
     max-width: 500px;
@@ -252,11 +290,11 @@ ion-toast {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     pointer-events: auto !important;
   }
-  
+
   ion-content {
     --background: white;
   }
-  
+
   @media (max-width: 767px) {
     .modal-wrapper {
       width: 95%;
@@ -271,13 +309,13 @@ ion-toast {
 .modal-editar-cliente {
   --background: #f4f6fa;
   pointer-events: auto !important;
-  
+
   align-items: flex-end;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
-  
+
   .modal-wrapper {
     width: 100%;
     height: 100%;
@@ -287,14 +325,14 @@ ion-toast {
 
   @media (min-width: 768px) {
     align-items: center;
-    
+
     .modal-wrapper {
       width: 600px;
       max-width: 90%;
       height: auto;
       max-height: 85vh;
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
   }
 
@@ -319,14 +357,14 @@ ion-toast {
 
 .custom-action-sheet {
   pointer-events: auto !important;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
-  
+
   .action-sheet-wrapper {
     pointer-events: auto !important;
-    
+
     .action-sheet-container {
       .action-sheet-group {
         .action-sheet-button {
@@ -335,11 +373,11 @@ ion-toast {
           font-family: 'Poppins', sans-serif;
           min-height: 56px;
           pointer-events: auto !important;
-          
+
           .action-sheet-button-inner {
             justify-content: center;
           }
-          
+
           &.action-sheet-selected {
             font-weight: 600;
             color: #0099ff !important;
@@ -347,7 +385,7 @@ ion-toast {
           }
         }
       }
-      
+
       .action-sheet-title {
         font-weight: 600;
         color: #8e8e93;
@@ -367,11 +405,11 @@ ion-toast {
 ion-alert {
   --backdrop-opacity: 0.5;
   pointer-events: auto !important;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
-  
+
   .alert-wrapper {
     border-radius: 14px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -381,14 +419,14 @@ ion-alert {
 
   .alert-head {
     padding: 20px 20px 12px 20px;
-    
+
     .alert-title {
       font-size: 17px;
       font-weight: 600;
       color: #1c1c1e;
       font-family: 'Poppins', sans-serif;
     }
-    
+
     .alert-sub-title {
       font-size: 13px;
       color: #8e8e93;
@@ -403,7 +441,7 @@ ion-alert {
     line-height: 1.5;
     color: #3c3c43;
     font-family: 'Poppins', sans-serif;
-    
+
     strong {
       color: #1c1c1e;
       font-weight: 600;
@@ -433,7 +471,7 @@ ion-alert {
         color: #8e8e93 !important;
         background: #f2f2f7;
       }
-      
+
       &:active {
         opacity: 0.6;
       }
@@ -445,7 +483,7 @@ ion-alert {
   .alert-wrapper {
     max-width: 340px;
   }
-  
+
   .alert-message {
     strong {
       color: #ff3b30;
@@ -483,7 +521,7 @@ ion-alert {
 .custom-alert {
   --backdrop-opacity: 0.6;
   pointer-events: auto !important;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
@@ -527,11 +565,11 @@ ion-toast {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
   pointer-events: auto !important;
-  
+
   &::part(message) {
     font-size: 14px;
   }
-  
+
   &::part(container) {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -541,11 +579,11 @@ ion-toast {
 ion-loading {
   font-family: 'Poppins', sans-serif;
   pointer-events: auto !important;
-  
+
   &::part(backdrop) {
     pointer-events: none !important;
   }
-  
+
   &::part(content) {
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

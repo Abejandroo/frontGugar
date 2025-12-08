@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Auth } from 'src/app/service/auth';
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
@@ -10,13 +10,14 @@ import {
   mapOutline, checkmarkDoneCircleOutline, alertCircleOutline,
   bicycleOutline, personCircleOutline, arrowForward, leafOutline
 } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, SupervisorNavbarComponent],
+  imports: [ CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents],
 })
 export class HomeComponent implements OnInit {
 

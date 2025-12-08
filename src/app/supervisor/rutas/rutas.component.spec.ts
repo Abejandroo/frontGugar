@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { RutasComponent } from './rutas.component';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 describe('RutasComponent', () => {
   let component: RutasComponent;
@@ -9,8 +9,7 @@ describe('RutasComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RutasComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [RutasComponent, ...IonicSharedComponents]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RutasComponent);

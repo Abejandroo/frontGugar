@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  IonicModule,
+  
   ToastController,
   ModalController,
   AlertController,
@@ -21,13 +21,16 @@ import {
   personOutline,
 } from 'ionicons/icons';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-conductores',
   templateUrl: './conductores.page.html',
   styleUrls: ['./conductores.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, AdminNavbarComponent],
+  imports: [CommonModule, FormsModule,  AdminNavbarComponent, ...IonicSharedComponents],
+    providers:[...IonicControllers]
 })
 export class ConductoresPage  {
   usuarios: any[] = [];

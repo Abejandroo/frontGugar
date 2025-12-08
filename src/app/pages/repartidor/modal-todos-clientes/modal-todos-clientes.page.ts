@@ -1,14 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import {  ModalController } from '@ionic/angular';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-modal-todos-clientes',
   templateUrl: './modal-todos-clientes.page.html',
   styleUrls: ['./modal-todos-clientes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [ CommonModule, FormsModule, ...IonicSharedComponents]
 })
 export class ModalTodosClientesPage {
   

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController, ActionSheetController, AlertController } from '@ionic/angular';
+import {  ModalController, ToastController,  AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RutaService } from 'src/app/service/ruta.service';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
@@ -19,13 +19,16 @@ import {
 import { OpcionesRutaModalComponent } from 'src/app/modal/opciones-ruta-modal/opciones-ruta-modal.component';
 import { Router } from '@angular/router';
 import { ReporteVentasService } from 'src/app/service/reporte-ventas.service';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-gestion-rutas',
   templateUrl: './gestion-rutas.page.html',
   styleUrls: ['./gestion-rutas.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, AdminNavbarComponent],
+  imports: [ CommonModule, FormsModule, AdminNavbarComponent, ...IonicSharedComponents],
+  providers:[...IonicControllers]
 })
 export class GestionRutasPage implements OnInit {
   rutas: any[] = [];

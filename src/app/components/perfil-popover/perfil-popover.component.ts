@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { PopoverController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Auth } from 'src/app/service/auth';
 import { addIcons } from 'ionicons';
 import { personCircle, logOutOutline } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-perfil-popover',
@@ -47,7 +48,7 @@ import { personCircle, logOutOutline } from 'ionicons/icons';
     }
   `],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [ CommonModule, ...IonicSharedComponents]
 })
 export class PerfilPopoverComponent {
   

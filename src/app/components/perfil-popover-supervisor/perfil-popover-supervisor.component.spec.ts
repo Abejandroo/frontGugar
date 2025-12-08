@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
 import { PerfilPopoverSupervisorComponent } from './perfil-popover-supervisor.component';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 describe('PerfilPopoverSupervisorComponent', () => {
   let component: PerfilPopoverSupervisorComponent;
@@ -9,8 +8,9 @@ describe('PerfilPopoverSupervisorComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PerfilPopoverSupervisorComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [PerfilPopoverSupervisorComponent,
+        ...IonicSharedComponents
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PerfilPopoverSupervisorComponent);

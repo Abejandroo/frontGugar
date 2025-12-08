@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { SupervisorNavbarComponent } from './supervisor-navbar.component';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 describe('SupervisorNavbarComponent', () => {
   let component: SupervisorNavbarComponent;
@@ -9,8 +9,9 @@ describe('SupervisorNavbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SupervisorNavbarComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [SupervisorNavbarComponent,
+        ...IonicSharedComponents
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SupervisorNavbarComponent);

@@ -1,3 +1,124 @@
-<p>
-  resultado-division-modal works!
-</p>
+    <ion-header>
+      <ion-toolbar color="success">
+        <ion-title>Resultado de la División</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrar()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <div class="resultado-container">
+        <ion-card class="resumen-card">
+          <ion-card-header>
+            <ion-card-title>{{ resultado.rutaOriginal.nombre }}</ion-card-title>
+            <ion-card-subtitle>
+              Día: {{ resultado.rutaOriginal.diaSemana }} | Total Clientes: {{ resultado.rutaOriginal.totalClientes }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ resultado.mensaje }}</p>
+            <ion-chip color="warning">
+              <ion-icon name="information-circle"></ion-icon>
+              <ion-label>Ruta original se marcará como "Dividida"</ion-label>
+            </ion-chip>
+          </ion-card-content>
+        </ion-card>
+        
+        <div class="subrutas-grid">
+          <ion-card class="subruta-card grupo-a-card">
+            <ion-card-header>
+              <ion-card-title>
+                <ion-icon name="people-outline"></ion-icon> {{ resultado.subRutaA.nombre }}
+              </ion-card-title>
+              <ion-card-subtitle>{{ resultado.subRutaA.totalClientes }} Clientes</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item lines="none">
+            <ion-label position="stacked">Asignar Repartidor (A)</ion-label>
+            <ion-select 
+                placeholder="Ninguno"
+                [(ngModel)]="idRepartidorASeleccionado"
+            >
+            <ion-select-option [value]="null">Sin asignar</ion-select-option>
+                    @for (rep of repartidores; track rep.id) {
+                      <ion-select-option [value]="rep.id">
+                        {{ rep.nombre }}
+                      </ion-select-option>
+                    }
+            </ion-select>
+        </ion-item>
+              <div class="metric-item">
+                <ion-icon name="map-outline"></ion-icon>
+                <span>Distancia: <strong>{{ resultado.subRutaA.distanciaKm }} km</strong></span>
+              </div>
+              <div class="metric-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>Tiempo Est.: <strong>{{ resultado.subRutaA.tiempoMinutos }} min</strong></span>
+              </div>
+              <ion-button expand="block" fill="clear" (click)="mostrarDetalle(resultado.subRutaA, 'Sub-Ruta A')">
+                Ver Clientes ({{resultado.subRutaA.totalClientes}})
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card class="subruta-card grupo-b-card">
+            <ion-card-header>
+              <ion-card-title>
+                <ion-icon name="people-outline"></ion-icon> {{ resultado.subRutaB.nombre }}
+              </ion-card-title>
+              <ion-card-subtitle>{{ resultado.subRutaB.totalClientes }} Clientes</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item lines="none">
+            <ion-label position="stacked">Asignar Repartidor (B)</ion-label>
+            <ion-select 
+                placeholder="Ninguno"
+                [(ngModel)]="idRepartidorBSeleccionado"
+            >
+                <ion-select-option [value]="null">Sin asignar</ion-select-option>
+                @for(rep of repartidores; track rep.id){
+                  <ion-select-option [value]="rep.id">
+                    {{ rep.nombre }}
+                  </ion-select-option>
+                }
+            </ion-select>
+        </ion-item>
+              <div class="metric-item">
+                <ion-icon name="map-outline"></ion-icon>
+                <span>Distancia: <strong>{{ resultado.subRutaB.distanciaKm }} km</strong></span>
+              </div>
+              <div class="metric-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>Tiempo Est.: <strong>{{ resultado.subRutaB.tiempoMinutos }} min</strong></span>
+              </div>
+              <ion-button expand="block" fill="clear" (click)="mostrarDetalle(resultado.subRutaB, 'Sub-Ruta B')">
+                Ver Clientes ({{resultado.subRutaB.totalClientes}})
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <ion-button 
+          expand="block" 
+          color="success" 
+          (click)="aceptarYGuardar()" 
+          class="btn-aceptar"
+        >
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          Confirmar y Guardar Sub-Rutas
+        </ion-button>
+
+        <ion-button 
+          expand="block" 
+          color="medium" 
+          fill="outline"
+          (click)="cerrar()" 
+          class="btn-cancelar"
+        >
+          Cancelar
+        </ion-button>
+      </div>
+    </ion-content>

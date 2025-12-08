@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   close, personOutline, callOutline, mailOutline, pricetagOutline,
@@ -12,13 +12,17 @@ import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
 import { RutaService } from 'src/app/service/ruta.service';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+
+// ✅ FIX: Declarar google como variable global
+declare var google: any;
 
 @Component({
   selector: 'app-agregar-cliente',
   templateUrl: './agregar-cliente.page.html',
   styleUrls: ['./agregar-cliente.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
 })
 export class AgregarClientePage implements OnInit {
 
@@ -29,18 +33,20 @@ export class AgregarClientePage implements OnInit {
   listaPrecios: any[] = [];
   rutasDisponibles: any[] = [];
 
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
+  // ✅ FIX: Valores iniciales SIN usar google.maps
+  center = { lat: 17.0732, lng: -96.7266 };
   zoom = 15;
-  markerPosition: google.maps.LatLngLiteral | undefined;
+  markerPosition: { lat: number; lng: number } | undefined;
 
-  mapOptions: google.maps.MapOptions = {
+  mapOptions = {
     disableDefaultUI: true,
     zoomControl: true,
     streetViewControl: false
   };
-  pinOptions: google.maps.MarkerOptions = {
-    draggable: false,
-    animation: google.maps.Animation.DROP,
+
+  // ✅ FIX: pinOptions sin Animation (se asigna en ngOnInit)
+  pinOptions: any = {
+    draggable: false
   };
 
   constructor(
@@ -64,8 +70,6 @@ export class AgregarClientePage implements OnInit {
       tipoPrecioId: [null, [Validators.required]],
       calle: ['', [Validators.required]],
       colonia: ['', [Validators.required]],
-
-      // CAMPOS OPCIONALES
       referencia: [''],
       latitud: [null],
       longitud: [null],
@@ -76,6 +80,15 @@ export class AgregarClientePage implements OnInit {
   }
 
   ngOnInit() {
+    // ✅ FIX: Configurar Animation DESPUÉS de que el componente se inicializa
+    // Para este momento, Google Maps ya debería estar cargado
+    if (typeof google !== 'undefined' && google.maps) {
+      this.pinOptions = {
+        draggable: false,
+        animation: google.maps.Animation.DROP
+      };
+    }
+
     this.cargarPreciosReales();
     this.cargarRutas();
     this.obtenerUbicacionActual();
@@ -114,7 +127,7 @@ export class AgregarClientePage implements OnInit {
     });
   }
 
-  agregarMarcador(event: google.maps.MapMouseEvent) {
+  agregarMarcador(event: any) {
     if (event.latLng) {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();

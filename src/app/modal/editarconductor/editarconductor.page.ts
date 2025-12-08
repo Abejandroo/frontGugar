@@ -8,7 +8,6 @@ import {
   Validators,
 } from '@angular/forms';
 import {
-  IonicModule,
   ModalController,
   NavParams,
   ToastController,
@@ -16,13 +15,14 @@ import {
 import { Auth } from 'src/app/service/auth';
 import { addIcons } from 'ionicons';
 import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-editarconductor',
   templateUrl: './editarconductor.page.html',
   styleUrls: ['./editarconductor.page.scss'],
   standalone: true,
-  imports: [IonicModule, ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [...IonicSharedComponents, ReactiveFormsModule, CommonModule, FormsModule],
 })
 export class EditarconductorPage {
   formUsuario!: FormGroup;

@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController, AlertController, LoadingController, ToastController, IonModal } from '@ionic/angular';
+import { ModalController, AlertController, LoadingController, ToastController, IonModal } from '@ionic/angular';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import * as XLSX from 'xlsx';
 import * as L from 'leaflet';
@@ -9,6 +9,7 @@ import { ImportService } from '../../service/import';
 import { ClienteImport, ImportResult } from '../../models/excel-import.model';
 import { CrearPrecioModalComponent } from '../crear-precio-modal/crear-precio-modal.component';
 import { GeocodingService } from 'src/app/service/geocoding.service';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 interface MapaRuta {
   dias: string;
@@ -22,7 +23,7 @@ interface MapaRuta {
   templateUrl: './importar-clientes-modal.component.html',
   styleUrls: ['./importar-clientes-modal.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [...IonicSharedComponents, CommonModule, FormsModule],
   animations: [
     trigger('slideIn', [
       transition(':enter', [

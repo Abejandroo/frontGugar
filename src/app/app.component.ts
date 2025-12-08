@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet, IonMenu, } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet,  } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
-import { MenuController, IonicModule } from '@ionic/angular';
+import { MenuController, } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   
@@ -79,7 +79,7 @@ import {
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [ IonApp, IonRouterOutlet, IonMenu,IonicModule ],
+  imports: [ IonApp, IonRouterOutlet, ],
   
 })
 export class AppComponent {
@@ -155,22 +155,6 @@ export class AppComponent {
   'information-circle': informationCircle,
 });
  }
-  isAdmin() {
-   return this.router.url.startsWith('/usuario/admin');
-  }
 
-  isInstructor() {
-    return this.router.url.startsWith('/dashboard') || this.router.url.startsWith('/docente');
-  }
-  isPadre() {
-    return this.router.url.startsWith('/padres-home') || this.router.url.startsWith('/padre');
-  }
-
-  isAlumno() {
-    return this.router.url.startsWith('/home');
-  }
-  toggleMenu() {
-    this.menu.toggle();
-  }
 
 }

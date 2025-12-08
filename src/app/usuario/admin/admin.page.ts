@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule, MenuController } from '@ionic/angular';
+import { MenuController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Auth } from 'src/app/service/auth';
 import { AdminNavbarComponent } from 'src/app/components/admin-navbar/admin-navbar.component';
 import { addIcons } from 'ionicons';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { 
   menu, logOutOutline, carSportOutline, timeOutline, 
   checkmarkCircleOutline, alertCircleOutline, close, 
@@ -16,13 +16,15 @@ import {
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { AgregarconductorPage } from 'src/app/modal/agregarconductor/agregarconductor.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, AdminNavbarComponent],
+  imports: [CommonModule, AdminNavbarComponent, ...IonicSharedComponents],
+  providers:[ModalController, PopoverController]
 })
 export class AdminPage  { 
 

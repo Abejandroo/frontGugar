@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { addIcons } from 'ionicons';
 import { circle } from 'leaflet';
 import { logOutOutline, person, personCircle } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 interface DiaRuta {
   id: number;
@@ -29,7 +30,7 @@ interface DiaRuta {
   templateUrl: './repartidor-rutas.page.html',
   styleUrls: ['./repartidor-rutas.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [CommonModule, ...IonicSharedComponents]
 })
 export class RepartidorRutasPage implements OnInit {
 

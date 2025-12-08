@@ -1,17 +1,18 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { PopoverController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { PerfilPopoverComponent } from '../perfil-popover/perfil-popover.component';
 import { addIcons } from 'ionicons';
 import { home, compass, people, settings, person } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-admin-navbar',
   templateUrl: './admin-navbar.component.html',
   styleUrls: ['./admin-navbar.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [ CommonModule, ...IonicSharedComponents]
 })
 export class AdminNavbarComponent {
 

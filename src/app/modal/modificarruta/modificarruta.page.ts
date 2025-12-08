@@ -1,18 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController, NavParams, ToastController } from '@ionic/angular';
+import { ModalController, NavParams, ToastController } from '@ionic/angular';
 import { close, trash, fingerPrint } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { Auth } from 'src/app/service/auth';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+
+// ✅ FIX: Declarar google como variable global
+declare var google: any;
 
 @Component({
   selector: 'app-modificarruta',
   templateUrl: './modificarruta.page.html',
   styleUrls: ['./modificarruta.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, GoogleMapsModule, ReactiveFormsModule],
+  imports: [...IonicSharedComponents, CommonModule, GoogleMapsModule, ReactiveFormsModule],
 })
 export class ModificarrutaPage  {
   
@@ -20,10 +24,11 @@ export class ModificarrutaPage  {
   rutaSeleccionada: any; 
   repartidores: any[] = []; 
 
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
+  // ✅ FIX: Valores iniciales SIN usar google.maps en la declaración
+  center = { lat: 17.0732, lng: -96.7266 };
   zoom = 14;
-  puntosRuta: google.maps.LatLngLiteral[] = [];
-  polylineOptions: google.maps.PolylineOptions = {
+  puntosRuta: { lat: number; lng: number }[] = [];
+  polylineOptions = {
     strokeColor: '#3880ff',
     strokeOpacity: 1.0,
     strokeWeight: 4,
@@ -90,7 +95,8 @@ export class ModificarrutaPage  {
     }
   }
 
-  agregarPuntoAlMapa(event: google.maps.MapMouseEvent) {
+  // ✅ FIX: Tipo cambiado de google.maps.MapMouseEvent a any
+  agregarPuntoAlMapa(event: any) {
     if (event.latLng) {
       const nuevoPunto = event.latLng.toJSON();
       this.puntosRuta.push(nuevoPunto);

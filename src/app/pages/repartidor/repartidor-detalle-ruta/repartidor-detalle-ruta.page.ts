@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
+import { ModalController, ToastController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RutaService } from 'src/app/service/ruta.service';
 import { GeolocationService } from 'src/app/service/geolocation.service';
@@ -12,13 +12,14 @@ import { ModalAgregarVentaPage } from '../modal-agregar-venta/modal-agregar-vent
 import { ModalEditarClientePage } from '../modal-editar-cliente/modal-editar-cliente.page';
 import { ModalSaltarClientePage } from '../modal-saltar-cliente/modal-saltar-cliente.page';
 import * as L from 'leaflet';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-repartidor-detalle-ruta',
   templateUrl: './repartidor-detalle-ruta.page.html',
   styleUrls: ['./repartidor-detalle-ruta.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [ CommonModule, ...IonicSharedComponents]
 })
 export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
 

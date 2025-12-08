@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
 import { PerfilPopoverComponent } from './perfil-popover.component';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 describe('PerfilPopoverComponent', () => {
   let component: PerfilPopoverComponent;
@@ -9,8 +8,10 @@ describe('PerfilPopoverComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PerfilPopoverComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [
+        PerfilPopoverComponent,
+        ...IonicSharedComponents
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PerfilPopoverComponent);

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
 import { addIcons } from 'ionicons';
@@ -13,13 +12,14 @@ import {
 } from 'ionicons/icons';
 import { MonitoreoRutaPage } from 'src/app/modal/monitoreo-ruta/monitoreo-ruta.page';
 import { RutaService } from 'src/app/service/ruta.service';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-rutas',
   templateUrl: './rutas.component.html',
   styleUrls: ['./rutas.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, SupervisorNavbarComponent]
+  imports: [ CommonModule, SupervisorNavbarComponent,...IonicSharedComponents]
 })
 export class RutasComponent implements OnInit {
 

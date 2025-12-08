@@ -1,16 +1,4 @@
 <ion-app>
-  @if (isAdmin()) {
-  <ion-menu side="start" menuId="admin-menu" contentId="main-content">
-  </ion-menu>
-  }
-  @if (isInstructor()) {
-  <ion-menu side="start" menuId="docente-menu" contentId="main-content">
-  </ion-menu>
-  }
-  @if (isPadre()) {
-  <ion-menu side="start" menuId="padre-menu" contentId="main-content">
-  </ion-menu>
-  }
   <div class="ion-page" id="main-content">
     <ion-router-outlet></ion-router-outlet>
   </div>

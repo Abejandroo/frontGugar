@@ -7,17 +7,18 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { IonicModule, ToastController, ModalController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
 import { close, eye, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Auth } from 'src/app/service/auth';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-agregarconductor',
   templateUrl: './agregarconductor.page.html',
   styleUrls: ['./agregarconductor.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AgregarconductorPage {
   formUsuario!: FormGroup;

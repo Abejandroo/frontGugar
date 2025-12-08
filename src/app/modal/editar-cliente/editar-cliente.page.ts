@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
+import { ModalController, ToastController, AlertController } from '@ionic/angular';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { addIcons } from 'ionicons';
 import {
@@ -12,13 +12,17 @@ import {
 import { ClienteService } from 'src/app/service/cliente.service';
 import { PrecioService } from 'src/app/service/precio';
 import { RutaService } from 'src/app/service/ruta.service';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+
+// ✅ FIX: Declarar google como variable global
+declare var google: any;
 
 @Component({
   selector: 'app-editar-cliente',
   templateUrl: './editar-cliente.page.html',
   styleUrls: ['./editar-cliente.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule, GoogleMapsModule]
 })
 export class EditarClientePage implements OnInit {
 
@@ -31,11 +35,14 @@ export class EditarClientePage implements OnInit {
 
   rutaActual: { rutaNombre: string; diaSemana: string; diaRutaId: number } | null = null;
 
-  center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
+  // ✅ FIX: Valores iniciales SIN usar google.maps en la declaración
+  center = { lat: 17.0732, lng: -96.7266 };
   zoom = 15;
-  markerPosition: google.maps.LatLngLiteral | undefined;
-  mapOptions: google.maps.MapOptions = { disableDefaultUI: true, zoomControl: true };
-  pinOptions: google.maps.MarkerOptions = { draggable: false, animation: google.maps.Animation.DROP };
+  markerPosition: { lat: number; lng: number } | undefined;
+  mapOptions = { disableDefaultUI: true, zoomControl: true };
+  
+  // ✅ FIX: pinOptions sin Animation (se asigna en ngOnInit)
+  pinOptions: any = { draggable: false };
 
   constructor(
     private fb: FormBuilder,
@@ -68,6 +75,14 @@ export class EditarClientePage implements OnInit {
   }
 
   ngOnInit() {
+    // ✅ FIX: Configurar Animation DESPUÉS de que el componente se inicializa
+    if (typeof google !== 'undefined' && google.maps) {
+      this.pinOptions = {
+        draggable: false,
+        animation: google.maps.Animation.DROP
+      };
+    }
+
     this.cargarPrecios();
     this.cargarRutas();
 
@@ -140,7 +155,8 @@ export class EditarClientePage implements OnInit {
     });
   }
 
-  agregarMarcador(event: google.maps.MapMouseEvent) {
+  // ✅ FIX: Tipo cambiado de google.maps.MapMouseEvent a any
+  agregarMarcador(event: any) {
     if (event.latLng) {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();

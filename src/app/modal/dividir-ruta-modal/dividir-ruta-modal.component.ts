@@ -1,16 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController, LoadingController, AlertController } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { close, cutOutline, peopleOutline } from 'ionicons/icons';
+import { ModalController, LoadingController, AlertController } from '@ionic/angular';
 import { ResultadoDivisionModalComponent } from '../resultado-division-modal/resultado-division-modal.component';
 import { RutaService } from 'src/app/service/ruta.service';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-dividir-ruta-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [...IonicSharedComponents, CommonModule, FormsModule],
   template: `
     <ion-header>
       <ion-toolbar color="warning">

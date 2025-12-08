@@ -1,17 +1,18 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import {  ModalController, ToastController } from '@ionic/angular';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { GeolocationService } from 'src/app/service/geolocation.service';
 import { ModalEditarVentaPage } from '../modal-editar-venta/modal-editar-venta.page';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-modal-editar-cliente',
   templateUrl: './modal-editar-cliente.page.html',
   styleUrls: ['./modal-editar-cliente.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule]
+  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents]
 })
 export class ModalEditarClientePage implements OnInit {
   

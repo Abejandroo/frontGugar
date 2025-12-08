@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, AlertController, ToastController, ModalController } from '@ionic/angular';
+import { AlertController, ToastController, ModalController } from '@ionic/angular';
 import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { DirectionsService } from 'src/app/service/directions.service';
@@ -27,13 +27,14 @@ import * as L from 'leaflet';
 import { DividirRutaModalComponent } from '../../modal/dividir-ruta-modal/dividir-ruta-modal.component';
 import { DetalleClienteModalComponent } from '../../modal/detalle-cliente-modal/detalle-cliente-modal.component';
 import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-detalle-ruta',
   templateUrl: './detalle-ruta.page.html',
   styleUrls: ['./detalle-ruta.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule,]
+  imports: [ CommonModule, FormsModule, ...IonicSharedComponents]
 })
 export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapaLeaflet', { static: false }) mapaElement!: ElementRef;

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ActionSheetController, ToastController } from '@ionic/angular';
+import {  ModalController, ActionSheetController, ToastController } from '@ionic/angular';
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
 import {
@@ -18,13 +18,16 @@ import {
   ClienteConRuta,
   DiaRutaConClientes
 } from '../../../models/clientes-agrupados.interface';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.page.html',
   styleUrls: ['./clientes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, AdminNavbarComponent]
+  imports: [ CommonModule, AdminNavbarComponent, ...IonicSharedComponents],
+    providers:[...IonicControllers]
 })
 export class ClientesPage implements OnInit {
 

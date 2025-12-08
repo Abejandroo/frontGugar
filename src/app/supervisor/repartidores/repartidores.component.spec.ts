@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { RepartidoresComponent } from './repartidores.component';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 describe('RepartidoresComponent', () => {
   let component: RepartidoresComponent;
@@ -9,8 +9,7 @@ describe('RepartidoresComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RepartidoresComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [RepartidoresComponent, ...IonicSharedComponents]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RepartidoresComponent);

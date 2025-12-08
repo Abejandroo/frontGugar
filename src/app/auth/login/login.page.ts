@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar, IonGrid, IonRow, IonCol, IonButtons, IonBackButton, IonItem, IonLabel, IonButton, IonIcon, IonInput, ToastController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { personOutline, lockOpenOutline, eyeOutline, eyeOffOutline, lockClosedOutline, arrowForwardOutline } from 'ionicons/icons';
 import { Auth } from 'src/app/service/auth';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonInput, IonIcon, IonButton,  IonItem, IonBackButton, IonButtons, IonContent, CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule,...IonicSharedComponents ],
+  // providers:[ToastController]
 })
 export class LoginPage {
   correo: string = '';

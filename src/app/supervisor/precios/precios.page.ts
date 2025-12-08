@@ -1,19 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, pricetag, createOutline, trashOutline, walletOutline, close } from 'ionicons/icons';
 import { AgregarprecioPage } from 'src/app/modal/agregarprecio/agregarprecio.page';
 import { EditarprecioPage } from 'src/app/modal/editarprecio/editarprecio.page';
 import { PrecioService } from 'src/app/service/precio';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-precios',
   templateUrl: './precios.page.html',
   styleUrls: ['./precios.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, AdminNavbarComponent]
+  imports: [CommonModule, AdminNavbarComponent, ...IonicSharedComponents],
+    providers:[...IonicControllers]
 })
 export class PreciosPage {
 

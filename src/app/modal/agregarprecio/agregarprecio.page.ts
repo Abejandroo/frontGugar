@@ -1,17 +1,18 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import {  ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close, pricetagOutline, cashOutline, saveOutline } from 'ionicons/icons';
 import { PrecioService } from 'src/app/service/precio';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-agregarprecio',
   templateUrl: './agregarprecio.page.html',
   styleUrls: ['./agregarprecio.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule] 
+  imports: [...IonicSharedComponents, CommonModule, FormsModule, ReactiveFormsModule] 
 })
 export class AgregarprecioPage  {
 

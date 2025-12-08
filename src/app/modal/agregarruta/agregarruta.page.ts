@@ -1,19 +1,20 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { close, trash, arrowUndo, saveOutline, searchOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Auth } from 'src/app/service/auth';
 import { RutaService } from 'src/app/service/ruta.service';
 import * as L from 'leaflet';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-agregarruta',
   templateUrl: './agregarruta.page.html',
   styleUrls: ['./agregarruta.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [...IonicSharedComponents, CommonModule, ReactiveFormsModule, FormsModule],
 })
 export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
 

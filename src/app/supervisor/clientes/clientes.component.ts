@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
@@ -17,13 +17,14 @@ import {
   ClienteConRuta,
   DiaRutaConClientes
 } from '../../models/clientes-agrupados.interface';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, SupervisorNavbarComponent]
+  imports: [CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents]
 })
 export class ClientesComponent implements OnInit {
 

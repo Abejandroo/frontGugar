@@ -1,18 +1,19 @@
 import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController, AlertController, ToastController } from '@ionic/angular';
+import { ModalController, AlertController, ToastController } from '@ionic/angular';
 import * as L from 'leaflet';
 import { addIcons } from 'ionicons';
 import {
   close, location, business, calendar, cash, document, trash,
   create, warning, card, documentText, person, listOutline
 } from 'ionicons/icons';
+import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 
 @Component({
   selector: 'app-detalle-cliente-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [...IonicSharedComponents, CommonModule, FormsModule],
   template: `
     <ion-header>
       <ion-toolbar>
