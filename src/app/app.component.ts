@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet, IonMenu, } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
-import { MenuController } from '@ionic/angular';
+import { MenuController, IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
+  
   personCircleOutline,
   homeOutline,
   settingsOutline,
@@ -78,7 +79,7 @@ import {
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [ IonApp, IonRouterOutlet, IonMenu, ],
+  imports: [ IonApp, IonRouterOutlet, IonMenu,IonicModule ],
   
 })
 export class AppComponent {

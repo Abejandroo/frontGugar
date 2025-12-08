@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class RutaService {
-  private url = 'http://localhost:3000';
+  private url = 'https://backgugar-production.up.railway.app';
 
   constructor(private http: HttpClient) { }
 

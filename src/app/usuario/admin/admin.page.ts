@@ -110,6 +110,7 @@ export class AdminPage  {
   irARutas() { this.router.navigate(['/gestion-rutas']); }
   irARepartidores() { this.router.navigate(['/conductores']); }
   async abrirModalCrearRuta() {
+    alert('¡Click recibido! Intentando abrir modal...');
      const modal = await this.modalCtrl.create({
       component: AgregarrutaPage,
     });

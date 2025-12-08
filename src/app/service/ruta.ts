@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class RutaService {
 
-  private apiUrl = 'http://localhost:3000/rutas'; // Ajusta a tu backend
+  private apiUrl = 'https://backgugar-production.up.railway.app/rutas'; // Ajusta a tu backend
 
   constructor(private http: HttpClient) { }
 

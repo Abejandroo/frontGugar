@@ -23,7 +23,7 @@ interface VentaReporte {
 })
 export class ReporteVentasService {
 
-  private url = 'http://localhost:3000';
+  private url = 'https://backgugar-production.up.railway.app';
 
   constructor(private http: HttpClient) {}
 

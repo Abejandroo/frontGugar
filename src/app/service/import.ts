@@ -12,7 +12,7 @@ import { ClienteImport, ImportResult } from '../models/excel-import.model';
 export class ImportService {
 
   // CONFIGURACIÓN
-  private apiUrl = 'http://localhost:3000'; 
+  private apiUrl = 'https://backgugar-production.up.railway.app'; 
 
   constructor(private http: HttpClient) { }
 

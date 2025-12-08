@@ -6,7 +6,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class Auth {
-  private apiUrl = 'http://localhost:3000'; 
+  private apiUrl = 'https://backgugar-production.up.railway.app';
 
   constructor(private http: HttpClient) { }
 
