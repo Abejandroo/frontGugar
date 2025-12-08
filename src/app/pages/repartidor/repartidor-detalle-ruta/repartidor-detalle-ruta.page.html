@@ -50,52 +50,45 @@
     </div>
     }
   </div>
-
-  <!-- BOTÓN INICIAR RUTA -->
-  @if (!rutaIniciada) {
+<ion-footer class="ion-no-border" style="background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);">
   <div class="ion-padding">
-    <ion-button expand="block" size="large" (click)="iniciarRuta()">
-      <ion-icon name="play-circle" slot="start"></ion-icon>
-      Iniciar Ruta
-    </ion-button>
-    <p class="ion-text-center">
-      <small>Se optimizará el recorrido según tu ubicación</small>
-    </p>
+    
+    <ion-item lines="none" class="switch-container" [color]="rutaIniciada ? 'light' : 'white'">
+      
+      <ion-icon 
+        [name]="rutaIniciada ? 'bicycle' : 'power'" 
+        [color]="rutaIniciada ? 'success' : 'medium'" 
+        slot="start" 
+        size="large">
+      </ion-icon>
+
+      <ion-label>
+        <h2 style="font-weight: bold; font-size: 18px;">
+          {{ rutaIniciada ? 'Ruta Activa' : 'Desconectado' }}
+        </h2>
+        
+        <p style="font-size: 12px; color: #666;">
+          @if (!rutaIniciada) {
+            Desliza para iniciar la ruta 🚚
+          } @else if (hayClientesPendientes) {
+            {{ clientesPendientesCount }} entregas pendientes 📦
+          } @else {
+            ¡Todo entregado! Apaga para terminar 🏁
+          }
+        </p>
+      </ion-label>
+
+      <ion-toggle 
+        slot="end"
+        color="success"
+        [checked]="rutaIniciada"
+        (ionChange)="onToggleRuta($event)"
+        style="transform: scale(1.2);"> </ion-toggle>
+
+    </ion-item>
+
   </div>
-  }
-
-  <!-- ✅ RUTA COMPLETADA - Todos los clientes visitados -->
-  @if (rutaIniciada && todosClientesVisitados) {
-  <ion-card color="success">
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="checkmark-circle"></ion-icon>
-        ¡Ruta Completada!
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div class="resumen-final">
-        <div class="resumen-item">
-          <span class="numero">{{ clientesCompletadosCount }}</span>
-          <span class="label">Ventas</span>
-        </div>
-        <div class="resumen-item">
-          <span class="numero">{{ clientesSaltadosCount }}</span>
-          <span class="label">Saltados</span>
-        </div>
-        <div class="resumen-item">
-          <span class="numero">{{ clientesOrdenados.length }}</span>
-          <span class="label">Total</span>
-        </div>
-      </div>
-
-      <ion-button expand="block" color="light" (click)="finalizarRuta()">
-        <ion-icon name="flag" slot="start"></ion-icon>
-        Finalizar Ruta
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-  }
+</ion-footer>
 
   <!-- CLIENTE ACTUAL -->
   @if (rutaIniciada && clienteActual) {
@@ -180,23 +173,5 @@
   </div>
   }
 
-  <!-- ✅ BOTÓN PAUSAR/FINALIZAR (footer fijo) -->
-  @if (rutaIniciada) {
-  <div class="footer-acciones">
-    @if (hayClientesPendientes) {
-    <!-- Si hay clientes pendientes, mostrar pausar -->
-    <ion-button expand="block" color="warning" (click)="pausarRuta()">
-      <ion-icon name="pause-circle" slot="start"></ion-icon>
-      Pausar Ruta ({{ clientesPendientesCount }} pendientes)
-    </ion-button>
-    } @else {
-    <!-- Si no hay pendientes, mostrar finalizar -->
-    <ion-button expand="block" color="success" (click)="finalizarRuta()">
-      <ion-icon name="flag" slot="start"></ion-icon>
-      Finalizar Ruta
-    </ion-button>
-    }
-  </div>
-  }
 
 </ion-content>

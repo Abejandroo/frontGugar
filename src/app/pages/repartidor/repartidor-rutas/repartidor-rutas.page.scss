@@ -304,4 +304,25 @@
       font-size: 1.2rem;
     }
   }
+  // Estilo para el botón flotante de ajustes
+.btn-flotante {
+  // Fondo BLANCO PURO
+  --background: #ffffff;
+  
+  // Icono AZUL (Usa el color primario de tu tema)
+  --color: var(--ion-color-primary);
+  
+  // Sombrita azul suave para que resalte del mapa o fondo
+  --box-shadow: 0 4px 15px rgba(var(--ion-color-primary-rgb), 0.3);
+  
+  // Opcional: Un bordecito muy sutil
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+  border-radius: 50%;
+
+  // Hacer el icono un poquito más grande si quieres
+  ion-icon {
+    font-size: 24px;
+    color: #ffffff;
+  }
+}
 }

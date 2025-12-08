@@ -6,7 +6,7 @@ import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { addIcons } from 'ionicons';
 import { circle } from 'leaflet';
-import { logOutOutline, person, personCircle } from 'ionicons/icons';
+import { logOutOutline, person, personCircle, mapOutline, personCircleOutline, peopleOutline, checkmarkDoneOutline, chevronForwardOutline, settingsOutline } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
 
@@ -51,7 +51,7 @@ export class RepartidorRutasPage implements OnInit {
     private toastController: ToastController,
     private authService: Auth,
   ) {
-    addIcons({ personCircle, logOutOutline, person });
+    addIcons({mapOutline,personCircleOutline,peopleOutline,checkmarkDoneOutline,chevronForwardOutline,settingsOutline,person,logOutOutline,personCircle});
     this.generarFechaActual();
   }
 

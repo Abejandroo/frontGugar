@@ -1,44 +1,15 @@
 <ion-content [fullscreen]="true" class="bg-light">
 
-  <!-- REFRESHER -->
   <ion-refresher slot="fixed" (ionRefresh)="cargarUsuarioYRutas()" class="custom-refresher">
     <ion-refresher-content coloring="white"></ion-refresher-content>
   </ion-refresher>
 
-  <!-- 1. ENCABEZADO AZUL -->
   <div class="main-header">
     <div class="header-content">
 
-      <!-- TOP BAR -->
       <div class="top-bar">
         <img src="./assets/logo.png" alt="Logo" class="mini-logo" />
-
-        <ion-button fill="clear" class="settings-btn" id="click-trigger">
-          <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
-        </ion-button>
-
-        <ion-popover #popover trigger="click-trigger" triggerAction="click" class="custom-popover">
-          <ng-template>
-            <div class="popover-content">
-
-              <div class="profile-section">
-                <div class="avatar-circle">
-                  <ion-icon name="person"></ion-icon>
-                </div>
-                <h3>{{ usuarioActual?.name || 'REPARTIDOR' }}</h3>
-                <p>Repartidor</p>
-              </div>
-
-              <div class="logout-section" (click)="popover.dismiss(); cerrarSesion()">
-                <ion-icon name="log-out-outline"></ion-icon>
-                <span>Cerrar Sesión</span>
-              </div>
-
-            </div>
-          </ng-template>
-        </ion-popover>
-
-      </div>
+        </div>
 
       <div class="text-container">
         <h2>👋 HOLA, {{ usuarioActual?.name || 'Repartidor' }}</h2>
@@ -46,77 +17,103 @@
         <p class="fecha"> Dias de reparto: {{ getDiaActual() }}</p>
         <div class="big-counter-box">
           <h1 class="big-number">{{ rutasDelDia.length }}</h1>
-                    <span class="counter-label">Rutas Asignadas Hoy</span>
+          <span class="counter-label">Rutas Asignadas Hoy</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="white-container">
-
     @if (cargando) {
-    }
+      }
     @else {
-    <div class="lista-container">
-      @if (rutasDelDia.length === 0) {
-      <div class="empty-state">
-        <ion-icon name="map-outline" size="large"></ion-icon>
-        <h3>No tienes rutas asignadas para hoy</h3>
-        <p>Contacta a tu supervisor o revisa otro día</p>
-      </div>
-      } @else {
-      @for (diaRuta of rutasDelDia; track diaRuta.id) {
-      <div class="clean-card" (click)="abrirRuta(diaRuta)">
-        <div class="status-strip" [ngClass]="getColorEstado(diaRuta.estado)"></div>
+      <div class="lista-container">
+        @if (rutasDelDia.length === 0) {
+          <div class="empty-state">
+            <ion-icon name="map-outline" size="large"></ion-icon>
+            <h3>No tienes rutas asignadas para hoy</h3>
+            <p>Contacta a tu supervisor o revisa otro día</p>
+          </div>
+        } @else {
+          @for (diaRuta of rutasDelDia; track diaRuta.id) {
+            <div class="clean-card" (click)="abrirRuta(diaRuta)">
+              <div class="status-strip" [ngClass]="getColorEstado(diaRuta.estado)"></div>
 
-        <div class="card-icon-box">
-          <ion-icon name="map-outline"></ion-icon>
-        </div>
+              <div class="card-icon-box">
+                <ion-icon name="map-outline"></ion-icon>
+              </div>
 
-        <div class="card-info">
-          <div class="card-header-row">
-            <h3 class="ruta-title">{{ diaRuta.ruta.nombre}} </h3>
-            <ion-badge mode="ios" [color]="getColorEstado(diaRuta.estado)" class="mini-badge">
-              <ion-icon [name]="getIconoEstado(diaRuta.estado)"
-                style="margin-right: 4px; font-size: 0.8rem;"></ion-icon>
-              {{ diaRuta.estado || 'PENDIENTE' | uppercase }}
-            </ion-badge>
-          </div>
-          <div class="meta-row">
-          </div>
-          <div class="meta-row">
-            <span>Ruta {{ diaRuta.ruta.id}} * {{diaRuta.diaSemana}}</span>
-          </div>
-          <div class="meta-row">
-            <ion-icon name="person-circle-outline"></ion-icon>
-            <span>Sup: {{ diaRuta.ruta.supervisor.name || 'Sin asignar' }}</span>
-          </div>
+              <div class="card-info">
+                <div class="card-header-row">
+                  <h3 class="ruta-title">{{ diaRuta.ruta.nombre}} </h3>
+                  <ion-badge mode="ios" [color]="getColorEstado(diaRuta.estado)" class="mini-badge">
+                    <ion-icon [name]="getIconoEstado(diaRuta.estado)" style="margin-right: 4px; font-size: 0.8rem;"></ion-icon>
+                    {{ diaRuta.estado || 'PENDIENTE' | uppercase }}
+                  </ion-badge>
+                </div>
+                
+                <div class="meta-row">
+                  <span>Ruta {{ diaRuta.ruta.id}} * {{diaRuta.diaSemana}}</span>
+                </div>
+                <div class="meta-row">
+                  <ion-icon name="person-circle-outline"></ion-icon>
+                  <span>Sup: {{ diaRuta.ruta.supervisor.name || 'Sin asignar' }}</span>
+                </div>
 
-          <div class="progress-section">
-            <div class="stats-text">
-              <span>
-                <ion-icon name="people-outline"></ion-icon>
-                {{ getClientesTotales(diaRuta) }} clientes
-              </span>
-              <span style="margin-left: auto;">
-                <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-                {{ getClientesCompletados(diaRuta) }} visitados
-              </span>
+                <div class="progress-section">
+                  <div class="stats-text">
+                    <span>
+                      <ion-icon name="people-outline"></ion-icon>
+                      {{ getClientesTotales(diaRuta) }} clientes
+                    </span>
+                    <span style="margin-left: auto;">
+                      <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+                      {{ getClientesCompletados(diaRuta) }} visitados
+                    </span>
+                  </div>
+                  <ion-progress-bar [value]="getClientesCompletados(diaRuta) / getClientesTotales(diaRuta)"
+                    [color]="getColorEstado(diaRuta.estado)">
+                  </ion-progress-bar>
+                </div>
+              </div>
+
+              <div class="arrow-container">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </div>
             </div>
-            <ion-progress-bar [value]="getClientesCompletados(diaRuta) / getClientesTotales(diaRuta)"
-              [color]="getColorEstado(diaRuta.estado)">
-            </ion-progress-bar>
-          </div>
-        </div>
-
-        <div class="arrow-container">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </div>
-
+          }
+        }
       </div>
-      }
-      }
-    </div>
     }
+    
     <div style="height: 100px;"></div>
   </div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="ion-margin">
+    
+    <ion-fab-button id="click-trigger" class="btn-flotante">
+      <ion-icon name="settings-outline"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab>
+
+  <ion-popover #popover trigger="click-trigger" triggerAction="click" class="custom-popover">
+    <ng-template>
+      <div class="popover-content">
+        <div class="profile-section">
+          <div class="avatar-circle">
+            <ion-icon name="person"></ion-icon>
+          </div>
+          <h3>{{ usuarioActual?.name || 'REPARTIDOR' }}</h3>
+          <p>Repartidor</p>
+        </div>
+
+        <div class="logout-section" (click)="popover.dismiss(); cerrarSesion()">
+          <ion-icon name="log-out-outline"></ion-icon>
+          <span>Cerrar Sesión</span>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
+
+</ion-content>

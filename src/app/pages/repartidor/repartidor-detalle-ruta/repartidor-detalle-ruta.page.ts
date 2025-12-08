@@ -14,13 +14,14 @@ import { ModalSaltarClientePage } from '../modal-saltar-cliente/modal-saltar-cli
 import * as L from 'leaflet';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
+import { IonToggle } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-repartidor-detalle-ruta',
   templateUrl: './repartidor-detalle-ruta.page.html',
   styleUrls: ['./repartidor-detalle-ruta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ...IonicSharedComponents],
+  imports: [IonToggle,  CommonModule, ...IonicSharedComponents],
   providers: [...IonicControllers]
 })
 export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
@@ -749,10 +750,61 @@ export class RepartidorDetalleRutaPage implements OnInit, AfterViewInit, OnDestr
   }
 
   volver() {
-    if (this.rutaIniciada && this.hayClientesPendientes) {
-      this.pausarRuta();
-    } else {
-      this.router.navigate(['/repartidor/rutas']);
+    this.router.navigate(['/repartidor/rutas']);
+  }
+  // =============================================================
+  // 🕹️ MANEJADOR DEL SWITCH (Interruptor Maestro)
+  // =============================================================
+
+  // Lógica de Pausa (Sin confirmaciones, directo al grano)
+  ejecutarPausaReal() {
+    this.mostrarToast('Pausando ruta...', 'warning');
+    this.rutasService.pausarDiaRuta(this.diaRuta.id).subscribe({
+      next: () => {
+        this.diaRuta.estado = 'pausada';
+        this.rutaIniciada = false; // Importante para que el switch sepa que se apagó
+        this.detenerSeguimiento();
+        this.router.navigate(['/repartidor/rutas']);
+      },
+      error: (err) => this.mostrarToast('Error al pausar', 'danger')
+    });
+  }
+
+  // Lógica de Fin (Directo al grano)
+  ejecutarFinReal() {
+    const visitados = this.clientesVisitadosCount;
+    const total = this.clientesOrdenados.length;
+    
+    this.mostrarToast('Finalizando ruta...', 'success');
+    this.rutasService.finalizarDiaRuta(this.diaRuta.id).subscribe({
+      next: async () => {
+        this.diaRuta.estado = 'completada';
+        this.rutaIniciada = false;
+        this.detenerSeguimiento();
+        if (this.vozHabilitada) await this.ttsService.anunciarFinRuta(visitados, total);
+        this.router.navigate(['/repartidor/rutas']);
+      },
+      error: (err) => this.mostrarToast('Error al finalizar', 'danger')
+    });
+  }
+  async onToggleRuta(event: any) {
+    const estaEncendido = event.detail.checked;
+
+    if (estaEncendido) {
+      // 🟢 SI LO PRENDES: INICIAR DIRECTO
+      if (!this.rutaIniciada) {
+        // CAMBIO AQUÍ: Llamamos a 'comenzarRuta' en vez de 'iniciarRuta'
+        // 'comenzarRuta' es la que tiene la lógica real sin alertas.
+        this.comenzarRuta(); 
+      }
+    } 
+    else {
+      // ⚫ SI LO APAGAS: PAUSAR O FINALIZAR
+      if (this.hayClientesPendientes) {
+        this.ejecutarPausaReal();
+      } else {
+        this.ejecutarFinReal();
+      }
     }
   }
 }
