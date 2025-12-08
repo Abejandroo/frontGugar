@@ -59,10 +59,12 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
                 placeholder="Ninguno"
                 [(ngModel)]="idRepartidorASeleccionado"
             >
-                <ion-select-option [value]="null">Sin asignar</ion-select-option>
-                <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
-                    {{ rep.nombre }}
-                </ion-select-option>
+            <ion-select-option [value]="null">Sin asignar</ion-select-option>
+                    @for (rep of repartidores; track rep.id) {
+                      <ion-select-option [value]="rep.id">
+                        {{ rep.nombre }}
+                      </ion-select-option>
+                    }
             </ion-select>
         </ion-item>
               <div class="metric-item">
@@ -94,9 +96,11 @@ addIcons({ close, trendingUpOutline, timeOutline, mapOutline, peopleOutline });
                 [(ngModel)]="idRepartidorBSeleccionado"
             >
                 <ion-select-option [value]="null">Sin asignar</ion-select-option>
-                <ion-select-option *ngFor="let rep of repartidores" [value]="rep.id">
+                @for(rep of repartidores; track rep.id){
+                  <ion-select-option [value]="rep.id">
                     {{ rep.nombre }}
-                </ion-select-option>
+                  </ion-select-option>
+                }
             </ion-select>
         </ion-item>
               <div class="metric-item">

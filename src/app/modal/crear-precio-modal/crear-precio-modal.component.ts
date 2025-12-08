@@ -43,8 +43,12 @@ import { ImportService } from '../../service/import';
     <ion-footer>
       <ion-toolbar>
         <ion-button expand="block" (click)="crear()" [disabled]="loading">
-          <ion-spinner *ngIf="loading"></ion-spinner>
-          <ion-icon *ngIf="!loading" name="checkmark" slot="start"></ion-icon>
+          @if(loading){
+            <ion-spinner></ion-spinner>
+          }
+          @if(!loading){
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+          }
           {{ loading ? 'Creando...' : 'Crear Precio' }}
         </ion-button>
       </ion-toolbar>
@@ -63,7 +67,7 @@ export class CrearPrecioModalComponent {
   constructor(
     private modalController: ModalController,
     private importService: ImportService
-  ) {}
+  ) { }
 
   async crear() {
     if (!this.tipoCompra.trim()) {
