@@ -11,6 +11,7 @@ import {
   bicycleOutline, personCircleOutline, arrowForward, leafOutline
 } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
+import { IonicControllers } from 'src/app/ionic-controller.providers';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,7 @@ import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
   styleUrls: ['./home.component.scss'],
   standalone: true,
   imports: [ CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents],
+  providers:[...IonicControllers]
 })
 export class HomeComponent implements OnInit {
 
