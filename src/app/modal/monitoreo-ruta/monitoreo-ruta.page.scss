@@ -1,52 +1,113 @@
-ion-content { --background: #f4f5f8; }
+ion-content {
+  --background: #f4f5f8;
+}
 
 .mapa-container {
-  height: 40vh; // 40% de la pantalla es mapa
+  height: 40vh;
   width: 100%;
   position: relative;
-  
+
   .map-controls {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    z-index: 1000; // Encima de Leaflet
+    z-index: 1000;
   }
 }
 
 .info-card {
   background: white;
   padding: 20px;
-  margin: -20px 15px 15px 15px; // Sube sobre el mapa
+  margin: -20px 15px 15px 15px;
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 1001;
 
-  h2 { margin: 0; font-size: 1.4rem; font-weight: 800; color: #333; }
-  .subtitulo { color: #666; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; margin-top: 5px;}
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #333;
+  }
+
+  .subtitulo {
+    color: #666;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+  }
 
   .stats-row {
-    display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+
     .stat {
       text-align: center;
-      strong { display: block; font-size: 1.2rem; color: #333; }
-      small { color: #999; font-size: 0.75rem; text-transform: uppercase; }
-      &.success strong { color: var(--ion-color-success); }
+
+      strong {
+        display: block;
+        font-size: 1.2rem;
+        color: #333;
+      }
+
+      small {
+        color: #999;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+
+      &.success strong {
+        color: var(--ion-color-success);
+      }
     }
   }
 }
 
 .lista-container {
   padding: 0 15px 20px 15px;
-  .lista-titulo { font-size: 1rem; font-weight: 700; color: #555; margin-bottom: 10px; margin-left: 5px; }
+
+  .lista-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
 
   ion-item {
-    --background: white; --border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    --background: white;
+    --border-radius: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+
     .orden-badge {
-      background: #e3f2fd; color: var(--ion-color-primary); width: 30px; height: 30px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;
+      background: #e3f2fd;
+      color: var(--ion-color-primary);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
-    h3 { font-size: 0.95rem; font-weight: 600; color: #333; }
-    p { font-size: 0.8rem; color: #666; }
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    p {
+      font-size: 0.8rem;
+      color: #666;
+    }
   }
 }

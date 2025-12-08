@@ -29,10 +29,8 @@ export class EditarClientePage implements OnInit {
   listaPrecios: any[] = [];
   rutasDisponibles: any[] = [];
 
-  // Info de ruta actual del cliente
   rutaActual: { rutaNombre: string; diaSemana: string; diaRutaId: number } | null = null;
 
-  // Mapa
   center: google.maps.LatLngLiteral = { lat: 17.0732, lng: -96.7266 };
   zoom = 15;
   markerPosition: google.maps.LatLngLiteral | undefined;
@@ -54,12 +52,11 @@ export class EditarClientePage implements OnInit {
       checkmarkCircle, businessOutline, calendarOutline, swapHorizontalOutline
     });
 
-    // ✅ Teléfono ahora es OPCIONAL
     this.formCliente = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       negocio: [''],
       cte: [''],
-      telefono: [''], // Sin Validators.required
+      telefono: [''],
       correo: ['', [Validators.email]],
       tipoPrecioId: [null, [Validators.required]],
       calle: ['', [Validators.required]],
@@ -77,7 +74,6 @@ export class EditarClientePage implements OnInit {
     if (this.cliente) {
       console.log('📝 Editando cliente:', this.cliente);
 
-      // Cargar datos del cliente
       this.formCliente.patchValue({
         nombre: this.cliente.nombre || '',
         negocio: this.cliente.negocio || '',
@@ -92,7 +88,6 @@ export class EditarClientePage implements OnInit {
         longitud: this.cliente.longitud
       });
 
-      // Si tiene ruta asignada, guardar la info
       if (this.cliente.ruta && this.cliente.diaRuta) {
         this.rutaActual = {
           rutaNombre: this.cliente.ruta.nombre,
@@ -101,7 +96,6 @@ export class EditarClientePage implements OnInit {
         };
       }
 
-      // Centrar mapa en ubicación del cliente
       if (this.cliente.latitud && this.cliente.longitud) {
         const pos = {
           lat: Number(this.cliente.latitud),
@@ -117,9 +111,8 @@ export class EditarClientePage implements OnInit {
     this.precioService.obtenerPrecios().subscribe({
       next: (res) => {
         this.listaPrecios = res;
-        console.log('💰 Precios cargados:', res);
       },
-      error: (err) => console.error('❌ Error cargando precios:', err)
+      error: (err) => console.error('Error cargando precios:', err)
     });
   }
 
@@ -142,9 +135,8 @@ export class EditarClientePage implements OnInit {
             });
           }
         });
-        console.log('🗺️ Rutas disponibles:', this.rutasDisponibles);
       },
-      error: (err) => console.error('❌ Error cargando rutas:', err)
+      error: (err) => console.error('Error cargando rutas:', err)
     });
   }
 
@@ -154,7 +146,6 @@ export class EditarClientePage implements OnInit {
       const lng = event.latLng.lng();
       this.markerPosition = { lat, lng };
       this.formCliente.patchValue({ latitud: lat, longitud: lng });
-      console.log('📍 Nueva ubicación:', { lat, lng });
     }
   }
 
@@ -163,19 +154,15 @@ export class EditarClientePage implements OnInit {
   }
 
   async actualizarCliente() {
-    console.log('🔄 Iniciando actualización...');
-    console.log('📋 Formulario válido:', this.formCliente.valid);
-    console.log('📋 Valores del formulario:', this.formCliente.value);
-    console.log('❌ Errores del formulario:', this.formCliente.errors);
+
 
     if (this.formCliente.invalid) {
       this.formCliente.markAllAsTouched();
 
-      // Mostrar campos con error
       Object.keys(this.formCliente.controls).forEach(key => {
         const control = this.formCliente.get(key);
         if (control?.invalid) {
-          console.log(`❌ Campo inválido: ${key}`, control.errors);
+          console.log(`Campo inválido: ${key}`, control.errors);
         }
       });
 
@@ -186,41 +173,36 @@ export class EditarClientePage implements OnInit {
     this.cargando = true;
     const formValue = this.formCliente.value;
 
-    // ✅ Preparar datos limpios (solo enviar lo que cambió)
     const datos: any = {
       nombre: formValue.nombre?.trim() || '',
       tipoPrecioId: Number(formValue.tipoPrecioId),
       calle: formValue.calle?.trim() || '',
       colonia: formValue.colonia?.trim() || '',
 
-      // ✅ Campos opcionales: enviar siempre (vacío, null, o con valor)
       negocio: formValue.negocio?.trim() || null,
       cte: formValue.cte ? Number(formValue.cte) : null,
-      telefono: formValue.telefono?.trim() || null, // ✅ Si está vacío, envía null
+      telefono: formValue.telefono?.trim() || null,
       correo: formValue.correo?.trim() || null,
       referencia: formValue.referencia?.trim() || null,
       latitud: formValue.latitud ? Number(formValue.latitud) : null,
       longitud: formValue.longitud ? Number(formValue.longitud) : null
     };
-    console.log('📤 Enviando al backend:', datos);
 
     this.clienteService.actualizarCliente(this.cliente.id, datos).subscribe({
       next: async (response) => {
         this.cargando = false;
-        console.log('✅ Respuesta del servidor:', response);
         await this.mostrarToast('Cliente actualizado correctamente', 'success');
         this.modalCtrl.dismiss({ actualizado: true });
       },
       error: async (err) => {
         this.cargando = false;
-        console.error('❌ Error completo:', err);
-        console.error('❌ Error.error:', err.error);
-        console.error('❌ Error.message:', err.message);
-        console.error('❌ Error.status:', err.status);
+        console.error('Error completo:', err);
+        console.error('Error.error:', err.error);
+        console.error('Error.message:', err.message);
+        console.error('Error.status:', err.status);
 
         let mensaje = 'Error al actualizar cliente';
 
-        // Manejar diferentes tipos de errores
         if (err.status === 400) {
           if (err.error?.message && Array.isArray(err.error.message)) {
             mensaje = err.error.message.join(', ');
@@ -282,7 +264,6 @@ export class EditarClientePage implements OnInit {
   async procesarCambioRuta(nuevoDiaRutaId: number | null) {
     this.cargando = true;
 
-    // Si es null, desasignar de ruta
     if (nuevoDiaRutaId === null && this.rutaActual) {
       this.rutaService.desasignarClienteDeRuta(this.cliente.id, this.rutaActual.diaRutaId).subscribe({
         next: async () => {
@@ -299,7 +280,6 @@ export class EditarClientePage implements OnInit {
       return;
     }
 
-    // Si hay ruta anterior, primero desasignar
     if (this.rutaActual) {
       this.rutaService.desasignarClienteDeRuta(this.cliente.id, this.rutaActual.diaRutaId).subscribe({
         next: () => {

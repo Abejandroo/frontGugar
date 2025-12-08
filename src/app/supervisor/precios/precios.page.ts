@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController } from '@ionic/angular'; // Quitamos Alert y ActionSheet
-import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
+import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, pricetag, createOutline, trashOutline, walletOutline, close } from 'ionicons/icons';
 import { AgregarprecioPage } from 'src/app/modal/agregarprecio/agregarprecio.page';
@@ -14,9 +13,9 @@ import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navb
   templateUrl: './precios.page.html',
   styleUrls: ['./precios.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule,  AdminNavbarComponent]
+  imports: [IonicModule, CommonModule, AdminNavbarComponent]
 })
-export class PreciosPage  {
+export class PreciosPage {
 
   precios: any[] = [];
   cargando: boolean = true;
@@ -50,10 +49,10 @@ export class PreciosPage  {
       component: AgregarprecioPage
     });
     await modal.present();
-    
+
     const { data } = await modal.onDidDismiss();
     if (data && (data.registrado || data.actualizado)) {
-      this.cargarPrecios(); 
+      this.cargarPrecios();
     }
   }
 
@@ -63,23 +62,22 @@ export class PreciosPage  {
       componentProps: { precio: precioSeleccionado }
     });
     await modal.present();
-    
+
     const { data } = await modal.onDidDismiss();
-    
+
     if (data && (data.registrado || data.actualizado)) {
-      this.cargarPrecios(); 
+      this.cargarPrecios();
     }
   }
   confirmarEliminar(precio: any) {
-    // window.confirm es del navegador, no depende de Ionic. ¡Siempre sale!
     if (window.confirm(`¿Estás seguro de eliminar "${precio.tipoCompra}"?`)) {
       this.eliminar(precio.id);
     }
   }
 
   eliminar(id: number) {
-    this.cargando = true; 
-    
+    this.cargando = true;
+
     this.precioService.eliminarPrecio(id).subscribe({
       next: () => {
         this.cargando = false;

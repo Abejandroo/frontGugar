@@ -13,13 +13,13 @@ interface DiaRuta {
   diaSemana: string;
   estado: string;
   dividida: boolean;
-  idRepartidor?: number | null; // Puede ser null si no está dividido y se usa la referencia de Ruta
-  clientesRuta: any[]; // Contiene la info de clientes asignados a este día
-  ruta: { // Asumimos que la relación 'ruta' viene cargada
+  idRepartidor?: number | null;
+  clientesRuta: any[];
+  ruta: {
     id: number;
     nombre: string;
-    idRepartidor?: number | null; // Repartidor asignado a la RUTA (general)
-    supervisor: { name: string } // Asumimos esta estructura
+    idRepartidor?: number | null;
+    supervisor: { name: string }
   }
 }
 
@@ -79,11 +79,10 @@ export class RepartidorRutasPage implements OnInit {
       return;
     }
 
-    // ⭐ CAMBIA ESTA LLAMADA para usar el nuevo endpoint que trae los DiaRuta
     this.rutasService.obtenerDiasrutasRepartidor(this.usuarioActual.id).subscribe({
       next: (diasRuta: any[]) => {
         this.diasRutaAsignados = diasRuta;
-        this.filtrarRutasPorDia(); // ⭐ Filtramos inmediatamente
+        this.filtrarRutasPorDia();
         this.cargando = false;
         console.log('diasRuta:', this.diasRutaAsignados, 'id usuario:', this.usuarioActual.id);
       },
@@ -117,15 +116,12 @@ export class RepartidorRutasPage implements OnInit {
     });
   }
 
-filtrarRutasPorDia() {
-    // 1. Solo filtramos por el día actual, ya que el backend maneja la lógica de asignación y división.
+  filtrarRutasPorDia() {
     this.rutasDelDia = this.diasRutaAsignados.filter((diaRuta: DiaRuta) => {
       return this.verificarSiEsHoyDiaVisita(diaRuta.diaSemana);
     });
-    
-    // Nota: La variable this.diasRutaAsignados ahora contiene los DiaRuta completos
-    // que cumplen con las condiciones de asignación, listos para ser filtrados por el día de visita.
-}
+
+  }
 
   verificarSiEsHoyDiaVisita(diaSemana: string): boolean {
     const hoy = new Date().getDay();

@@ -1,5 +1,3 @@
-// src/app/models/excel-import.model.ts
-
 export interface ClienteImport {
   numeroCliente: string;
   nombreNegocio?: string;

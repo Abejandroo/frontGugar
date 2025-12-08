@@ -1,54 +1,48 @@
-// ========================================
-// FUENTE GENERAL
-// ========================================
 * {
   font-family: 'Poppins', sans-serif;
 }
 
-// ========================================
-// CORRECCIONES DE Z-INDEX (PARA ALERTAS Y MODALES)
-// ========================================
 ion-alert {
   z-index: 20001 !important;
-  .alert-wrapper { 
-    z-index: 20002 !important; 
+
+  .alert-wrapper {
+    z-index: 20002 !important;
   }
 }
 
-ion-backdrop { 
-  z-index: 20000 !important; 
+ion-backdrop {
+  z-index: 20000 !important;
 }
 
 ion-action-sheet {
   z-index: 20001 !important;
-  .action-sheet-wrapper { 
-    z-index: 20002 !important; 
+
+  .action-sheet-wrapper {
+    z-index: 20002 !important;
   }
 }
 
 ion-modal {
   z-index: 20001 !important;
+
   .modal-wrapper {
     z-index: 20002 !important;
   }
 }
 
-// ========================================
-// HEADER AZUL CONSISTENTE
-// ========================================
 .toolbar-destacado {
   --background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
   --color: white;
   --border-width: 0;
   padding-top: env(safe-area-inset-top);
-  
+
   ion-title {
     font-size: 1.1rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  
+
   .btn-header {
     ion-icon {
       font-size: 24px;
@@ -57,15 +51,12 @@ ion-modal {
   }
 }
 
-// ========================================
-// NOMBRE DE LA RUTA (Header Style)
-// ========================================
 .nombre-section {
   padding: 20px 20px 25px 20px;
   background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
   color: white;
   position: relative;
-  
+
   .nombre-input {
     --background: rgba(255, 255, 255, 0.2);
     --color: white;
@@ -76,13 +67,13 @@ ion-modal {
     font-weight: 600;
     border-radius: 12px;
     margin-bottom: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
     &::part(native) {
       text-align: center;
     }
   }
-  
+
   .ruta-numero {
     color: rgba(255, 255, 255, 0.9);
     font-size: 14px;
@@ -94,9 +85,6 @@ ion-modal {
   }
 }
 
-// ========================================
-// CONTENEDOR BLANCO CON BORDE REDONDEADO
-// ========================================
 .contenido-principal {
   background: #f4f6fa;
   margin-top: -15px;
@@ -107,9 +95,6 @@ ion-modal {
   min-height: calc(100vh - 180px);
 }
 
-// ========================================
-// ASIGNACIONES (Supervisor/Repartidor)
-// ========================================
 .asignaciones-section {
   display: flex;
   gap: 12px;
@@ -120,10 +105,10 @@ ion-modal {
   margin-top: -15px;
   position: relative;
   z-index: 3;
-  
+
   .asignacion-col {
     flex: 1;
-    
+
     .asignacion-label {
       font-size: 11px;
       font-weight: 600;
@@ -132,7 +117,7 @@ ion-modal {
       letter-spacing: 0.8px;
       text-transform: uppercase;
     }
-    
+
     .select-personal {
       --background: #f4f6fa;
       --padding-start: 14px;
@@ -143,7 +128,7 @@ ion-modal {
       --color: #333;
       color: #333;
       min-height: 44px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
   }
 }
@@ -157,18 +142,17 @@ ion-modal {
   border-radius: 8px;
   font-size: 14px;
   color: var(--ion-color-dark);
-  
+
   ion-icon {
     font-size: 18px;
     color: var(--ion-color-medium);
   }
-  
+
   span {
     font-weight: 500;
   }
 }
 
-// Mensaje informativo de monitoreo
 .monitoreo-info {
   display: flex;
   align-items: center;
@@ -180,20 +164,17 @@ ion-modal {
   border-radius: 8px;
   font-size: 12px;
   color: var(--ion-color-medium);
-  
+
   ion-icon {
     font-size: 16px;
   }
 }
 
-// ========================================
-// SELECTOR DE DÍA
-// ========================================
 .dia-section {
   padding: 16px;
   background: white;
   border-bottom: 1px solid #e9ecef;
-  
+
   .dia-label {
     font-size: 11px;
     font-weight: 600;
@@ -202,7 +183,7 @@ ion-modal {
     letter-spacing: 0.8px;
     text-transform: uppercase;
   }
-  
+
   .select-dia {
     --background: #f4f6fa;
     --padding-start: 14px;
@@ -213,20 +194,17 @@ ion-modal {
     --color: #0099ff;
     color: #0099ff;
     min-height: 44px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 }
 
-// ========================================
-// MAPA FIJO CON ESTILO LIMPIO
-// ========================================
 .mapa-fijo {
   margin: 16px;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   background: white;
-  
+
   .mapa-header-info {
     display: flex;
     justify-content: space-between;
@@ -234,7 +212,7 @@ ion-modal {
     padding: 14px 16px;
     background: white;
     border-bottom: 1px solid #e9ecef;
-    
+
     .mapa-titulo {
       display: flex;
       align-items: center;
@@ -242,13 +220,13 @@ ion-modal {
       font-weight: 600;
       font-size: 14px;
       color: #333;
-      
-      ion-icon { 
+
+      ion-icon {
         color: #0099ff;
         font-size: 20px;
       }
     }
-    
+
     ion-badge {
       --background: #eaf6ff;
       --color: #0099ff;
@@ -257,42 +235,39 @@ ion-modal {
       font-size: 12px;
     }
   }
-  
+
   .leaflet-map {
     height: 280px;
     width: 100%;
   }
 }
 
-// ========================================
-// ESTADÍSTICAS MEJORADAS
-// ========================================
 .stats-section {
   padding: 16px;
   background: white;
   margin: 0 16px 16px 16px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
   .stats-cards {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    
+
     .stat-card {
       flex: 1;
       padding: 18px 12px;
       border-radius: 14px;
       text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
       .stat-numero {
         font-size: 32px;
         font-weight: 700;
         margin-bottom: 6px;
         line-height: 1;
       }
-      
+
       .stat-label {
         font-size: 11px;
         font-weight: 600;
@@ -300,27 +275,27 @@ ion-modal {
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
-      
-      &.visitados { 
-        background: linear-gradient(135deg, #34c759 0%, #30d158 100%); 
+
+      &.visitados {
+        background: linear-gradient(135deg, #34c759 0%, #30d158 100%);
         color: white;
       }
-      
-      &.pendientes { 
-        background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%); 
+
+      &.pendientes {
+        background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%);
         color: white;
       }
-      
-      &.total { 
-        background: linear-gradient(135deg, #0099ff 0%, #20b0ff 100%); 
+
+      &.total {
+        background: linear-gradient(135deg, #0099ff 0%, #20b0ff 100%);
         color: white;
       }
     }
   }
-  
+
   .progreso-bar {
     margin-bottom: 16px;
-    
+
     .progreso-texto {
       display: flex;
       justify-content: space-between;
@@ -328,21 +303,20 @@ ion-modal {
       font-size: 13px;
       font-weight: 500;
       color: #666;
-      
-      .progreso-porcentaje { 
-        font-weight: 700; 
+
+      .progreso-porcentaje {
+        font-weight: 700;
         color: #34c759;
       }
     }
-    
+
     ion-progress-bar {
       height: 6px;
       border-radius: 3px;
       --background: #e9ecef;
     }
   }
-  
-  // Botones de acción
+
   ion-button {
     --border-radius: 12px;
     font-weight: 600;
@@ -354,14 +328,11 @@ ion-modal {
   }
 }
 
-// ========================================
-// BUSCADOR LIMPIO
-// ========================================
 .search-section {
   padding: 16px;
   background: white;
   border-bottom: 1px solid #e9ecef;
-  
+
   ion-searchbar {
     --background: #f4f6fa;
     --color: #333;
@@ -369,16 +340,13 @@ ion-modal {
     --placeholder-color: #888;
     --border-radius: 12px;
     padding: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
 }
 
-// ========================================
-// SECCIÓN DE CLIENTES
-// ========================================
 .clientes-section {
   padding: 16px;
-  
+
   .clientes-header {
     display: flex;
     align-items: center;
@@ -401,9 +369,6 @@ ion-modal {
   }
 }
 
-// ========================================
-// CARD CLIENTE SELECCIONADO (DESTACADO)
-// ========================================
 .cliente-card.destacado {
   margin: 0 0 16px 0;
   border-radius: 16px;
@@ -427,7 +392,7 @@ ion-modal {
         display: flex;
         align-items: center;
         gap: 6px;
-        
+
         ion-icon {
           font-size: 16px;
         }
@@ -439,7 +404,8 @@ ion-modal {
         cursor: pointer;
         transition: color 0.2s;
 
-        &:hover, &:active {
+        &:hover,
+        &:active {
           color: #ff3b30;
         }
       }
@@ -454,7 +420,6 @@ ion-modal {
       align-items: flex-start;
       gap: 12px;
 
-      // Número de orden - Estilo badge grande
       .orden-numero {
         min-width: 48px;
         height: 48px;
@@ -470,7 +435,6 @@ ion-modal {
         flex-shrink: 0;
       }
 
-      // Datos del cliente
       .cliente-datos {
         flex: 1;
         min-width: 0;
@@ -500,7 +464,7 @@ ion-modal {
             font-size: 14px;
             color: #0099ff;
           }
-          
+
           span {
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -521,7 +485,7 @@ ion-modal {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          
+
           ion-badge {
             display: flex;
             align-items: center;
@@ -537,7 +501,6 @@ ion-modal {
         }
       }
 
-      // Botones de acción
       .botones-accion {
         flex-shrink: 0;
         display: flex;
@@ -559,7 +522,7 @@ ion-modal {
             font-size: 20px;
             color: #0099ff;
           }
-          
+
           &:last-child ion-icon {
             color: #ff3b30;
           }
@@ -569,9 +532,6 @@ ion-modal {
   }
 }
 
-// ========================================
-// LISTA DE CLIENTES (CARDS NORMALES)
-// ========================================
 .clientes-section ion-list {
   background: transparent;
   padding: 0;
@@ -601,7 +561,6 @@ ion-modal {
       border-color: #d0e8fb;
     }
 
-    // Número de orden circular
     .orden-circulo {
       min-width: 36px;
       height: 36px;
@@ -649,7 +608,7 @@ ion-modal {
           font-size: 12px;
           color: #0099ff;
         }
-        
+
         span {
           word-wrap: break-word;
           overflow-wrap: break-word;
@@ -666,17 +625,17 @@ ion-modal {
           border-radius: 12px;
           font-size: 0.75em;
           font-weight: 600;
-          
+
           &[color="primary"] {
             --background: #34c759;
             --color: white;
           }
-          
+
           &[color="danger"] {
             display: flex;
             align-items: center;
             gap: 4px;
-            
+
             ion-icon {
               font-size: 10px;
             }
@@ -685,13 +644,11 @@ ion-modal {
       }
     }
 
-    // Icono de visitado
     ion-icon[name="checkmark-circle"] {
       font-size: 24px;
       margin-left: 8px;
     }
 
-    // Estado visitado
     &.visitado {
       --background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
       border-color: rgba(52, 199, 89, 0.3);
@@ -701,7 +658,6 @@ ion-modal {
       }
     }
 
-    // Estado seleccionado
     &.seleccionado {
       --background: linear-gradient(135deg, white 0%, #eaf6ff 100%);
       border-color: #0099ff;
@@ -709,7 +665,6 @@ ion-modal {
     }
   }
 
-  // Opciones de deslizar
   ion-item-options {
     border-radius: 0 12px 12px 0;
 
@@ -723,9 +678,6 @@ ion-modal {
   }
 }
 
-// ========================================
-// ESTADO VACÍO
-// ========================================
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -751,19 +703,16 @@ ion-modal {
   }
 }
 
-// ========================================
-// CORRECCIONES DE MAPA LEAFLET
-// ========================================
 ::ng-deep {
   .custom-marker-icon {
     background: transparent !important;
     border: none !important;
-    
+
     .marker-custom {
       display: flex;
       justify-content: center;
       align-items: center;
-      
+
       .marker-numero {
         width: 36px;
         height: 36px;
@@ -780,11 +729,11 @@ ion-modal {
       }
     }
   }
-  
+
   .custom-repartidor-icon {
     background: transparent !important;
     border: none !important;
-    
+
     .marker-repartidor {
       width: 44px;
       height: 44px;
@@ -798,46 +747,45 @@ ion-modal {
       animation: pulse 2s infinite;
     }
   }
-  
+
   @keyframes pulse {
-    0%, 100% { 
+
+    0%,
+    100% {
       transform: scale(1);
       box-shadow: 0 4px 12px rgba(52, 199, 89, 0.5);
     }
-    50% { 
+
+    50% {
       transform: scale(1.15);
       box-shadow: 0 6px 16px rgba(52, 199, 89, 0.7);
     }
   }
 
-  // Popup del mapa
   .leaflet-popup-content-wrapper {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   .leaflet-popup-content {
     color: #333 !important;
     font-size: 13px;
     margin: 12px;
     font-family: 'Poppins', sans-serif;
-    
-    strong { 
+
+    strong {
       color: #000;
       font-weight: 600;
       display: block;
       margin-bottom: 4px;
     }
   }
-  
+
   .leaflet-popup-tip {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 }
 
-// ========================================
-// CORRECCIONES PARA ACTION SHEET
-// ========================================
 .custom-action-sheet {
   .action-sheet-wrapper {
     .action-sheet-container {
@@ -845,7 +793,7 @@ ion-modal {
         .action-sheet-button {
           color: #000 !important;
           font-weight: 500;
-          
+
           .action-sheet-button-inner {
             justify-content: center;
           }
@@ -855,37 +803,34 @@ ion-modal {
   }
 }
 
-// ========================================
-// ALERT PERSONALIZADA
-// ========================================
 .alert-eliminar-cliente {
   .alert-wrapper {
     border-radius: 16px;
-    
+
     .alert-head {
       padding: 20px 20px 16px 20px;
-      
+
       h2 {
         font-weight: 700;
         color: #333;
       }
     }
-    
+
     .alert-message {
       padding: 0 20px 20px 20px;
       color: #666;
       font-size: 14px;
       line-height: 1.6;
     }
-    
+
     .alert-button-group {
       .alert-button {
         font-weight: 600;
-        
+
         &[role="cancel"] {
           color: #666;
         }
-        
+
         &[role="destructive"] {
           color: #ff3b30;
         }
@@ -894,9 +839,6 @@ ion-modal {
   }
 }
 
-// ========================================
-// RESPONSIVE
-// ========================================
 @media (max-width: 576px) {
   .cliente-card.destacado {
     ion-card-content {
@@ -912,12 +854,12 @@ ion-modal {
             font-size: 1em;
           }
         }
-        
+
         .botones-accion {
           ion-button {
             height: 36px;
             width: 36px;
-            
+
             ion-icon {
               font-size: 18px;
             }

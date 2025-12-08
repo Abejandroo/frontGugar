@@ -1,4 +1,3 @@
-// src/app/components/opciones-ruta-modal/opciones-ruta-modal.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
@@ -42,7 +41,7 @@ import { IonicModule, ModalController } from '@ionic/angular';
 export class OpcionesRutaModalComponent {
   @Input() ruta: any;
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController) { }
 
   seleccionar(accion: string) {
     this.modalController.dismiss({ accion });

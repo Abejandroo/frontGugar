@@ -6,7 +6,6 @@ import { RutaService } from 'src/app/service/ruta.service';
 import { Auth } from 'src/app/service/auth';
 import { DirectionsService } from 'src/app/service/directions.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Geolocation } from '@capacitor/geolocation';
 import { addIcons } from 'ionicons';
 import {
   arrowBack,
@@ -49,11 +48,9 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   rutaId!: number;
   hayaCambios: boolean = false;
 
-  // Personal
   supervisores: any[] = [];
   repartidores: any[] = [];
 
-  // Día seleccionado
   diaSeleccionado: string = '';
   diasDisponibles: any[] = [];
   clientesDia: any[] = [];
@@ -62,24 +59,19 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   estadoDiaRuta: string = '';
   esHoyDiaDeVisita: boolean = false;
 
-  // Búsqueda
   textoBusqueda: string = '';
   clientesFiltrados: any[] = [];
 
-  // Cliente seleccionado
   clienteSeleccionado: any = null;
 
-  // Monitoreo
   monitoreando: boolean = false;
   watchId: string | null = null;
   markerRepartidor: L.Marker | null = null;
   private monitoreoInterval: any = null;
 
-  // Mapa Leaflet
   private mapa: L.Map | null = null;
   private markers: Map<number, L.Marker> = new Map();
 
-  // Stats
   totalClientes: number = 0;
   visitados: number = 0;
   pendientes: number = 0;
@@ -164,7 +156,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       if (this.diasDisponibles.length === 0) {
         this.diaSeleccionado = '';
         this.mostrarToast('Todos los días de esta ruta han sido divididos.', 'warning');
-        this.clientesDia = []; 
+        this.clientesDia = [];
         return;
       }
 
@@ -194,7 +186,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       next: (response) => {
         this.mostrarToast('Repartidor actualizado', 'success');
 
-        // Actualizar el día en el array local también
         const dia = this.diasDisponibles.find(d => d.id === this.diaRutaIdActual);
         if (dia) {
           dia.idRepartidor = nuevoRepartidorId;
@@ -209,7 +200,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   verificarSiEsHoyDiaVisita(diaSemana: string): boolean {
-    const hoy = new Date().getDay(); 
+    const hoy = new Date().getDay();
     const diaLower = diaSemana.toLowerCase();
     const mapaDias: { [key: number]: string[] } = {
       0: ['domingo'],
@@ -312,10 +303,6 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  // ========================================
-  // MAPA LEAFLET
-  // ========================================
-
   inicializarMapa() {
     if (this.mapa) this.mapa.remove();
     const mapElement = this.mapaElement?.nativeElement;
@@ -400,62 +387,59 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // ========================================
-  // MONITOREO EN TIEMPO REAL
-  // ========================================
 
- async iniciarMonitoreo() {
+  async iniciarMonitoreo() {
     if (this.monitoreando) {
-        this.detenerMonitoreo();
-        return;
+      this.detenerMonitoreo();
+      return;
     }
 
     if (!this.repartidorDiaId) {
-        this.mostrarToast('Asigna un repartidor para monitorear', 'warning');
-        return;
+      this.mostrarToast('Asigna un repartidor para monitorear', 'warning');
+      return;
     }
 
     this.monitoreando = true;
     this.mostrarToast('Monitoreando repartidor... (Actualizando cada 10s)', 'success');
 
     this.monitoreoInterval = setInterval(() => {
-        this.rutasService.obtenerUbicacionRepartidor(this.repartidorDiaId!).subscribe({
-            next: (posicion: { lat: number, lng: number }) => {
-                if (posicion && posicion.lat && posicion.lng) {
-                    this.actualizarPosicionRepartidor(posicion);
-                    this.mapa?.setView([posicion.lat, posicion.lng], 15);
-                }
-            },
-            error: (err) => {
-                console.warn('No se pudo obtener la ubicación del repartidor:', err);
-            }
-        });
-    }, 10000); 
+      this.rutasService.obtenerUbicacionRepartidor(this.repartidorDiaId!).subscribe({
+        next: (posicion: { lat: number, lng: number }) => {
+          if (posicion && posicion.lat && posicion.lng) {
+            this.actualizarPosicionRepartidor(posicion);
+            this.mapa?.setView([posicion.lat, posicion.lng], 15);
+          }
+        },
+        error: (err) => {
+          console.warn('No se pudo obtener la ubicación del repartidor:', err);
+        }
+      });
+    }, 10000);
 
-}
+  }
 
   detenerMonitoreo() {
     this.monitoreando = false;
 
     if (this.monitoreoInterval) {
-        clearInterval(this.monitoreoInterval);
-        this.monitoreoInterval = null;
+      clearInterval(this.monitoreoInterval);
+      this.monitoreoInterval = null;
     }
 
     if (this.markerRepartidor) {
-        this.markerRepartidor.remove();
-        this.markerRepartidor = null;
+      this.markerRepartidor.remove();
+      this.markerRepartidor = null;
     }
 
     this.mostrarToast('Monitoreo detenido', 'medium');
-}
+  }
 
-ngOnDestroy() {
+  ngOnDestroy() {
     this.detenerMonitoreo();
     if (this.mapa) {
-        this.mapa.remove();
+      this.mapa.remove();
     }
-}
+  }
 
   actualizarPosicionRepartidor(posicion: { lat: number; lng: number }) {
     if (!this.mapa) return;
@@ -481,17 +465,13 @@ ngOnDestroy() {
       icon: repartidorIcon
     })
       .bindPopup(`
-        <strong>🚗 ${this.ruta.repartidor?.name || 'Repartidor'}</strong><br>
+        <strong> ${this.ruta.repartidor?.name || 'Repartidor'}</strong><br>
         Ubicación en tiempo real
       `)
       .addTo(this.mapa);
 
-    console.log('📍 Posición actualizada:', posicion);
   }
 
-  // ========================================
-  // DIVIDIR RUTA
-  // ========================================
 
   async dividirRuta() {
     if (this.clientesDia.length < 4) {
@@ -532,7 +512,7 @@ ngOnDestroy() {
       }
 
     } catch (error) {
-      console.error('❌ Error abriendo modal dividir:', error);
+      console.error('Error abriendo modal dividir:', error);
       this.mostrarToast('Error al abrir el modal', 'danger');
     }
   }
@@ -592,9 +572,6 @@ ngOnDestroy() {
     }
   }
 
-  // ========================================
-  // EDICIÓN
-  // ========================================
 
   marcarCambio() {
     this.hayaCambios = true;
@@ -618,9 +595,6 @@ ngOnDestroy() {
     });
   }
 
-  // ========================================
-  // ACCIONES DE CLIENTES
-  // ========================================
 
   buscarCliente(event: any) {
     const busqueda = event.target.value.toLowerCase();
@@ -636,10 +610,6 @@ ngOnDestroy() {
     });
   }
 
-  // ========================================
-  // MODAL DETALLE CLIENTE (Reutiliza el existente)
-  // ========================================
-  // En DetalleRutaPage.ts
 
   async editarUbicacionCliente(clienteRuta: any) {
     try {
@@ -745,9 +715,6 @@ ngOnDestroy() {
     });
   }
 
-  // ========================================
-  // UTILIDADES
-  // ========================================
 
   async mostrarToast(msg: string, color: string) {
     const t = await this.toastController.create({

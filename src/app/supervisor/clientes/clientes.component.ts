@@ -1,21 +1,19 @@
-// src/app/supervisor/clientes/clientes.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { SupervisorNavbarComponent } from "src/app/components/supervisor-navbar/supervisor-navbar.component";
 import { ClienteService } from 'src/app/service/cliente.service';
 import { addIcons } from 'ionicons';
-import { 
-  searchOutline, mapOutline, personOutline, callOutline, 
+import {
+  searchOutline, mapOutline, personOutline, callOutline,
   createOutline, listOutline, arrowBackOutline, calendarOutline,
   add, trashOutline, close, trash
 } from 'ionicons/icons';
 import { EditarClientePage } from 'src/app/modal/editar-cliente/editar-cliente.page';
 import { AgregarClientePage } from 'src/app/modal/agregar-cliente/agregar-cliente.page';
-import { 
-  ClientesAgrupados, 
-  RutaConClientes, 
+import {
+  ClientesAgrupados,
+  RutaConClientes,
   ClienteConRuta,
   DiaRutaConClientes
 } from '../../models/clientes-agrupados.interface';
@@ -29,21 +27,17 @@ import {
 })
 export class ClientesComponent implements OnInit {
 
-  // Datos del supervisor
   supervisorId: number = 0;
   supervisorNombre: string = '';
 
-  // Datos de rutas y clientes
   datosAgrupados: ClientesAgrupados | null = null;
-  
-  // Ruta seleccionada
+
   rutaSeleccionada: RutaConClientes | null = null;
   diaSeleccionado: string = 'Lunes-Jueves';
-  
-  // Búsqueda
+
   terminoBusqueda: string = '';
   busquedaClientesRuta: string = '';
-  
+
   cargando: boolean = true;
 
   constructor(
@@ -51,8 +45,8 @@ export class ClientesComponent implements OnInit {
     private modalCtrl: ModalController,
     private toastCtrl: ToastController
   ) {
-    addIcons({ 
-      searchOutline, mapOutline, personOutline, callOutline, 
+    addIcons({
+      searchOutline, mapOutline, personOutline, callOutline,
       createOutline, listOutline, arrowBackOutline, calendarOutline,
       add, trashOutline, close, trash
     });
@@ -63,7 +57,6 @@ export class ClientesComponent implements OnInit {
     this.cargarRutas();
   }
 
-  // Obtener datos del supervisor del localStorage
   cargarDatosSupervisor() {
     const usuarioStr = localStorage.getItem('usuario');
     if (usuarioStr) {
@@ -73,7 +66,6 @@ export class ClientesComponent implements OnInit {
     }
   }
 
-  // Cargar rutas asignadas al supervisor
   cargarRutas() {
     if (!this.supervisorId) {
       this.mostrarToast('No se pudo identificar al supervisor', 'danger');
@@ -95,7 +87,6 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  // Seleccionar una ruta para ver sus clientes
   seleccionarRuta(ruta: RutaConClientes) {
     this.rutaSeleccionada = ruta;
     if (ruta.diasRuta.length > 0) {
@@ -103,75 +94,66 @@ export class ClientesComponent implements OnInit {
     }
   }
 
-  // Volver a la lista de rutas
   volverARutas() {
     this.rutaSeleccionada = null;
     this.terminoBusqueda = '';
     this.busquedaClientesRuta = '';
   }
 
-  // Cambiar día de visita
   cambiarDia(event: any) {
     this.diaSeleccionado = event.detail.value;
     this.busquedaClientesRuta = '';
   }
 
-  // Buscar rutas
   buscar(event: any) {
     this.terminoBusqueda = event.target.value?.toLowerCase() || '';
   }
 
-  // Buscar clientes dentro de la ruta
   buscarClienteEnRuta(event: any) {
     this.busquedaClientesRuta = event.target.value?.toLowerCase() || '';
   }
 
-  // Obtener rutas filtradas
   get rutasFiltradas(): RutaConClientes[] {
     if (!this.datosAgrupados) return [];
-    
+
     if (!this.terminoBusqueda) {
       return this.datosAgrupados.asignados;
     }
 
     const termino = this.terminoBusqueda.toLowerCase();
-    return this.datosAgrupados.asignados.filter(r => 
+    return this.datosAgrupados.asignados.filter(r =>
       r.nombre.toLowerCase().includes(termino) ||
       r.numeroRuta.toLowerCase().includes(termino) ||
       (r.repartidor && r.repartidor.nombre.toLowerCase().includes(termino))
     );
   }
 
-  // Obtener clientes del día seleccionado
   get clientesDelDiaSeleccionado(): ClienteConRuta[] {
     if (!this.rutaSeleccionada) return [];
     const dia = this.rutaSeleccionada.diasRuta.find(d => d.diaSemana === this.diaSeleccionado);
-    
+
     if (!dia) return [];
-    
-    // Aplicar filtro de búsqueda
+
     if (!this.busquedaClientesRuta) {
       return dia.clientes;
     }
 
     const termino = this.busquedaClientesRuta.toLowerCase();
-    return dia.clientes.filter(c => 
-      c.nombre.toLowerCase().includes(termino) || 
+    return dia.clientes.filter(c =>
+      c.nombre.toLowerCase().includes(termino) ||
       (c.negocio && c.negocio.toLowerCase().includes(termino)) ||
       (c.telefono && c.telefono.includes(termino))
     );
   }
 
-  // Obtener iniciales
   obtenerIniciales(nombre: string): string {
     if (!nombre) return '';
     const partes = nombre.split(' ');
-    return partes.length >= 2 
-      ? (partes[0][0] + partes[1][0]).toUpperCase() 
+    return partes.length >= 2
+      ? (partes[0][0] + partes[1][0]).toUpperCase()
       : nombre.substring(0, 2).toUpperCase();
   }
 
-  // Modal editar cliente
   async abrirModalEditar(cliente: ClienteConRuta) {
     const modal = await this.modalCtrl.create({
       component: EditarClientePage,
@@ -182,7 +164,6 @@ export class ClientesComponent implements OnInit {
     if (data?.actualizado) this.cargarRutas();
   }
 
-  // Obtener color del badge de día
   getColorDia(dia: string): string {
     const colores: { [key: string]: string } = {
       'Lunes-Jueves': 'primary',
@@ -192,12 +173,11 @@ export class ClientesComponent implements OnInit {
     return colores[dia] || 'medium';
   }
 
-  // Modal agregar cliente
   async abrirModalCrear() {
     const modal = await this.modalCtrl.create({
       component: AgregarClientePage,
       componentProps: {
-        supervisorId: this.supervisorId // Pasar el ID del supervisor
+        supervisorId: this.supervisorId
       }
     });
     await modal.present();
@@ -205,7 +185,6 @@ export class ClientesComponent implements OnInit {
     if (data?.registrado) this.cargarRutas();
   }
 
-  // Confirmar eliminación de cliente
   async confirmarEliminar(cliente: ClienteConRuta) {
     const toast = await this.toastCtrl.create({
       header: 'Confirmar eliminación',
@@ -233,7 +212,6 @@ export class ClientesComponent implements OnInit {
     await toast.present();
   }
 
-  // Eliminar cliente
   eliminar(id: number) {
     this.cargando = true;
     this.clienteService.eliminarCliente(id).subscribe({
@@ -262,7 +240,6 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  // Mostrar toast
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastCtrl.create({
       message: mensaje,

@@ -1,5 +1,3 @@
-// src/app/services/import.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -11,8 +9,7 @@ import { ClienteImport, ImportResult } from '../models/excel-import.model';
 })
 export class ImportService {
 
-  // CONFIGURACIÓN
-  private apiUrl = 'http://localhost:3000'; 
+  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) { }
 
@@ -22,7 +19,7 @@ export class ImportService {
     fechaReporte: string,
     nombreRuta: string,
     supervisorId?: number,
-    repartidorId?: number  
+    repartidorId?: number
   ): Observable<ImportResult> {
 
 
@@ -33,7 +30,6 @@ export class ImportService {
       'Miércoles - Sábado': 'IS'
     };
 
-    //Envia al backend
     const payload = {
       fechaReporte: fechaReporte,
       nombreRuta: nombreRuta,
@@ -52,7 +48,7 @@ export class ImportService {
         precioGarrafon: c.precioGarrafon.toString(),
         esCredito: c.esCredito,
         requiereFactura: c.requiereFactura,
-        diasVisita: diasACodigoMap[c.diasVisita[0]], // Solo envía la ruta asignada (ej: "Lunes-Jueves")
+        diasVisita: diasACodigoMap[c.diasVisita[0]],
         ordenVisita: c.ordenVisita.toString()
       }))
     };
@@ -65,7 +61,7 @@ export class ImportService {
       .pipe(
         map(response => ({
           success: response.success || true,
-          message: response.message || '✅ Importación exitosa',
+          message: response.message || 'Importación exitosa',
           totalRows: clientes.length,
           processedRows: response.clientesCreados || clientes.length,
           errors: response.errors || [],
@@ -76,7 +72,7 @@ export class ImportService {
           detalles: response.detalles
         })),
         catchError(error => {
-          console.error('❌ Error importando:', error);
+          console.error('Error importando:', error);
           return of({
             success: false,
             message: error.error?.message || 'Error al importar clientes',
@@ -91,28 +87,22 @@ export class ImportService {
 
 
 
-  /**
-   * Verificar conexión con el backend
-   */
   verificarConexion(): Observable<boolean> {
 
 
     return this.http.get(`${this.apiUrl}/rutas`, { observe: 'response' })
       .pipe(
         map(response => {
-          console.log('✅ Backend conectado:', response.status);
+          console.log(' Backend conectado:', response.status);
           return true;
         }),
         catchError(error => {
-          console.error('❌ Backend no disponible:', error.message);
+          console.error('Backend no disponible:', error.message);
           return of(false);
         })
       );
   }
 
-  /**
-   * Obtener todas las rutas (opcional)
-   */
   getRutas(): Observable<any[]> {
 
     return this.http.get<any[]>(`${this.apiUrl}/rutas`)
@@ -124,9 +114,6 @@ export class ImportService {
       );
   }
 
-  /**
-   * Obtener detalles de una ruta específica
-   */
   getRutaDetalle(rutaId: number): Observable<any> {
 
 
@@ -139,9 +126,6 @@ export class ImportService {
       );
   }
 
-  /**
-   * Obtener clientes de un día de ruta específico
-   */
   getClientesDiaRuta(diaRutaId: number): Observable<any[]> {
 
 
@@ -154,9 +138,6 @@ export class ImportService {
       );
   }
 
-  /**
-   * Eliminar una ruta completa (con sus días y clientes)
-   */
   eliminarRuta(rutaId: number): Observable<any> {
 
 
@@ -169,38 +150,26 @@ export class ImportService {
       );
   }
 
-  /**
- * Verificar si un precio existe en la BD
- */
-verificarPrecioExiste(precio: number): Observable<boolean> {
-  return this.http.get<boolean>(`${this.apiUrl}/precios/verificar/${precio}`)
-    .pipe(catchError(() => of(false)));
-}
+  verificarPrecioExiste(precio: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/precios/verificar/${precio}`)
+      .pipe(catchError(() => of(false)));
+  }
 
-/**
- * Crear un nuevo precio
- */
-crearPrecio(precioPorGarrafon: number, tipoCompra: string): Observable<any> {
-  return this.http.post(`${this.apiUrl}/precios`, {
-    precioPorGarrafon,
-    tipoCompra
-  });
-}
+  crearPrecio(precioPorGarrafon: number, tipoCompra: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/precios`, {
+      precioPorGarrafon,
+      tipoCompra
+    });
+  }
 
-/**
- * Obtener lista de supervisores
- */
-getSupervisores(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl}/usuarios/supervisores`)
-    .pipe(catchError(() => of([])));
-}
+  getSupervisores(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios/supervisores`)
+      .pipe(catchError(() => of([])));
+  }
 
-/**
- * Obtener lista de repartidores
- */
-getRepartidores(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl}/usuarios/repartidores`)
-    .pipe(catchError(() => of([])));
-}
+  getRepartidores(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios/repartidores`)
+      .pipe(catchError(() => of([])));
+  }
 
 }

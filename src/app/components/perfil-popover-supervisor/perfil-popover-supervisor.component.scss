@@ -1,12 +1,11 @@
 ion-footer {
-  background: transparent; 
+  background: transparent;
   padding: 0;
-  // Un margen abajo para que no pegue con el borde de la pantalla en iOS modernos
-  padding-bottom: env(safe-area-inset-bottom); 
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .navbar-container {
-  background-color: #dceeff; // Azul clarito de fondo
+  background-color: #dceeff;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   height: 70px;
@@ -14,14 +13,14 @@ ion-footer {
   justify-content: space-around;
   align-items: center;
   padding: 0 10px;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333; 
+  color: #333;
   padding: 10px;
   border-radius: 20px;
   transition: all 0.3s ease;
@@ -31,12 +30,12 @@ ion-footer {
     font-size: 1.6rem;
   }
 
-  // Estado ACTIVO (La píldora azul fuerte)
+  // Estado ACTIVO 
   &.active {
-    background-color: #90c2ff; 
-    color: #0044aa; 
-    padding: 8px 16px; 
-    gap: 8px; 
+    background-color: #90c2ff;
+    color: #0044aa;
+    padding: 8px 16px;
+    gap: 8px;
 
     span {
       font-weight: 700;
@@ -47,6 +46,13 @@ ion-footer {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

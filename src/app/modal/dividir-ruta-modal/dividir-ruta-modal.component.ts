@@ -348,7 +348,6 @@ import { RutaService } from 'src/app/service/ruta.service';
   `]
 })
 export class DividirRutaModalComponent {
-  // **NUEVOS INPUTS**
   @Input() rutaId!: number;
   @Input() diaRutaId!: number;
 
@@ -364,9 +363,9 @@ export class DividirRutaModalComponent {
 
   constructor(
     private modalController: ModalController,
-    private rutasService: RutaService, // **Inyectar el servicio**
-    private loadingController: LoadingController, // Para la carga
-    private alertController: AlertController // Para errores
+    private rutasService: RutaService,
+    private loadingController: LoadingController,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -375,93 +374,82 @@ export class DividirRutaModalComponent {
 
   esValido(): boolean {
     const pc = this.puntoCorte;
-    // Debe haber al menos 2 clientes en cada grupo
     return pc >= 2 && pc <= this.totalClientes - 2;
   }
 
-async calcular() {
-  if (!this.esValido()) {
-    return;
-  }
+  async calcular() {
+    if (!this.esValido()) {
+      return;
+    }
 
-  // Validación de IDs
-  const rutaIdNum = Number(this.rutaId);
-  const diaRutaIdNum = Number(this.diaRutaId);
+    const rutaIdNum = Number(this.rutaId);
+    const diaRutaIdNum = Number(this.diaRutaId);
 
-  if (rutaIdNum <= 0 || diaRutaIdNum <= 0 || isNaN(rutaIdNum) || isNaN(diaRutaIdNum)) {
-    const alert = await this.alertController.create({
-      header: 'Error de Datos',
-      message: 'Los IDs de Ruta y Día de Ruta son obligatorios y deben ser números válidos.',
-      buttons: ['OK'],
-    });
-    await alert.present();
-    return;
-  }
-
-  const loading = await this.loadingController.create({
-    message: 'Calculando rutas optimizadas...',
-  });
-  await loading.present();
-
-  // 🆕 Guardar los datos originales
-  const datosOriginales = {
-    rutaId: this.rutaId,
-    diaRutaId: this.diaRutaId,
-    puntoCorte: this.puntoCorte,
-    diaSemana: this.diaSemana,
-  };
-
-  this.rutasService.dividirRuta(datosOriginales).subscribe({
-    next: async (resultado) => {
-      await loading.dismiss();
-
-      // Mostrar modal de resultados
-      const modalResultados = await this.mostrarResultados(resultado, datosOriginales); // 🆕 Pasar datos
-
-      // Esperar a que el modal de resultados se cierre
-      const { data } = await modalResultados.onWillDismiss();
-
-      // 🆕 Si viene cerrarTodos, cerrar también este modal
-      if (data?.cerrarTodos || data?.recargar) {
-          console.log('🔄 Cerrando modal dividir-ruta con recargar=true');
-
-        this.modalController.dismiss({ recargar: true });
-      } else {
-        // Cierre normal sin recarga
-          console.log('❌ Cerrando modal dividir-ruta sin recargar');
-
-        this.modalController.dismiss();
-      }
-    },
-    error: async (err) => {
-      await loading.dismiss();
-      console.error('Error al dividir la ruta:', err);
-
-      const mensaje = err.error?.message || 'Ocurrió un error al calcular las sub-rutas.';
+    if (rutaIdNum <= 0 || diaRutaIdNum <= 0 || isNaN(rutaIdNum) || isNaN(diaRutaIdNum)) {
       const alert = await this.alertController.create({
-        header: 'Error',
-        message: mensaje,
+        header: 'Error de Datos',
+        message: 'Los IDs de Ruta y Día de Ruta son obligatorios y deben ser números válidos.',
         buttons: ['OK'],
       });
       await alert.present();
+      return;
     }
-  });
-}
 
-// 🆕 MODIFICAR método mostrarResultados
-async mostrarResultados(resultado: any, datosOriginales: any) { // 🆕 Agregar parámetro
-  const modal = await this.modalController.create({
-    component: ResultadoDivisionModalComponent,
-    componentProps: {
-      resultado: resultado,
-      datosOriginales: datosOriginales // 🆕 Pasar datos originales
-    },
-    cssClass: 'auto-height-modal',
-  });
-  await modal.present();
+    const loading = await this.loadingController.create({
+      message: 'Calculando rutas optimizadas...',
+    });
+    await loading.present();
 
-  return modal;
-}
+    const datosOriginales = {
+      rutaId: this.rutaId,
+      diaRutaId: this.diaRutaId,
+      puntoCorte: this.puntoCorte,
+      diaSemana: this.diaSemana,
+    };
+
+    this.rutasService.dividirRuta(datosOriginales).subscribe({
+      next: async (resultado) => {
+        await loading.dismiss();
+
+        const modalResultados = await this.mostrarResultados(resultado, datosOriginales); // 🆕 Pasar datos
+        const { data } = await modalResultados.onWillDismiss();
+        if (data?.cerrarTodos || data?.recargar) {
+          console.log('🔄 Cerrando modal dividir-ruta con recargar=true');
+
+          this.modalController.dismiss({ recargar: true });
+        } else {
+          console.log('❌ Cerrando modal dividir-ruta sin recargar');
+          this.modalController.dismiss();
+        }
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        console.error('Error al dividir la ruta:', err);
+
+        const mensaje = err.error?.message || 'Ocurrió un error al calcular las sub-rutas.';
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: mensaje,
+          buttons: ['OK'],
+        });
+        await alert.present();
+      }
+    });
+  }
+
+  async mostrarResultados(resultado: any, datosOriginales: any) {
+    const modal = await this.modalController.create({
+      component: ResultadoDivisionModalComponent,
+      componentProps: {
+        resultado: resultado,
+        datosOriginales: datosOriginales
+      },
+      cssClass: 'auto-height-modal',
+    });
+    await modal.present();
+
+    return modal;
+  }
 
   cerrar() {
     this.modalController.dismiss();

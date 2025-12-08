@@ -25,11 +25,8 @@ export class ReporteVentasService {
 
   private url = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  /**
-   * Obtiene las ventas de la semana actual
-   */
   obtenerVentasSemana(): Observable<any[]> {
     const hoy = new Date();
     const inicioSemana = this.getInicioSemana(hoy);
@@ -40,20 +37,13 @@ export class ReporteVentasService {
     );
   }
 
-  /**
-   * Obtiene las ventas de una semana específica
-   */
   obtenerVentasPorRango(inicio: Date, fin: Date): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.url}/ventas/rango?inicio=${inicio.toISOString()}&fin=${fin.toISOString()}`
     );
   }
 
-  /**
-   * Genera y descarga el Excel de ventas semanales
-   */
   async generarExcelSemanal(ventas: any[]): Promise<void> {
-    // Transformar datos para el Excel
     const datosExcel = ventas.map(v => ({
       'ID': v.id,
       'Fecha': new Date(v.fecha).toLocaleDateString('es-MX'),
@@ -71,46 +61,41 @@ export class ReporteVentasService {
       'Motivo Salto': v.motivoSalto || ''
     }));
 
-    // Crear workbook
     const wb = XLSX.utils.book_new();
-    
-    // ===== HOJA 1: VENTAS DETALLADAS =====
+
     const ws = XLSX.utils.json_to_sheet(datosExcel);
-    
-    // Ajustar ancho de columnas
+
     ws['!cols'] = [
-      { wch: 6 },   // ID
-      { wch: 12 },  // Fecha
-      { wch: 10 },  // Hora
-      { wch: 25 },  // Cliente
-      { wch: 20 },  // Negocio
-      { wch: 30 },  // Dirección
-      { wch: 20 },  // Colonia
-      { wch: 20 },  // Ruta
-      { wch: 18 },  // Día
-      { wch: 10 },  // Cantidad
-      { wch: 14 },  // Precio Unitario
-      { wch: 12 },  // Total
-      { wch: 12 },  // Estado
-      { wch: 25 },  // Motivo Salto
+      { wch: 6 },
+      { wch: 12 },
+      { wch: 10 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 18 },
+      { wch: 10 },
+      { wch: 14 },
+      { wch: 12 },
+      { wch: 12 },
+      { wch: 25 },
     ];
 
     XLSX.utils.book_append_sheet(wb, ws, 'Ventas');
 
-    // ===== HOJA 2: RESUMEN POR RUTA =====
     const resumenRutas = this.generarResumenPorRuta(ventas);
     const wsRutas = XLSX.utils.json_to_sheet(resumenRutas);
     wsRutas['!cols'] = [
-      { wch: 25 },  // Ruta
-      { wch: 18 },  // Clientes Visitados
-      { wch: 10 },  // Ventas
-      { wch: 10 },  // Saltados
-      { wch: 12 },  // Garrafones
-      { wch: 15 },  // Ingresos
+      { wch: 25 },
+      { wch: 18 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 12 },
+      { wch: 15 },
     ];
     XLSX.utils.book_append_sheet(wb, wsRutas, 'Por Ruta');
 
-    // ===== HOJA 3: RESUMEN GENERAL =====
     const resumen = this.generarResumen(ventas);
     const wsResumen = XLSX.utils.json_to_sheet(resumen);
     wsResumen['!cols'] = [
@@ -119,17 +104,13 @@ export class ReporteVentasService {
     ];
     XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen General');
 
-    // Generar nombre de archivo con fecha
     const hoy = new Date();
     const nombreArchivo = `Ventas_Semana_${this.formatearFechaArchivo(hoy)}.xlsx`;
 
-    // Descargar
     XLSX.writeFile(wb, nombreArchivo);
   }
 
-  /**
-   * Genera el resumen de ventas
-   */
+
   private generarResumen(ventas: any[]): any[] {
     const ventasRealizadas = ventas.filter(v => v.estado === 'realizado');
     const ventasSaltadas = ventas.filter(v => v.estado === 'saltado');
@@ -137,7 +118,6 @@ export class ReporteVentasService {
     const totalGarrafones = ventasRealizadas.reduce((sum, v) => sum + v.cantidadVendida, 0);
     const totalIngresos = ventasRealizadas.reduce((sum, v) => sum + parseFloat(v.total), 0);
 
-    // Agrupar por día
     const ventasPorDia: { [key: string]: number } = {};
     const ingresosPorDia: { [key: string]: number } = {};
 
@@ -148,14 +128,14 @@ export class ReporteVentasService {
     });
 
     const resumen = [
-      { 'Concepto': '📊 RESUMEN SEMANAL', 'Valor': '' },
+      { 'Concepto': 'RESUMEN SEMANAL', 'Valor': '' },
       { 'Concepto': '', 'Valor': '' },
       { 'Concepto': 'Total Ventas Realizadas', 'Valor': ventasRealizadas.length },
       { 'Concepto': 'Total Clientes Saltados', 'Valor': ventasSaltadas.length },
       { 'Concepto': 'Total Garrafones Vendidos', 'Valor': totalGarrafones },
       { 'Concepto': 'Total Ingresos', 'Valor': `$${totalIngresos.toFixed(2)}` },
       { 'Concepto': '', 'Valor': '' },
-      { 'Concepto': '📅 VENTAS POR DÍA', 'Valor': '' },
+      { 'Concepto': 'VENTAS POR DÍA', 'Valor': '' },
     ];
 
     Object.keys(ventasPorDia).forEach(dia => {
@@ -172,28 +152,25 @@ export class ReporteVentasService {
     return resumen;
   }
 
-  /**
-   * Genera resumen por ruta
-   */
   private generarResumenPorRuta(ventas: any[]): any[] {
     const ventasRealizadas = ventas.filter(v => v.estado === 'realizado');
     const ventasSaltadas = ventas.filter(v => v.estado === 'saltado');
 
-    // Agrupar por ruta
-    const rutasMap: { [key: string]: {
-      nombre: string;
-      garrafones: number;
-      ingresos: number;
-      ventasRealizadas: number;
-      clientesSaltados: number;
-      clientes: Set<string>;
-    }} = {};
+    const rutasMap: {
+      [key: string]: {
+        nombre: string;
+        garrafones: number;
+        ingresos: number;
+        ventasRealizadas: number;
+        clientesSaltados: number;
+        clientes: Set<string>;
+      }
+    } = {};
 
-    // Procesar ventas realizadas
     ventasRealizadas.forEach(v => {
       const rutaNombre = v.clienteRuta?.diaRuta?.ruta?.nombre || 'Sin Ruta';
       const clienteNombre = v.clienteRuta?.cliente?.representante || 'N/A';
-      
+
       if (!rutasMap[rutaNombre]) {
         rutasMap[rutaNombre] = {
           nombre: rutaNombre,
@@ -204,18 +181,17 @@ export class ReporteVentasService {
           clientes: new Set()
         };
       }
-      
+
       rutasMap[rutaNombre].garrafones += v.cantidadVendida;
       rutasMap[rutaNombre].ingresos += parseFloat(v.total);
       rutasMap[rutaNombre].ventasRealizadas++;
       rutasMap[rutaNombre].clientes.add(clienteNombre);
     });
 
-    // Procesar ventas saltadas
     ventasSaltadas.forEach(v => {
       const rutaNombre = v.clienteRuta?.diaRuta?.ruta?.nombre || 'Sin Ruta';
       const clienteNombre = v.clienteRuta?.cliente?.representante || 'N/A';
-      
+
       if (!rutasMap[rutaNombre]) {
         rutasMap[rutaNombre] = {
           nombre: rutaNombre,
@@ -226,25 +202,23 @@ export class ReporteVentasService {
           clientes: new Set()
         };
       }
-      
+
       rutasMap[rutaNombre].clientesSaltados++;
       rutasMap[rutaNombre].clientes.add(clienteNombre);
     });
 
-    // Convertir a array para Excel
     const resumenRutas: any[] = [
-      { 
-        'Ruta': '🚚 RESUMEN POR RUTA', 
-        'Clientes Visitados': '', 
+      {
+        'Ruta': 'RESUMEN POR RUTA',
+        'Clientes Visitados': '',
         'Ventas': '',
         'Saltados': '',
-        'Garrafones': '', 
-        'Ingresos': '' 
+        'Garrafones': '',
+        'Ingresos': ''
       },
       { 'Ruta': '', 'Clientes Visitados': '', 'Ventas': '', 'Saltados': '', 'Garrafones': '', 'Ingresos': '' },
     ];
 
-    // Ordenar rutas por ingresos (de mayor a menor)
     const rutasOrdenadas = Object.values(rutasMap).sort((a, b) => b.ingresos - a.ingresos);
 
     let totalGeneralGarrafones = 0;
@@ -270,10 +244,9 @@ export class ReporteVentasService {
       totalGeneralClientes += ruta.clientes.size;
     });
 
-    // Agregar totales
     resumenRutas.push({ 'Ruta': '', 'Clientes Visitados': '', 'Ventas': '', 'Saltados': '', 'Garrafones': '', 'Ingresos': '' });
     resumenRutas.push({
-      'Ruta': '📊 TOTAL GENERAL',
+      'Ruta': 'TOTAL GENERAL',
       'Clientes Visitados': totalGeneralClientes,
       'Ventas': totalGeneralVentas,
       'Saltados': totalGeneralSaltados,
@@ -284,28 +257,23 @@ export class ReporteVentasService {
     return resumenRutas;
   }
 
-  /**
-   * Elimina ventas antiguas (más de 7 días)
-   */
+
   eliminarVentasAntiguas(): Observable<any> {
     return this.http.delete(`${this.url}/ventas/limpiar-antiguas`);
   }
 
-  // ========================================
-  // HELPERS
-  // ========================================
 
   private getInicioSemana(fecha: Date): Date {
     const d = new Date(fecha);
     const dia = d.getDay();
-    const diff = d.getDate() - dia + (dia === 0 ? -6 : 1); // Lunes como inicio
+    const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
   }
 
   private getFinSemana(fecha: Date): Date {
     const inicio = this.getInicioSemana(fecha);
     const fin = new Date(inicio);
-    fin.setDate(fin.getDate() + 6); // Domingo
+    fin.setDate(fin.getDate() + 6);
     fin.setHours(23, 59, 59, 999);
     return fin;
   }
@@ -323,16 +291,12 @@ export class ReporteVentasService {
     }
   }
 
-  /**
-   * Verifica si hoy es domingo (día de generar reporte)
-   */
+
   esHoyDomingo(): boolean {
     return new Date().getDay() === 0;
   }
 
-  /**
-   * Obtiene la fecha del último domingo
-   */
+
   getUltimoDomingo(): Date {
     const hoy = new Date();
     const dia = hoy.getDay();

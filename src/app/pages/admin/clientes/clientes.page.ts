@@ -1,5 +1,3 @@
-// src/app/pages/clientes/clientes.page.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ActionSheetController, ToastController } from '@ionic/angular';
@@ -30,20 +28,15 @@ import {
 })
 export class ClientesPage implements OnInit {
 
-  // Segmento principal
   segmentoActivo: 'asignados' | 'noAsignados' = 'asignados';
 
-  // Datos agrupados
   datosAgrupados: ClientesAgrupados | null = null;
 
-  // Para filtrado
   terminoBusqueda: string = '';
 
-  // Ruta seleccionada para mostrar detalles
   rutaSeleccionada: RutaConClientes | null = null;
   diaSeleccionado: string = 'Lunes-Jueves';
 
-  // Búsqueda de clientes dentro de la ruta
   busquedaClientesRuta: string = '';
 
   cargando: boolean = true;
@@ -80,25 +73,16 @@ export class ClientesPage implements OnInit {
     });
   }
 
-  // Cambiar segmento principal
   cambiarSegmento(event: any) {
     this.segmentoActivo = event.detail.value;
     this.rutaSeleccionada = null;
     this.terminoBusqueda = '';
   }
 
-  // Seleccionar una ruta para ver sus clientes
   seleccionarRuta(ruta: RutaConClientes) {
     this.rutaSeleccionada = ruta;
-
-    // 💡 Filtrar los días antes de seleccionar el día por defecto
     const diasNoDivididos = ruta.diasRuta.filter(dia => dia.dividida === false || dia.dividida === 0);
-    
-
-    // Reemplazar la lista de días de la ruta seleccionada con la lista filtrada
     this.rutaSeleccionada.diasRuta = diasNoDivididos as DiaRutaConClientes[];
-
-    // Seleccionar el primer día disponible (que ahora es uno no dividido)
     if (diasNoDivididos.length > 0) {
       this.diaSeleccionado = diasNoDivididos[0].diaSemana;
     } else {
@@ -107,32 +91,27 @@ export class ClientesPage implements OnInit {
     }
   }
 
-  // Volver a la lista de rutas
   volverARutas() {
     this.rutaSeleccionada = null;
     this.terminoBusqueda = '';
-    this.busquedaClientesRuta = ''; // Limpiar búsqueda de clientes
+    this.busquedaClientesRuta = '';
   }
 
-  // Cambiar día de visita
   cambiarDia(event: any) {
     this.diaSeleccionado = event.detail.value;
-    this.busquedaClientesRuta = ''; // Limpiar búsqueda al cambiar de día
+    this.busquedaClientesRuta = '';
   }
 
-  // Buscar clientes dentro de la ruta
   buscarClienteEnRuta(event: any) {
     this.busquedaClientesRuta = event.target.value?.toLowerCase() || '';
   }
 
-  // Obtener clientes del día seleccionado
   get clientesDelDiaSeleccionado(): ClienteConRuta[] {
     if (!this.rutaSeleccionada) return [];
     const dia = this.rutaSeleccionada.diasRuta.find(d => d.diaSemana === this.diaSeleccionado);
 
     if (!dia) return [];
 
-    // Aplicar filtro de búsqueda
     if (!this.busquedaClientesRuta) {
       return dia.clientes;
     }
@@ -145,7 +124,6 @@ export class ClientesPage implements OnInit {
     );
   }
 
-  // Obtener clientes no asignados filtrados
   get clientesNoAsignadosFiltrados(): ClienteConRuta[] {
     if (!this.datosAgrupados) return [];
 
@@ -161,7 +139,6 @@ export class ClientesPage implements OnInit {
     );
   }
 
-  // Obtener rutas filtradas
   get rutasFiltradas(): RutaConClientes[] {
     if (!this.datosAgrupados) return [];
 
@@ -176,12 +153,10 @@ export class ClientesPage implements OnInit {
     );
   }
 
-  // Buscar
   buscar(event: any) {
     this.terminoBusqueda = event.target.value?.toLowerCase() || '';
   }
 
-  // Obtener iniciales
   obtenerIniciales(nombre: string): string {
     if (!nombre) return '';
     const partes = nombre.split(' ');
@@ -190,7 +165,6 @@ export class ClientesPage implements OnInit {
       : nombre.substring(0, 2).toUpperCase();
   }
 
-  // Modal crear cliente
   async abrirModalCrear() {
     const modal = await this.modalCtrl.create({
       component: AgregarClientePage
@@ -200,7 +174,6 @@ export class ClientesPage implements OnInit {
     if (data?.registrado) this.cargarDatos();
   }
 
-  // Modal editar cliente
   async abrirModalEditar(cliente: ClienteConRuta) {
     const modal = await this.modalCtrl.create({
       component: EditarClientePage,
@@ -211,7 +184,6 @@ export class ClientesPage implements OnInit {
     if (data?.actualizado) this.cargarDatos();
   }
 
-  // Confirmar eliminación
   async confirmarEliminar(cliente: ClienteConRuta) {
     const toast = await this.toastCtrl.create({
       header: 'Confirmar eliminación',
@@ -239,7 +211,6 @@ export class ClientesPage implements OnInit {
     await toast.present();
   }
 
-  // Eliminar cliente
   eliminar(id: number) {
     this.cargando = true;
     this.clienteService.eliminarCliente(id).subscribe({
@@ -268,7 +239,6 @@ export class ClientesPage implements OnInit {
     });
   }
 
-  // Obtener color del badge de día
   getColorDia(dia: string): string {
     const colores: { [key: string]: string } = {
       'Lunes-Jueves': 'primary',
@@ -279,12 +249,12 @@ export class ClientesPage implements OnInit {
   }
 
   async mostrarToast(msg: string, color: string) {
-    const toast = await this.toastCtrl.create({
-      message: msg,
-      duration: 2500,
-      color,
-      position: 'top' // o 'bottom'
-    });
-    toast.present();
-  }
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 2500,
+      color,
+      position: 'top'
+    });
+    toast.present();
+  }
 }

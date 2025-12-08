@@ -9,9 +9,8 @@
 
 // --- HEADER AZUL ---
 .main-header {
-  // Gradiente azul (Mismo que las otras pantallas)
   background: linear-gradient(180deg, #0099ff 0%, #20b0ff 100%);
-  padding: 40px 20px 80px 20px; // Más alto porque es el Login/Home
+  padding: 40px 20px 80px 20px;
   color: white;
   position: relative;
   z-index: 1;
@@ -19,25 +18,37 @@
 
   .top-bar {
     margin-bottom: 20px;
+
     .main-logo {
-      height: 100px; // Logo más grande para impacto inicial
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      height: 100px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     }
   }
 
   .text-container {
-    h2 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
-    p { margin: 5px 0 0 0; font-size: 1rem; opacity: 0.9; font-weight: 300; }
+    h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    p {
+      margin: 5px 0 0 0;
+      font-size: 1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
   }
 }
 
 // --- CONTENEDOR BLANCO ---
 .white-container {
   background: #f4f6fa;
-  margin-top: -50px; // Overlap pronunciado
+  margin-top: -50px;
   border-top-left-radius: 35px;
   border-top-right-radius: 35px;
-  min-height: 80vh; // Cubre el resto
+  min-height: 80vh;
   position: relative;
   z-index: 2;
   padding: 30px 20px;
@@ -71,15 +82,26 @@
 
   // CAJA DE IMAGEN (Izquierda)
   .role-icon-box {
-    width: 70px; height: 70px;
+    width: 70px;
+    height: 70px;
     border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px;
-    
+
     // Variantes de color de fondo sutil según el rol
-    &.blue { background: #e3f2fd; }   // Repartidor
-    &.purple { background: #f3e5f5; } // Supervisor
-    &.dark { background: #eceff1; }   // Admin
+    &.blue {
+      background: #e3f2fd;
+    }
+
+    &.purple {
+      background: #f3e5f5;
+    }
+
+    &.dark {
+      background: #eceff1;
+    }
 
     img {
       width: 100%;
@@ -91,12 +113,14 @@
   // INFO (Centro)
   .role-info {
     flex: 1;
+
     h3 {
       margin: 0 0 4px 0;
       font-size: 1.1rem;
       font-weight: 700;
       color: #333;
     }
+
     p {
       margin: 0;
       font-size: 0.85rem;
@@ -108,8 +132,7 @@
   .arrow-box {
     color: #ccc;
     font-size: 1.4rem;
-    display: flex; align-items: center;
+    display: flex;
+    align-items: center;
   }
 }
-
-// ---

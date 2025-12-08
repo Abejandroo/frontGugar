@@ -1,5 +1,3 @@
-// src/app/components/importar-clientes-modal/importar-clientes-modal.component.ts
-
 import { Component, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,9 +9,6 @@ import { ImportService } from '../../service/import';
 import { ClienteImport, ImportResult } from '../../models/excel-import.model';
 import { CrearPrecioModalComponent } from '../crear-precio-modal/crear-precio-modal.component';
 import { GeocodingService } from 'src/app/service/geocoding.service';
-
-
-
 
 interface MapaRuta {
   dias: string;
@@ -45,33 +40,25 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
   @ViewChild('editModal') editModal!: IonModal;
 
-  // Propiedades principales
   archivoSeleccionado: File | null = null;
   datosExcel: ClienteImport[] = [];
   mostrarVistaPrevia: boolean = false;
   fechaReporte: string = '';
   loading: boolean = false;
 
-  // Control de tabs
   tabSeleccionado: string = '0';
 
-  // Mapas por día de visita
   mapasRutas: MapaRuta[] = [];
   clienteSeleccionado: ClienteImport | null = null;
 
-  // Control de vista de cards
   mostrarTodasCards: boolean = false;
 
-  // Modal de edición
   mostrarModalEdicion: boolean = false;
   clienteEnEdicion: ClienteImport | null = null;
   mapaEdicion?: L.Map;
   marcadorEdicion?: L.Marker;
 
-  // Modal de confirmación custom
 
-
-  // Mapeo de días del Excel a las 3 rutas fijas de la BD
   private diasMap: { [key: string]: string } = {
     'LJ': 'Lunes - Jueves',
     'LUN': 'Lunes - Jueves',
@@ -85,7 +72,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
     'DOM': 'Miércoles - Sábado'
   };
 
-  // Índices de columnas del Excel
   private columnIndexes = {
     vis: 0,
     rec: 1,
@@ -118,7 +104,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   ) { }
 
   ngAfterViewInit() {
-    // Los mapas se inicializarán después de cargar los datos
   }
 
   // ========================================
@@ -165,7 +150,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       this.fechaReporte = this.extraerFecha(jsonData);
       this.datosExcel = this.procesarDatosExcel(jsonData);
 
-      // Agrupar clientes por días de visita
       this.agruparClientesPorDias();
 
       await loading.dismiss();
@@ -175,7 +159,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
       this.mostrarVistaPrevia = true;
 
-      // Inicializar mapa del primer tab después de que el DOM esté listo
       setTimeout(() => {
         const firstTab = this.mapasRutas[0];
         if (firstTab) {
@@ -186,7 +169,7 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       }, 200);
 
       await this.mostrarToast(
-        `✅ ${this.datosExcel.length} registros leídos correctamente`,
+        `${this.datosExcel.length} registros leídos correctamente`,
         'success'
       );
 
@@ -202,13 +185,11 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   async verificarDatosParaImportar() {
     this.verificandoPrecios = true;
 
-    // Obtener precios únicos
     const preciosMap = new Map<number, number>();
     this.datosExcel.forEach(c => {
       preciosMap.set(c.precioGarrafon, (preciosMap.get(c.precioGarrafon) || 0) + 1);
     });
 
-    // Verificar cuáles NO existen
     this.preciosFaltantes = [];
     for (const [precio, cantidad] of preciosMap) {
       try {
@@ -221,7 +202,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       }
     }
 
-    // Cargar personal
     try {
       this.supervisores = await this.importService.getSupervisores().toPromise() || [];
       this.repartidores = await this.importService.getRepartidores().toPromise() || [];
@@ -247,9 +227,8 @@ export class ImportarClientesModalComponent implements AfterViewInit {
     const { data } = await modal.onWillDismiss();
 
     if (data?.creado) {
-      // Remover de la lista de faltantes
       this.preciosFaltantes = this.preciosFaltantes.filter(p => p.precio !== precioInfo.precio);
-      await this.mostrarToast(`✅ Precio $${precioInfo.precio} creado`, 'success');
+      await this.mostrarToast(`Precio $${precioInfo.precio} creado`, 'success');
     }
   }
 
@@ -362,7 +341,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
         };
       });
 
-    console.log('📊 Mapas agrupados con coordenadas reales:', this.mapasRutas);
   }
 
   private async geocodificarClientes(clientes: ClienteImport[]): Promise<ClienteImport[]> {
@@ -372,11 +350,8 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       .filter(item => !item.cliente.latitud || !item.cliente.longitud);
 
     if (clientesSinCoords.length === 0) {
-      console.log('✅ Todos los clientes ya tienen coordenadas');
       return clientes;
     }
-
-    console.log(`📍 Geocodificando ${clientesSinCoords.length} direcciones...`);
 
     // Crear loading
     const loading = await this.loadingController.create({
@@ -416,7 +391,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
           cliente.longitud = coords.lng;
           geocodificadas++;
         } else {
-          // Fallback: usar coordenadas simuladas
           const simuladas = this.geocodingService.generarCoordenadasSimuladas();
           cliente.latitud = simuladas.lat;
           cliente.longitud = simuladas.lng;
@@ -425,17 +399,16 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       }
     });
 
-    console.log(`✅ Geocodificadas: ${geocodificadas}, Simuladas: ${fallback}`);
+    console.log(`Geocodificadas: ${geocodificadas}, Simuladas: ${fallback}`);
 
-    // Mostrar resultado
     if (fallback > 0) {
       await this.mostrarToast(
-        `⚠️ ${fallback} direcciones no se pudieron geocodificar`,
+        ` ${fallback} direcciones no se pudieron geocodificar`,
         'warning'
       );
     } else {
       await this.mostrarToast(
-        `✅ ${geocodificadas} direcciones geocodificadas`,
+        `${geocodificadas} direcciones geocodificadas`,
         'success'
       );
     }
@@ -459,7 +432,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
       if (!mapaRuta) return;
 
-      // Siempre recrear el mapa para evitar problemas de renderizado
       if (mapaRuta.mapa) {
         try {
           mapaRuta.mapa.off();
@@ -481,7 +453,7 @@ export class ImportarClientesModalComponent implements AfterViewInit {
     const mapElement = document.getElementById(`map-${index}`);
 
     if (!mapElement) {
-      console.error(`❌ No se encontró el elemento map-${index}`);
+      console.error(`No se encontró el elemento map-${index}`);
       return;
     }
 
@@ -518,10 +490,9 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
     const bounds = L.latLngBounds([]);
 
-    // Agregar marcadores (solo puntos, sin líneas)
     clientesConCoords.forEach((cliente) => {
       if (!cliente.latitud || !cliente.longitud) {
-        console.warn(`⚠️ Cliente sin coordenadas: ${cliente.numeroCliente}`);
+        console.warn(`Cliente sin coordenadas: ${cliente.numeroCliente}`);
         return;
       }
 
@@ -540,7 +511,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       bounds.extend([cliente.latitud, cliente.longitud]);
     });
 
-    // Ajustar vista al conjunto de marcadores
     if (bounds.isValid()) {
       mapa.fitBounds(bounds, {
         padding: [50, 50],
@@ -550,12 +520,11 @@ export class ImportarClientesModalComponent implements AfterViewInit {
 
     mapaRuta.mapa = mapa;
 
-    // Forzar invalidación después de crear
     setTimeout(() => {
       mapa.invalidateSize();
     }, 100);
 
-    console.log(`✅ Mapa ${index} inicializado con ${clientesConCoords.length} marcadores`);
+    console.log(`Mapa ${index} inicializado con ${clientesConCoords.length} marcadores`);
   }
 
   private configurarIconosLeaflet() {
@@ -568,8 +537,8 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   }
 
   private crearIconoMarcador(numero: number, seleccionado: boolean = false): L.DivIcon {
-    const colorPrimario = '#0044AA'; // Azul Agua Gugar
-    const colorSeleccionado = '#E50005'; // Rojo Agua Gugar
+    const colorPrimario = '#0044AA';
+    const colorSeleccionado = '#E50005';
     const color = seleccionado ? colorSeleccionado : colorPrimario;
 
     return L.divIcon({
@@ -601,7 +570,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
     this.clienteSeleccionado = cliente;
     console.log('Cliente seleccionado desde card:', cliente);
 
-    // Centrar mapa en el cliente
     const mapa = this.mapasRutas[mapaIndex].mapa;
     if (mapa && cliente.latitud && cliente.longitud) {
       mapa.setView([cliente.latitud, cliente.longitud], 16, {
@@ -635,7 +603,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   editarDireccion(cliente: ClienteImport, event: Event) {
     event.stopPropagation();
 
-    // Crear copia profunda del cliente para edición
     this.clienteEnEdicion = JSON.parse(JSON.stringify(cliente));
     this.mostrarModalEdicion = true;
 
@@ -660,13 +627,11 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       maxZoom: 19
     }).addTo(this.mapaEdicion);
 
-    // Crear marcador arrastrable
     this.marcadorEdicion = L.marker([lat, lng], {
       draggable: true,
       icon: this.crearIconoMarcador(1, true)
     }).addTo(this.mapaEdicion);
 
-    // Actualizar coordenadas al arrastrar
     this.marcadorEdicion.on('dragend', () => {
       const pos = this.marcadorEdicion!.getLatLng();
       if (this.clienteEnEdicion) {
@@ -710,7 +675,7 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       clienteOriginal.latitud = this.clienteEnEdicion.latitud;
       clienteOriginal.longitud = this.clienteEnEdicion.longitud;
 
-      await this.mostrarToast('✅ Dirección actualizada', 'success');
+      await this.mostrarToast('Dirección actualizada', 'success');
 
       // Encontrar el índice de la ruta que contiene este cliente
       const rutaIndex = this.mapasRutas.findIndex(mr =>
@@ -730,7 +695,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
         setTimeout(() => {
           this.inicializarMapaTab(rutaIndex);
 
-          // Actualizar selección si el cliente sigue seleccionado
           if (this.clienteSeleccionado?.numeroCliente === clienteOriginal.numeroCliente) {
             this.clienteSeleccionado = clienteOriginal;
           }
@@ -762,7 +726,7 @@ export class ImportarClientesModalComponent implements AfterViewInit {
     if (!this.puedeImportar) {
       console.log('no se puede');
 
-      await this.mostrarToast('⚠️ Completa todos los campos requeridos', 'warning');
+      await this.mostrarToast('Completa todos los campos requeridos', 'warning');
       return;
     }
 
@@ -774,12 +738,12 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   async importarABaseDatos() {
     this.loading = true;
     try {
-      console.log('datos para enviar',this.datosExcel, 'fecha',
-        this.fechaReporte,'nombre ruta',
+      console.log('datos para enviar', this.datosExcel, 'fecha',
+        this.fechaReporte, 'nombre ruta',
         this.nombreRuta, 'supervisorId',
-        this.supervisorId,'repartidorId',
+        this.supervisorId, 'repartidorId',
         this.repartidorId);
-      
+
 
       const resultado = await this.importService.importarClientes(
         this.datosExcel,
@@ -792,7 +756,7 @@ export class ImportarClientesModalComponent implements AfterViewInit {
       this.loading = false;
 
       if (resultado && resultado.success) {
-        await this.mostrarToast('✅ Importación exitosa', 'success');
+        await this.mostrarToast('Importación exitosa', 'success');
         this.modalController.dismiss({ success: true, data: resultado });
       } else {
         await this.mostrarError(resultado?.message || 'Error en la importación');
@@ -829,7 +793,6 @@ export class ImportarClientesModalComponent implements AfterViewInit {
   }
 
   cerrarModal() {
-    // Destruir mapas antes de cerrar
     this.mapasRutas.forEach(mr => {
       if (mr.mapa) {
         mr.mapa.remove();

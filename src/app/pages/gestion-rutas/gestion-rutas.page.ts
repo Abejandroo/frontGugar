@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { RutaService } from 'src/app/service/ruta.service';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
 import { ModificarrutaPage } from 'src/app/modal/modificarruta/modificarruta.page';
-import { DetalleRutaPage } from 'src/app/pages/detalle-ruta/detalle-ruta.page';
 import { ImportarClientesModalComponent } from '../../modal/importar-clientes-modal/importar-clientes-modal.component';
 import { AdminNavbarComponent } from "src/app/components/admin-navbar/admin-navbar.component";
 import { addIcons } from 'ionicons';
@@ -36,7 +35,6 @@ export class GestionRutasPage implements OnInit {
   textoBusqueda: string = '';
   mostrarFiltros: boolean = false;
 
-  // Mapeo de días de la semana
   private diasSemanaMap: { [key: string]: string } = {
     'Lunes - Jueves': 'Lun - Jue',
     'Martes - Viernes': 'Mar - Vie',
@@ -69,10 +67,6 @@ export class GestionRutasPage implements OnInit {
     this.cargarRutas();
   }
 
-  // ========================================
-  // CARGA DE DATOS
-  // ========================================
-
   cargarRutas() {
     this.rutasService.obtenerTodasLasRutas().subscribe({
       next: (data: any[]) => {
@@ -86,9 +80,6 @@ export class GestionRutasPage implements OnInit {
     });
   }
 
-  // ========================================
-  // FILTROS
-  // ========================================
 
   toggleFiltros() {
     this.mostrarFiltros = !this.mostrarFiltros;
@@ -97,7 +88,6 @@ export class GestionRutasPage implements OnInit {
   aplicarFiltros() {
     let resultado = [...this.rutas];
 
-    // Filtro por estado (solo del día actual)
     if (this.filtroEstado !== 'todos') {
       resultado = resultado.filter(ruta => {
         const diaActual = this.getDiaRutaActual(ruta);
@@ -105,7 +95,6 @@ export class GestionRutasPage implements OnInit {
       });
     }
 
-    // Filtro por búsqueda
     if (this.textoBusqueda.trim()) {
       const busqueda = this.textoBusqueda.toLowerCase();
       resultado = resultado.filter(ruta =>
@@ -123,29 +112,20 @@ export class GestionRutasPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  // ========================================
-  // HELPERS - DÍA ACTUAL
-  // ========================================
-
-  /**
-   * Obtiene el día de ruta que corresponde al día actual de la semana
-   */
   private getDiaRutaActual(ruta: any): any {
     if (!ruta.diasRuta || ruta.diasRuta.length === 0) return null;
 
-    const hoy = new Date().getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+    const hoy = new Date().getDay();
 
-    // Mapear día actual a la mini-ruta correspondiente
     let diaRutaBuscado = '';
-    if (hoy === 1 || hoy === 4) { // Lunes o Jueves
+    if (hoy === 1 || hoy === 4) {
       diaRutaBuscado = 'Lunes - Jueves';
-    } else if (hoy === 2 || hoy === 5) { // Martes o Viernes
+    } else if (hoy === 2 || hoy === 5) {
       diaRutaBuscado = 'Martes - Viernes';
-    } else if (hoy === 3 || hoy === 6) { // Miércoles o Sábado
+    } else if (hoy === 3 || hoy === 6) {
       diaRutaBuscado = 'Miércoles - Sábado';
     } else {
-      // Domingo u otro día sin ruta asignada
-      return ruta.diasRuta[0]; // Devolver la primera por defecto
+      return ruta.diasRuta[0];
     }
 
     return ruta.diasRuta.find((dr: any) => dr.diaSemana === diaRutaBuscado) || ruta.diasRuta[0];
@@ -176,29 +156,26 @@ export class GestionRutasPage implements OnInit {
     return colores[estado] || '#8e8e93';
   }
 
-  // ========================================
-  // HELPERS - PROGRESO
-  // ========================================
 
   getClientesTotalesDia(ruta: any): number {
     const diaActual = this.getDiaRutaActual(ruta);
     return diaActual?.clientesRuta?.length || 0;
   }
 
-getClientesVisitados(ruta: any): number {
+  getClientesVisitados(ruta: any): number {
     const diaActual = this.getDiaRutaActual(ruta);
 
     if (!diaActual || !diaActual.clientesRuta) {
-        return 0;
+      return 0;
     }
 
     const visitados = diaActual.clientesRuta.filter((clienteRuta: any) => {
-        return clienteRuta.venta && 
-               (clienteRuta.venta.estado === 'realizado' || clienteRuta.venta.estado === 'saltado');
+      return clienteRuta.venta &&
+        (clienteRuta.venta.estado === 'realizado' || clienteRuta.venta.estado === 'saltado');
     }).length;
 
     return visitados;
-}
+  }
 
   getProgresoRuta(ruta: any): number {
     const total = this.getClientesTotalesDia(ruta);
@@ -213,9 +190,6 @@ getClientesVisitados(ruta: any): number {
     return 'danger';
   }
 
-  // ========================================
-  // ACCIONES DE RUTAS
-  // ========================================
 
   async abrirOpcionesRuta(ruta: any) {
     const modal = await this.modalController.create({
@@ -335,20 +309,17 @@ getClientesVisitados(ruta: any): number {
   }
 
   async generarReporteSemanal() {
-  // Obtener ventas de la semana
-  this.reporteService.obtenerVentasSemana().subscribe({
-    next: async (ventas) => {
-      // Generar Excel
-      await this.reporteService.generarExcelSemanal(ventas);
-      this.mostrarToast('Reporte generado correctamente', 'success');
-    },
-    error: (err) => {
-      console.error('Error generando reporte:', err);
-      this.mostrarToast('Error al generar reporte', 'danger');
-    }
-  });
-}
-  // En gestion-rutas.page.ts
+    this.reporteService.obtenerVentasSemana().subscribe({
+      next: async (ventas) => {
+        await this.reporteService.generarExcelSemanal(ventas);
+        this.mostrarToast('Reporte generado correctamente', 'success');
+      },
+      error: (err) => {
+        console.error('Error generando reporte:', err);
+        this.mostrarToast('Error al generar reporte', 'danger');
+      }
+    });
+  }
 
   async abrirModalAgregarGrupo() {
     const modal = await this.modalController.create({
@@ -358,8 +329,7 @@ getClientesVisitados(ruta: any): number {
 
     const { data } = await modal.onDidDismiss();
 
-    // Verificamos que sea true explícitamente
-    if (data === true) { 
+    if (data === true) {
       this.mostrarToast('Ruta guardada exitosamente', 'success');
       this.cargarRutas();
     }
