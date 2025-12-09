@@ -73,7 +73,8 @@ import {
   list,
   calculatorOutline,
   informationCircle,
-  personOutline
+  personOutline,
+  informationCircleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -86,6 +87,7 @@ export class AppComponent {
  constructor(private readonly menu: MenuController, private readonly router: Router) {
   addIcons({
     'checkmark-circle-outline': checkmarkCircleOutline,
+    'information-circle-outline':informationCircleOutline,
   'person-circle-outline': personCircleOutline,
   'home-outline': homeOutline,
   'settings-outline': settingsOutline,

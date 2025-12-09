@@ -119,87 +119,87 @@ ion-toolbar {
   color: #10dc60;
 }
 
-// ion-backdrop {
-//   pointer-events: none !important; 
-// }
+ion-backdrop {
+  pointer-events: none !important; 
+}
 
-// ion-modal {
-//   pointer-events: auto !important;
+ion-modal {
+  pointer-events: auto !important;
 
-//   &::part(backdrop) {
-//     pointer-events: none !important; 
-//   }
+  &::part(backdrop) {
+    pointer-events: none !important; 
+  }
 
-//   .modal-wrapper {
-//     pointer-events: auto !important; 
-//   }
-// }
+  .modal-wrapper {
+    pointer-events: auto !important; 
+  }
+}
 
-// ion-alert {
-//   pointer-events: auto !important;
+ion-alert {
+  pointer-events: auto !important;
 
-//   &::part(backdrop) {
-//     pointer-events: none !important; 
-//   }
+  &::part(backdrop) {
+    pointer-events: none !important; 
+  }
 
-//   .alert-wrapper {
-//     pointer-events: auto !important;
-//   }
-// }
+  .alert-wrapper {
+    pointer-events: auto !important;
+  }
+}
 
-// ion-action-sheet {
-//   pointer-events: auto !important;
+ion-action-sheet {
+  pointer-events: auto !important;
 
-//   &::part(backdrop) {
-//     pointer-events: none !important; 
-//   }
+  &::part(backdrop) {
+    pointer-events: none !important; 
+  }
 
-//   .action-sheet-wrapper {
-//     pointer-events: auto !important;
-//   }
-// }
+  .action-sheet-wrapper {
+    pointer-events: auto !important;
+  }
+}
 
-// ion-loading {
-//   pointer-events: auto !important;
+ion-loading {
+  pointer-events: auto !important;
 
-//   &::part(backdrop) {
-//     pointer-events: none !important;
-//   }
-// }
+  &::part(backdrop) {
+    pointer-events: none !important;
+  }
+}
 
-// ion-toast {
-//   pointer-events: auto !important;
-// }
+ion-toast {
+  pointer-events: auto !important;
+}
 
 
 // ========================================
 // ESTILOS GENERALES
 // ========================================
 
-// 🚨 SOLUCIÓN PARA OVERLAYS EN ANDROID APK 🚨
+// // 🚨 SOLUCIÓN PARA OVERLAYS EN ANDROID APK 🚨
 
-// Asegurar que el botón flotante (FAB) esté encima de todo
-ion-fab {
-  z-index: 9999 !important;
-}
+// // Asegurar que el botón flotante (FAB) esté encima de todo
+// ion-fab {
+//   z-index: 9999 !important;
+// }
 
-// Asegurar que la barra de navegación inferior esté siempre interactiva
-ion-tab-bar {
-  z-index: 9998 !important; // Un poco menos para no tapar el FAB
-}
+// // Asegurar que la barra de navegación inferior esté siempre interactiva
+// ion-tab-bar {
+//   z-index: 9998 !important; // Un poco menos para no tapar el FAB
+// }
 
-// Ya manejas los modales con pointer-events, pero un z-index alto no está de más
-ion-menu,
-ion-modal,
-ion-backdrop,
-ion-alert,
-ion-loading,
-ion-action-sheet,
-ion-toast {
-  z-index: 9999 !important;
-}
+// // Ya manejas los modales con pointer-events, pero un z-index alto no está de más
+// ion-menu,
+// ion-modal,
+// ion-backdrop,
+// ion-alert,
+// ion-loading,
+// ion-action-sheet,
+// ion-toast {
+//   z-index: 9999 !important;
+// }
 
-// ... (El resto de tus estilos generales)
+// // ... (El resto de tus estilos generales)
 
 ion-item ion-icon {
   color: rgb(68, 68, 68) !important;
