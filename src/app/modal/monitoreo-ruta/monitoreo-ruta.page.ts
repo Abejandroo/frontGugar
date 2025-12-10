@@ -4,7 +4,7 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
 import * as L from 'leaflet';
 import { addIcons } from 'ionicons';
-import { close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle } from 'ionicons/icons';
+import { close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle, locationOutline } from 'ionicons/icons';
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
@@ -39,7 +39,7 @@ export class MonitoreoRutaPage implements OnInit, AfterViewInit, OnDestroy {
     private rutasService: RutaService,
     private toastCtrl: ToastController
   ) {
-    addIcons({ close, map, location, timeOutline, car, businessOutline, checkmarkCircle, searchOutline, closeCircle });
+    addIcons({close,car,businessOutline,locationOutline,map,location,timeOutline,checkmarkCircle,searchOutline,closeCircle});
   }
 
   ngOnInit() {

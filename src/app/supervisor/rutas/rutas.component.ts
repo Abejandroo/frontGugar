@@ -89,4 +89,5 @@ export class RutasComponent implements OnInit {
     }
     return total;
   }
+  
 }
