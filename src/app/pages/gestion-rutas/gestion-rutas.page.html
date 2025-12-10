@@ -13,12 +13,8 @@
       </div>
 
       <div class="search-wrapper">
-        <ion-searchbar 
-          [(ngModel)]="textoBusqueda" 
-          (ionInput)="onBuscar($event)" 
-          placeholder="Buscar ruta o repartidor..."
-          mode="ios"
-          class="custom-searchbar">
+        <ion-searchbar [(ngModel)]="textoBusqueda" (ionInput)="onBuscar($event)"
+          placeholder="Buscar ruta o repartidor..." mode="ios" class="custom-searchbar">
         </ion-searchbar>
       </div>
     </div>
@@ -26,86 +22,103 @@
 
   <div class="white-container">
 
-      <div class="tabs-container">
-        <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()" mode="ios" class="custom-segment" scrollable>
-          <ion-segment-button value="todos">
-            <ion-label>Todas</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="en_curso">
-            <ion-label>En Curso</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="pendiente">
-            <ion-label>Pendientes</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="completada">
-            <ion-label>Fin</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
+    <div class="tabs-container">
+      <ion-segment [(ngModel)]="filtroEstado" (ionChange)="aplicarFiltros()" mode="ios" class="custom-segment"
+        scrollable>
+        <ion-segment-button value="todos">
+          <ion-label>Todas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="en_curso">
+          <ion-label>En Curso</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pendiente">
+          <ion-label>Pendientes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completada">
+          <ion-label>Fin</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
 
     <div class="actions-row">
       <ion-button fill="outline" shape="round" size="small" (click)="abrirImportador()">
         <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
         Importar Excel
       </ion-button>
-      <ion-button fill="outline" shape="round" size="small" color="secondary" (click)="generarReporteSemanal()">
+      <!-- <ion-button fill="outline" shape="round" size="small" color="secondary" (click)="generarReporteSemanal()">
         <ion-icon name="download-outline" slot="start"></ion-icon>
         Reporte Semanal
-      </ion-button>
+      </ion-button> -->
     </div>
 
-    <div class="lista-container">
-      @for (ruta of rutasFiltradas; track ruta.id) {
-        
-        <div class="clean-card" (click)="abrirOpcionesRuta(ruta)">
-          
-          <div class="card-icon-box">
-            <ion-icon name="map-outline"></ion-icon>
-          </div>
+<div class="lista-container">
+  @for (ruta of rutasFiltradas; track ruta.id) {
 
-          <div class="card-info">
-            <div class="card-header-row">
-              <h3 class="ruta-title">{{ ruta.nombre }}</h3>
-              <div class="status-dot" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
-            </div>
-            
-            <div class="meta-row">
-              <span>Ruta #{{ ruta.id }}</span> • 
-              <span>{{ getDiaVisitaActual(ruta) }}</span>
-            </div>
+  <div class="clean-card" (click)="abrirOpcionesRuta(ruta)">
 
-            <div class="staff-row">
-              <div class="staff-item">
-                <ion-icon name="person-circle-outline"></ion-icon>
-                <span>{{ ruta.supervisor?.name || 'S/A' }}</span>
-              </div>
-              <div class="staff-item">
-                <ion-icon name="bicycle-outline"></ion-icon>
-                <span>{{ ruta.repartidor?.name || 'S/A' }}</span>
-              </div>
-            </div>
+    <div class="card-icon-box">
+      <ion-icon name="map-outline"></ion-icon>
+    </div>
 
-            <div class="progress-section">
-              <div class="progress-text">
-                {{ getClientesVisitados(ruta) }}/{{ getClientesTotalesDia(ruta) }} clientes
-              </div>
-              <ion-progress-bar [value]="getProgresoRuta(ruta)" [color]="getColorProgreso(ruta)"></ion-progress-bar>
-            </div>
-          </div>
+    <div class="card-info">
+      <div class="card-header-row">
+        <h3 class="ruta-title">{{ ruta.nombre }}</h3>
+        @if (getDiaRutaActual(ruta)) { 
+          <div class="status-dot" [style.background-color]="getColorEstadoDiaActual(ruta)"></div>
+        }
+      </div>
 
-          <div class="arrow-container">
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </div>
+      <div class="meta-row">
+        <span>Ruta #{{ ruta.id }}</span> •
+        <span>
+          {{ getDiaRutaActual(ruta) ? 
+            (getDiaRutaActual(ruta).dividida ? 
+            'Ruta dividida (' + getDiaRutaActual(ruta).diaSemana + ')' :
+            getDiaVisitaActual(ruta)) 
+            : 'Hoy no es dia de visita'
+          }}
+        </span>
+      </div>
 
+      <div class="staff-row">
+        <div class="staff-item">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <span>{{ ruta.supervisor?.name || 'S/A' }}</span>
         </div>
+        <div class="staff-item">
+          <ion-icon name="bicycle-outline"></ion-icon>
+          <span>{{ ruta.repartidor?.name || 'S/A' }}</span>
+        </div>
+      </div>
 
-      } @empty {
-        <div class="empty-state">
-          <ion-icon name="map-outline" size="large"></ion-icon>
-          <p>No hay rutas con el filtro seleccionado</p>
+      @if (getDiaRutaActual(ruta)) {
+<div class="progress-section">
+          
+          <div class="progress-text">
+            {{ 
+              getDiaRutaActual(ruta).dividida ? 
+              (getClientesTotalesDia(ruta) + ' clientes') : 
+              (getClientesVisitados(ruta) + '/' + getClientesTotalesDia(ruta) + ' clientes') 
+            }}
+          </div>
+          
+          @if (!getDiaRutaActual(ruta).dividida) {
+            <ion-progress-bar [value]="getProgresoRuta(ruta)" [color]="getColorProgreso(ruta)"></ion-progress-bar>
+          }
+          
         </div>
       }
     </div>
+
+    <div class="arrow-container">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+
+  </div>
+
+  } @empty {
+    }
+</div>
 
     <div style="height: 100px;"></div>
   </div>

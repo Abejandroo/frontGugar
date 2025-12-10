@@ -57,7 +57,7 @@
                 </div>
                 <div class="meta-row">
                   <ion-icon name="person-circle-outline"></ion-icon>
-                  <span>Sup: {{ diaRuta.ruta.supervisor.name || 'Sin asignar' }}</span>
+                  <span>Sup: {{ diaRuta.ruta.supervisor ? diaRuta.ruta.supervisor.name : 'SIN ASIGNAR' }}</span>
                 </div>
 
                 <div class="progress-section">

@@ -115,30 +115,25 @@ export class ResultadoDivisionModalComponent implements OnInit {
 
     this.authService.getUsuarios().subscribe({
       next: (usuarios) => {
-        this.repartidores = usuarios.filter(u => u.role === 'repartidor');
+        this.repartidores = usuarios.filter(u => u.role === 'repartidor');        
       }
     });
   }
-  async mostrarDetalle(subRuta: SubRutaResult, titulo: string) {
-    const listaClientes = subRuta.clientes
-      .map((c, i) => `${i + 1}. ${c.nombre}<br><small>${c.direccion}</small>`)
-      .join('<br><br>');
 
-    const alert = await this.alertController.create({
-      header: titulo,
-      message: `
-        <div style="text-align: left;">
-          <strong>Total: ${subRuta.totalClientes} clientes</strong><br>
-          <strong>Distancia: ${subRuta.distanciaKm} km</strong><br>
-          <strong>Tiempo: ${subRuta.tiempoMinutos} min</strong><br><br>
-          ${listaClientes}
-        </div>
-      `,
-      buttons: ['Cerrar']
-    });
+async mostrarDetalle(subRuta: SubRutaResult, titulo: string) {
+  const listaClientes = subRuta.clientes
+    .map((c, i) => `${i + 1}. ${c.nombre} - ${c.direccion}`)
+    .join(' • ');
 
-    await alert.present();
-  }
+  const alert = await this.alertController.create({
+    header: titulo,
+    message: `Total: ${subRuta.totalClientes} clientes | Distancia: ${subRuta.distanciaKm} km | Tiempo: ${subRuta.tiempoMinutos} min • ${listaClientes}`,
+    buttons: ['Cerrar']
+  });
+
+  await alert.present();
+}
+
 
   async aceptarYGuardar() {
     if (this.idRepartidorASeleccionado === null || this.idRepartidorBSeleccionado === null) {
@@ -169,11 +164,11 @@ export class ResultadoDivisionModalComponent implements OnInit {
         const alert = await this.alertController.create({
           header: 'Sub-Rutas Guardadas',
           message: `
-                    <strong>Las sub-rutas han sido creadas exitosamente:</strong><br><br>
-                    📍 ${resultado.subRutaA.nombre} (${resultado.subRutaA.totalClientes} clientes)<br>
-                    📍 ${resultado.subRutaB.nombre} (${resultado.subRutaB.totalClientes} clientes)<br><br>
-                    La ruta original "${resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida" y sus clientes fueron reasignados.<br><br>
-                    <strong>Ahora puedes asignar estas sub-rutas a diferentes repartidores.</strong>
+                    Las sub-rutas han sido creadas exitosamente:
+                    📍 ${resultado.subRutaA.nombre} (${resultado.subRutaA.totalClientes} clientes)
+                    📍 ${resultado.subRutaB.nombre} (${resultado.subRutaB.totalClientes} clientes) |
+                     • La ruta original "${resultado.rutaOriginal.diaSemana}" ha sido marcada como "Dividida" y sus clientes fueron reasignados
+                    Ahora puedes asignar estas sub-rutas a diferentes repartidores.
                 `,
           buttons: [
             {

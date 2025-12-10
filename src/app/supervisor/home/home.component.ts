@@ -12,14 +12,15 @@ import {
 } from 'ionicons/icons';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
+import { ClienteService } from 'src/app/service/cliente.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone: true,
-  imports: [ CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents],
-  providers:[...IonicControllers]
+  imports: [CommonModule, SupervisorNavbarComponent, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class HomeComponent implements OnInit {
 
@@ -30,6 +31,7 @@ export class HomeComponent implements OnInit {
   rutasCompletadasCount: number = 0;
   incidenciasCount: number = 0;
   repartidoresCount: number = 0;
+  supervisorId: number = 0;
 
   segmentoActual: string = 'activas';
   todasLasRutas: any[] = [];
@@ -38,7 +40,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: Auth,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private clienteService: ClienteService,
   ) {
     addIcons({
       mapOutline, checkmarkDoneCircleOutline, alertCircleOutline,
@@ -58,6 +61,7 @@ export class HomeComponent implements OnInit {
     if (usuarioGuardado) {
       const user = JSON.parse(usuarioGuardado);
       this.userName = user.name || 'Supervisor';
+      this.supervisorId = user.id;
     }
   }
 
@@ -77,9 +81,9 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    this.authService.obtenerRutas().subscribe({
-      next: (rutas: any[]) => {
-        this.todasLasRutas = rutas;
+    this.clienteService.obtenerRutasDeSupervisor(this.supervisorId).subscribe({
+      next: (datos) => {
+        this.todasLasRutas = datos.asignados || [];
         this.calcularIndicadores();
         this.filtrarRutas();
       },
@@ -96,8 +100,7 @@ export class HomeComponent implements OnInit {
     const diaDeHoy = ruta.diasRuta.find((d: any) => d.diaSemana.includes(nombreDiaHoy));
 
     if (diaDeHoy) {
-      return diaDeHoy.estado;
-    }
+return diaDeHoy.estado || 'pendiente';    }
 
     return 'pendiente';
   }

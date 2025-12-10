@@ -123,6 +123,8 @@ export class RepartidorRutasPage implements OnInit {
     this.rutasDelDia = this.diasRutaAsignados.filter((diaRuta: DiaRuta) => {
       return this.verificarSiEsHoyDiaVisita(diaRuta.diaSemana);
     });
+    console.log('jijij',this.rutasDelDia);
+    
 
   }
 

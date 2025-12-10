@@ -45,9 +45,9 @@ export class AgregarrutaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   diasSemana = [
-    { value: 'Lunes - Jueves', label: 'Lunes - Jueves' },
-    { value: 'Martes - Viernes', label: 'Martes - Viernes' },
-    { value: 'Miercoles - Sábado', label: 'Miércoles - Sábado' }
+    { value: 'Lunes-Jueves', label: 'Lunes - Jueves' },
+    { value: 'Martes-Viernes', label: 'Martes - Viernes' },
+    { value: 'Miércoles-Sábado', label: 'Miércoles - Sábado' }
   ];
 
   // Leaflet

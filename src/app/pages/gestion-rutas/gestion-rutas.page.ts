@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {  ModalController, ToastController,  AlertController } from '@ionic/angular';
+import { ModalController, ToastController, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RutaService } from 'src/app/service/ruta.service';
 import { AgregarrutaPage } from 'src/app/modal/agregarruta/agregarruta.page';
@@ -27,8 +27,8 @@ import { IonicControllers } from 'src/app/ionic-controller.providers';
   templateUrl: './gestion-rutas.page.html',
   styleUrls: ['./gestion-rutas.page.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, AdminNavbarComponent, ...IonicSharedComponents],
-  providers:[...IonicControllers]
+  imports: [CommonModule, FormsModule, AdminNavbarComponent, ...IonicSharedComponents],
+  providers: [...IonicControllers]
 })
 export class GestionRutasPage implements OnInit {
   rutas: any[] = [];
@@ -84,9 +84,7 @@ export class GestionRutasPage implements OnInit {
   }
 
 
-  toggleFiltros() {
-    this.mostrarFiltros = !this.mostrarFiltros;
-  }
+
 
   aplicarFiltros() {
     let resultado = [...this.rutas];
@@ -108,6 +106,7 @@ export class GestionRutasPage implements OnInit {
     }
 
     this.rutasFiltradas = resultado;
+    console.log('jhjhjh', this.rutasFiltradas);
   }
 
   onBuscar(event: any) {
@@ -115,23 +114,28 @@ export class GestionRutasPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  private getDiaRutaActual(ruta: any): any {
+  getDiaRutaActual(ruta: any): any {
     if (!ruta.diasRuta || ruta.diasRuta.length === 0) return null;
 
     const hoy = new Date().getDay();
 
     let diaRutaBuscado = '';
     if (hoy === 1 || hoy === 4) {
-      diaRutaBuscado = 'Lunes - Jueves';
+      diaRutaBuscado = 'Lunes-Jueves';
     } else if (hoy === 2 || hoy === 5) {
-      diaRutaBuscado = 'Martes - Viernes';
+      diaRutaBuscado = 'Martes-Viernes';
     } else if (hoy === 3 || hoy === 6) {
-      diaRutaBuscado = 'Miércoles - Sábado';
-    } else {
-      return ruta.diasRuta[0];
-    }
+      diaRutaBuscado = 'Miércoles-Sábado';
+    } 
 
-    return ruta.diasRuta.find((dr: any) => dr.diaSemana === diaRutaBuscado) || ruta.diasRuta[0];
+    console.log('rutaa',ruta);
+    
+
+    const si = ruta.diasRuta.find((dr: any) => dr.diaSemana === diaRutaBuscado)
+    console.log(si);
+    
+    return si 
+    
   }
 
   getDiaVisitaActual(ruta: any): string {
@@ -173,8 +177,7 @@ export class GestionRutasPage implements OnInit {
     }
 
     const visitados = diaActual.clientesRuta.filter((clienteRuta: any) => {
-      return clienteRuta.venta &&
-        (clienteRuta.venta.estado === 'realizado' || clienteRuta.venta.estado === 'saltado');
+      return clienteRuta.visitado === true;
     }).length;
 
     return visitados;
@@ -245,13 +248,8 @@ export class GestionRutasPage implements OnInit {
     const alert = await this.alertController.create({
       header: '⚠️ Eliminar Ruta',
       message: `
-        <div style="text-align: left;">
-          <p><strong>¿Estás seguro de eliminar "Ruta Centro"?</strong></p>
-          <ul>
-            <li><strong>45</strong> clientes asignados</li>
-            <li><strong>3</strong> días de ruta</li>
-          </ul>
-        </div>
+          ¿Estás seguro de eliminar ${ruta.nombre}? • 
+          ${totalClientes} clientes asignados
     `,
       cssClass: 'alert-eliminar-ruta',
       buttons: [

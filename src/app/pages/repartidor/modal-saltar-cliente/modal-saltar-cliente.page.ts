@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {  ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { VentaService } from 'src/app/service/venta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
@@ -11,11 +11,11 @@ import { IonicControllers } from 'src/app/ionic-controller.providers';
   templateUrl: './modal-saltar-cliente.page.html',
   styleUrls: ['./modal-saltar-cliente.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
+  imports: [CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
   providers: [...IonicControllers]
 })
 export class ModalSaltarClientePage implements OnInit {
-  
+
   @Input() clienteRuta: any;
   @Input() diaRutaId: number = 0;
 
@@ -37,7 +37,7 @@ export class ModalSaltarClientePage implements OnInit {
     private fb: FormBuilder,
     private ventaService: VentaService,
     private toastController: ToastController
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.formSaltar = this.fb.group({
@@ -55,7 +55,7 @@ export class ModalSaltarClientePage implements OnInit {
     this.guardando = true;
 
     const motivoTexto = this.motivosSalto.find(m => m.valor === this.formSaltar.value.motivo)?.texto || '';
-    const motivoCompleto = this.formSaltar.value.observaciones 
+    const motivoCompleto = this.formSaltar.value.observaciones
       ? `${motivoTexto} - ${this.formSaltar.value.observaciones}`
       : motivoTexto;
 
@@ -69,16 +69,36 @@ export class ModalSaltarClientePage implements OnInit {
 
     this.ventaService.registrarVenta(venta).subscribe({
       next: () => {
-        this.mostrarToast('Cliente saltado', 'warning');
-        this.modalController.dismiss({
-          saltado: true,
-          motivo: motivoCompleto
-        });
+        this.marcarComoVisitado();
       },
       error: (err) => {
         console.error('Error al saltar cliente:', err);
         this.mostrarToast('Error al saltar cliente', 'danger');
         this.guardando = false;
+      }
+    });
+  }
+
+  marcarComoVisitado() {
+    this.ventaService.marcarClienteVisitado(
+      this.clienteRuta.id,
+      true,
+      0 // 0 garrafones porque fue saltado
+    ).subscribe({
+      next: () => {
+        this.mostrarToast('Cliente saltado', 'warning');
+        this.modalController.dismiss({
+          saltado: true,
+          motivo: this.formSaltar.value.motivo
+        });
+      },
+      error: (err) => {
+        console.error('Error marcando como visitado:', err);
+        // Aún así cerrar el modal
+        this.modalController.dismiss({
+          saltado: true,
+          motivo: this.formSaltar.value.motivo
+        });
       }
     });
   }

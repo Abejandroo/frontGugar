@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {  ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { VentaService } from 'src/app/service/venta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
@@ -11,11 +11,11 @@ import { IonicControllers } from 'src/app/ionic-controller.providers';
   templateUrl: './modal-agregar-venta.page.html',
   styleUrls: ['./modal-agregar-venta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
+  imports: [CommonModule, ReactiveFormsModule, ...IonicSharedComponents],
   providers: [...IonicControllers]
 })
 export class ModalAgregarVentaPage implements OnInit {
-  
+
   @Input() clienteRuta: any;
   @Input() diaRutaId: number = 0;
 
@@ -27,7 +27,7 @@ export class ModalAgregarVentaPage implements OnInit {
     private fb: FormBuilder,
     private ventaService: VentaService,
     private toastController: ToastController
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.formVenta = this.fb.group({
@@ -70,13 +70,7 @@ export class ModalAgregarVentaPage implements OnInit {
 
     this.ventaService.registrarVenta(venta).subscribe({
       next: () => {
-        this.mostrarToast('Venta registrada', 'success');
-        this.modalController.dismiss({
-          guardado: true,
-          venta: {
-            garrafones: this.formVenta.value.cantidadVendida
-          }
-        });
+        this.marcarComoVisitado(this.formVenta.value.cantidadVendida);
       },
       error: (err) => {
         console.error('Error guardando venta:', err);
@@ -85,6 +79,34 @@ export class ModalAgregarVentaPage implements OnInit {
       }
     });
   }
+
+  marcarComoVisitado(garrafones: number) {
+  this.ventaService.marcarClienteVisitado(
+    this.clienteRuta.id,
+    true,
+    garrafones
+  ).subscribe({
+    next: () => {
+      this.mostrarToast('Venta registrada', 'success');
+      this.modalController.dismiss({
+        guardado: true,
+        venta: {
+          garrafones: garrafones
+        }
+      });
+    },
+    error: (err) => {
+      console.error('Error marcando como visitado:', err);
+      // Aún así cerrar el modal porque la venta sí se guardó
+      this.modalController.dismiss({
+        guardado: true,
+        venta: {
+          garrafones: garrafones
+        }
+      });
+    }
+  });
+}
 
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({

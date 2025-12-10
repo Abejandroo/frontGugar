@@ -15,6 +15,16 @@ export class VentaService {
     return this.http.post(`${this.url}/ventas`, venta);
   }
 
+  marcarClienteVisitado(clienteRutaId: number, visitado: boolean, garrafones: number) {
+  return this.http.patch(
+    `${this.url}/rutas/cliente-ruta/${clienteRutaId}/visitado`,
+    {
+      visitado: visitado,
+      garrafonesVendidos: garrafones
+    }
+  );
+}
+
   obtenerVentasPorDiaRuta(diaRutaId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}/ventas/dia-ruta/${diaRutaId}`);
   }

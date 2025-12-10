@@ -14,6 +14,7 @@ import { MonitoreoRutaPage } from 'src/app/modal/monitoreo-ruta/monitoreo-ruta.p
 import { RutaService } from 'src/app/service/ruta.service';
 import { IonicSharedComponents } from 'src/app/ionic-standalone-imports';
 import { IonicControllers } from 'src/app/ionic-controller.providers';
+import { ClienteService } from 'src/app/service/cliente.service';
 
 @Component({
   selector: 'app-rutas',
@@ -27,11 +28,14 @@ export class RutasComponent implements OnInit {
 
   rutas: any[] = [];
   cargando: boolean = true;
+    supervisorId: number = 0; 
+
 
   constructor(
     private rutaService: RutaService,
     private router: Router,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private clienteService: ClienteService,
   ) {
     addIcons({
       mapOutline,
@@ -45,16 +49,27 @@ export class RutasComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.cargarDatosSupervisor();
     this.cargarRutas();
+  }
+
+
+    cargarDatosSupervisor() {
+    const usuarioStr = localStorage.getItem('usuario');
+    if (usuarioStr) {
+      const usuario = JSON.parse(usuarioStr);
+      this.supervisorId = usuario.id;
+      console.log('✅ Supervisor ID:', this.supervisorId);
+    }
   }
 
   cargarRutas() {
     this.cargando = true;
-    this.rutaService.obtenerTodasLasRutas().subscribe({
-      next: (res) => {
-        this.rutas = res;
+ this.clienteService.obtenerRutasDeSupervisor(this.supervisorId).subscribe({
+      next: (datos) => {
+        this.rutas = datos.asignados || [];
         this.cargando = false;
-        console.log('Rutas cargadas:', this.rutas);
+        console.log('✅ Rutas del supervisor:', this.rutas);
       },
       error: (err) => {
         console.error('Error al cargar rutas:', err);
@@ -81,13 +96,8 @@ export class RutasComponent implements OnInit {
   }
 
   contarClientes(ruta: any): number {
-    let total = 0;
-    if (ruta.diasRuta) {
-      ruta.diasRuta.forEach((dia: any) => {
-        if (dia.clientes) total += dia.clientes.length;
-      });
-    }
-    return total;
+    return ruta.totalClientes || 0;
+
   }
   
 }

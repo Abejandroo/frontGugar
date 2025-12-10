@@ -79,6 +79,10 @@ export class ClientesComponent implements OnInit {
     this.cargando = true;
     this.clienteService.obtenerRutasDeSupervisor(this.supervisorId).subscribe({
       next: (datos) => {
+
+        console.log('✅ Datos recibidos del backend:', datos);
+      console.log('📊 Cantidad de rutas asignadas:', datos.asignados?.length || 0);
+      console.log('📊 Total clientes asignados:', datos.totalAsignados);
         this.datosAgrupados = datos;
         this.cargando = false;
       },

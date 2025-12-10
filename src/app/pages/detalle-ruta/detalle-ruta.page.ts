@@ -35,7 +35,7 @@ import { IonicControllers } from 'src/app/ionic-controller.providers';
   templateUrl: './detalle-ruta.page.html',
   styleUrls: ['./detalle-ruta.page.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, ...IonicSharedComponents],
+  imports: [CommonModule, FormsModule, ...IonicSharedComponents],
   providers: [...IonicControllers]
 })
 export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
@@ -266,7 +266,7 @@ export class DetalleRutaPage implements OnInit, AfterViewInit, OnDestroy {
       if (dia.clientesRuta && dia.clientesRuta.length > 0) {
         listaCruda = dia.clientesRuta.map((cr: any) => ({
           ...cr,
-          visitado: cr.venta && (cr.venta.estado === 'realizado' || cr.venta.estado === 'saltado'),
+          visitado: cr.visitado === true,
         }));
       } else if (dia.clientes && dia.clientes.length > 0) {
         listaCruda = dia.clientes.map((c: any, i: number) => ({
